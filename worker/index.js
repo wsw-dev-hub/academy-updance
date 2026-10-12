@@ -1907,15 +1907,14 @@ async function lerReputacao(env, email) {
    GET /api/perfil/resumo — painel "Meu perfil" do membro logado.
    Junta, numa chamada, o que já existe espalhado pelo sistema:
    envios de desafios (trilhas + Árvore de Talentos), habilidades,
-   títulos/insígnias, reputação, ranking por XP, participações em
+   títulos/insígnias, reputação, ranking por XP e participações em
    eventos promovidos pela plataforma (tabelas eventos e
-   evento_participacoes) e atividade recente.
+   evento_participacoes). Não lê a tabela events (registro de ações).
    Cada seção é lida à parte: se uma consulta falhar, as demais
    seguem e o nome da seção volta em `falhas`.
    Ranking: nunca devolve e-mail de terceiros — só iniciais e XP.
 ================================================================ */
 const PERFIL_TOP = 5;
-const PERFIL_ATIVIDADE = /^(member_|magic_|reset_concluido|trilha_desafio_|talento_desafio_|talento_plano_|reputacao_)/;
 
 async function perfilResumo(request, env) {
   const m = await getMember(request, env);
@@ -1929,7 +1928,7 @@ async function perfilResumo(request, env) {
   };
   const todos = (sql, ...args) => env.DB.prepare(sql).bind(...args).all().then(r => r.results || []);
 
-  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, atividade, eventos] = await Promise.all([
+  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, eventos] = await Promise.all([
     secao('membro', () => env.DB.prepare(
       'SELECT name, created_at FROM members WHERE email = ?'
     ).bind(email).first(), null),
@@ -1978,20 +1977,6 @@ async function perfilResumo(request, env) {
       'SELECT titulo_id AS id, perfil_id AS grupo FROM talent_titulos WHERE email = ?', email), []),
     secao('reputacao', () => lerReputacao(env, email), { global: { pr: 0, pd: 0, n: 0 }, porPerfil: {}, titulos: [] }),
     secao('ranking', () => perfilRanking(env, email), null),
-    /* Atividade: só tipos do próprio percurso do membro; o detalhe bruto nunca
-       sai (pode conter o e-mail de quem avaliou) — apenas o id do desafio. */
-    secao('atividade', async () => (await todos(
-      'SELECT type AS tipo, detail AS detalhe, created_at AS em FROM events ' +
-      ' WHERE email = ? ORDER BY created_at DESC LIMIT 60', email))
-      .filter(a => PERFIL_ATIVIDADE.test(a.tipo || '') && !/_erro$/.test(a.tipo))
-      .slice(0, 20)
-      .map(a => {
-        const semAutor = String(a.detalhe || '').split(' por ')[0];
-        const i = semAutor.indexOf(': ');
-        const ref = (i >= 0 ? semAutor.slice(i + 2) : semAutor).split(' ')[0].slice(0, 80);
-        return { tipo: a.tipo, em: a.em, ref: ref || null };
-      }), []),
-
     /* Eventos da plataforma (presenciais ou on-line) em que o membro se
        inscreveu. Inscrições canceladas e eventos inativos ficam de fora. */
     secao('eventos', () => todos(
@@ -2023,7 +2008,6 @@ async function perfilResumo(request, env) {
     titulos: { insignias, talentos: titulosTal },
     reputacao,
     ranking,
-    atividade,
     eventos,
     falhas,
   });

@@ -4,8 +4,8 @@
    ----------------------------------------------------------------
    Lê GET /api/perfil/resumo (uma chamada) e monta o painel:
    ritmo diário, desafios, habilidades, eventos da plataforma
-   (presenciais e on-line), experiência, ranking, títulos,
-   reputação e atividade (ações do próprio membro).
+   (presenciais e on-line), experiência, ranking, títulos e
+   reputação.
    Usa, só para exibir nomes, os módulos já existentes:
      /js/talentTree.data.js  → window.UDX_TALENTOS (títulos da Árvore)
      /js/reputacao.data.js   → window.UDX_REP (bandas e títulos)
@@ -46,23 +46,6 @@
   /* Ordem base → topo dos tipos de membro (MEMBER_TYPES do worker). */
   var ORDEM_TIPOS = ['Free', 'Iniciante', 'Intermediário', 'Técnico', 'Estagiário(a)',
                      'Monitor(a)', 'Assistente', 'Professor(a)', 'Premium'];
-
-  /* Atividade: rótulo por tipo de evento registrado pelo worker. */
-  var ATIVIDADE = {
-    member_cadastro:          { txt: 'Criou a conta',                         cor: '#8F7CFF' },
-    member_confirmado:        { txt: 'Confirmou o e-mail',                    cor: '#8F7CFF' },
-    member_login:             { txt: 'Entrou na área de membros',             cor: 'rgba(223,224,242,.45)' },
-    magic_login_ok:           { txt: 'Entrou por link de acesso',             cor: 'rgba(223,224,242,.45)' },
-    reset_concluido:          { txt: 'Criou uma nova senha',                  cor: 'rgba(223,224,242,.45)' },
-    trilha_desafio_pendente:  { txt: 'Enviou um desafio de trilha',           cor: '#8F7CFF', desafio: true },
-    trilha_desafio_aprovado:  { txt: 'Desafio de trilha aprovado',            cor: '#FA33A1', desafio: true },
-    trilha_desafio_recusado:  { txt: 'Desafio de trilha recusado',            cor: '#F27405', desafio: true },
-    talento_desafio_pendente: { txt: 'Enviou um desafio da Árvore de Talentos', cor: '#8F7CFF', desafio: true },
-    talento_desafio_aprovado: { txt: 'Desafio da Árvore de Talentos aprovado', cor: '#FA33A1', desafio: true },
-    talento_desafio_recusado: { txt: 'Desafio da Árvore de Talentos recusado', cor: '#F27405', desafio: true },
-    talento_plano_salvo:      { txt: 'Salvou um plano da Árvore de Talentos', cor: '#8F7CFF' },
-    reputacao_reavaliar:      { txt: 'Nota de desempenho revisada',           cor: '#F2B807', desafio: true }
-  };
 
   /* ---------------- utilitários ---------------- */
   function $(s, r) { return (r || doc).querySelector(s); }
@@ -441,8 +424,7 @@
 
   /* ================================================================
      EVENTOS — encontros presenciais e on-line promovidos pela plataforma
-     (tabelas eventos + evento_participacoes). Não confundir com a
-     "Atividade recente", que é o registro de ações do próprio membro.
+     (tabelas eventos + evento_participacoes).
   ================================================================ */
   /* Eventos são marcados no horário de Brasília: exibimos sempre nele, com a
      indicação "(Brasília)" para quem estiver com o aparelho em outro fuso. */
@@ -686,20 +668,6 @@
   }
 
   /* ================================================================
-     ATIVIDADE RECENTE
-  ================================================================ */
-  function renderAtividade(d, v) {
-    var nomes = {}; v.lista.forEach(function (x) { nomes[x.id] = x.nome; });
-    var itens = (d.atividade || []).filter(function (a) { return ATIVIDADE[a.tipo]; }).slice(0, 12);
-    $('#pfAtividade').innerHTML = itens.length
-      ? '<ol class="pf-tempo">' + itens.map(function (a) {
-          var m = ATIVIDADE[a.tipo], extra = m.desafio && a.ref && nomes[a.ref] ? ': ' + nomes[a.ref] : '';
-          return '<li style="--marca:' + m.cor + '">' + esc(m.txt + extra) + '<small>' + esc(quando(data(a.em))) + '</small></li>';
-        }).join('') + '</ol>'
-      : '<div class="pf-vazio">Sem atividade registrada ainda.</div>';
-  }
-
-  /* ================================================================
      MONTAGEM, EVENTOS E CARGA
   ================================================================ */
   var deriv = null;
@@ -707,7 +675,7 @@
     var d = estado.dados; deriv = derivar(d);
     renderHero(d, deriv); renderHoje(deriv); renderGrafico(deriv);
     renderDesafios(d, deriv); renderHabilidades(d, deriv); renderEventos(d);
-    renderXp(d, deriv); renderRanking(d); renderTitulos(d); renderReputacao(d); renderAtividade(d, deriv);
+    renderXp(d, deriv); renderRanking(d); renderTitulos(d); renderReputacao(d);
     var falhas = d.falhas || [];
     var aviso = $('#pfAviso');
     if (falhas.length) {

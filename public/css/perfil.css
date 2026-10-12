@@ -378,23 +378,6 @@
 }
 .page-perfil .pf-sala:hover{ background: rgba(143,124,255,.35); }
 
-/* ---------------- atividade ---------------- */
-.page-perfil .pf-tempo{ list-style: none; margin: 0; padding: 0 0 0 4px; display: grid; gap: 0; }
-.page-perfil .pf-tempo li{
-  position: relative; padding: 0 0 14px 22px;
-  font-size: 13px; color: var(--udx-text); line-height: 1.45;
-}
-.page-perfil .pf-tempo li::before{
-  content: ""; position: absolute; left: 3px; top: 6px; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--marca, var(--pf-enviado));
-  box-shadow: 0 0 0 2px #0a0828;
-}
-.page-perfil .pf-tempo li::after{
-  content: ""; position: absolute; left: 6.5px; top: 16px; bottom: 0; width: 1px; background: var(--pf-line);
-}
-.page-perfil .pf-tempo li:last-child::after{ display: none; }
-.page-perfil .pf-tempo small{ display: block; color: var(--pf-muted); font-size: 11.5px; }
-
 /* ---------------- carregando ---------------- */
 .page-perfil .pf-esqueleto{
   border-radius: 10px; min-height: 18px;
