@@ -166,6 +166,7 @@ export default {
       // ---- TRILHAS DE NÍVEL (Free / Iniciante / Intermediário) ----
       if (pathname === '/api/trilha/estado')                                 return trilhaEstado(request, env, url);
       if (pathname === '/api/reputacao/estado')                              return reputacaoEstado(request, env);
+      if (pathname === '/api/perfil/resumo')                                 return perfilResumo(request, env);
       if (pathname === '/api/trilha/desafio' && request.method === 'POST')   return trilhaEnviarDesafio(request, env);
 
       // ---- ÁRVORE DE TALENTOS (admin) ----
@@ -1900,4 +1901,174 @@ async function lerReputacao(env, email) {
     else porPerfil[r.perfil_id] = { pr: r.pr, pd: r.pd, n: r.n_avaliacoes };
   }
   return { global, porPerfil, titulos: (tit.results || []) };
+}
+
+/* ================================================================
+   GET /api/perfil/resumo — painel "Meu perfil" do membro logado.
+   Junta, numa chamada, o que já existe espalhado pelo sistema:
+   envios de desafios (trilhas + Árvore de Talentos), habilidades,
+   títulos/insígnias, reputação, ranking por XP e atividade recente.
+   Cada seção é lida à parte: se uma consulta falhar, as demais
+   seguem e o nome da seção volta em `falhas`.
+   Ranking: nunca devolve e-mail de terceiros — só iniciais e XP.
+================================================================ */
+const PERFIL_TOP = 5;
+const PERFIL_ATIVIDADE = /^(member_|magic_|reset_concluido|trilha_desafio_|talento_desafio_|talento_plano_|reputacao_)/;
+
+async function perfilResumo(request, env) {
+  const m = await getMember(request, env);
+  if (!m) return json(null, 401);
+  const email = m.email;
+  const types = Array.isArray(m.types) && m.types.length ? m.types : [m.type || 'Free'];
+  const falhas = [];
+  const secao = async (nome, fn, vazio) => {
+    try { return await fn(); }
+    catch (e) { console.error('perfilResumo/' + nome + ':', (e && e.message) || e); falhas.push(nome); return vazio; }
+  };
+  const todos = (sql, ...args) => env.DB.prepare(sql).bind(...args).all().then(r => r.results || []);
+
+  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, atividade] = await Promise.all([
+    secao('membro', () => env.DB.prepare(
+      'SELECT name, created_at FROM members WHERE email = ?'
+    ).bind(email).first(), null),
+
+    secao('niveis', () => env.DB.prepare('SELECT id, nome FROM trilha_niveis').all().then(r => r.results || []), []),
+    secao('perfisTalento', () => env.DB.prepare('SELECT id, nome FROM talent_perfis').all().then(r => r.results || []), []),
+
+    secao('desafios', () => todos(
+      "SELECT 'trilha' AS origem, p.desafio_id AS id, p.nivel_id AS grupo, p.xp, p.status, " +
+      '       p.parecer, p.created_at AS enviado, p.reviewed_at AS avaliado, ' +
+      '       d.nome, d.tipo, d.habilidade_id AS hab, h.nome AS hab_nome ' +
+      '  FROM trilha_progresso p ' +
+      '  JOIN trilha_desafios d ON d.id = p.desafio_id ' +
+      '  LEFT JOIN trilha_habilidades h ON h.id = d.habilidade_id ' +
+      ' WHERE p.email = ?1 ' +
+      'UNION ALL ' +
+      "SELECT 'talentos', p.desafio_id, p.perfil_id, p.xp, p.status, " +
+      '       p.parecer, p.created_at, p.reviewed_at, ' +
+      '       d.nome, d.tipo, d.habilidade_id, h.nome ' +
+      '  FROM talent_progresso p ' +
+      '  JOIN talent_desafios d ON d.id = p.desafio_id ' +
+      '  LEFT JOIN talent_habilidades h ON h.id = d.habilidade_id ' +
+      ' WHERE p.email = ?1 ' +
+      'ORDER BY enviado DESC', email), []),
+
+    /* Totais por habilidade — só das habilidades em que o membro já enviou algo. */
+    secao('habilidades', () => todos(
+      "SELECT 'trilha' AS origem, d.habilidade_id AS id, h.nome, d.nivel_id AS grupo, " +
+      '       COUNT(*) AS total, SUM(d.xp) AS xp_total ' +
+      '  FROM trilha_desafios d LEFT JOIN trilha_habilidades h ON h.id = d.habilidade_id ' +
+      ' WHERE d.ativo = 1 AND d.habilidade_id IN ( ' +
+      '   SELECT d2.habilidade_id FROM trilha_progresso p2 ' +
+      '     JOIN trilha_desafios d2 ON d2.id = p2.desafio_id WHERE p2.email = ?1) ' +
+      ' GROUP BY d.habilidade_id ' +
+      'UNION ALL ' +
+      "SELECT 'talentos', d.habilidade_id, h.nome, d.perfil_id, COUNT(*), SUM(d.xp) " +
+      '  FROM talent_desafios d LEFT JOIN talent_habilidades h ON h.id = d.habilidade_id ' +
+      ' WHERE d.ativo = 1 AND d.habilidade_id IN ( ' +
+      '   SELECT d2.habilidade_id FROM talent_progresso p2 ' +
+      '     JOIN talent_desafios d2 ON d2.id = p2.desafio_id WHERE p2.email = ?1) ' +
+      ' GROUP BY d.habilidade_id', email), []),
+
+    secao('insignias', () => todos(
+      'SELECT insignia_id AS id, nivel_id AS grupo, created_at AS em FROM trilha_insignias WHERE email = ?', email), []),
+    secao('titulosTalento', () => todos(
+      'SELECT titulo_id AS id, perfil_id AS grupo FROM talent_titulos WHERE email = ?', email), []),
+    secao('reputacao', () => lerReputacao(env, email), { global: { pr: 0, pd: 0, n: 0 }, porPerfil: {}, titulos: [] }),
+    secao('ranking', () => perfilRanking(env, email), null),
+    /* Atividade: só tipos do próprio percurso do membro; o detalhe bruto nunca
+       sai (pode conter o e-mail de quem avaliou) — apenas o id do desafio. */
+    secao('atividade', async () => (await todos(
+      'SELECT type AS tipo, detail AS detalhe, created_at AS em FROM events ' +
+      ' WHERE email = ? ORDER BY created_at DESC LIMIT 60', email))
+      .filter(a => PERFIL_ATIVIDADE.test(a.tipo || '') && !/_erro$/.test(a.tipo))
+      .slice(0, 20)
+      .map(a => {
+        const semAutor = String(a.detalhe || '').split(' por ')[0];
+        const i = semAutor.indexOf(': ');
+        const ref = (i >= 0 ? semAutor.slice(i + 2) : semAutor).split(' ')[0].slice(0, 80);
+        return { tipo: a.tipo, em: a.em, ref: ref || null };
+      }), []),
+  ]);
+
+  const mapa = (rows) => Object.fromEntries((rows || []).map(r => [r.id, r.nome]));
+  const trilhas = {};
+  for (const [id, cfg] of Object.entries(TRILHAS)) {
+    trilhas[id] = { limiar: cfg.limiar, insignia: cfg.insignia };
+  }
+
+  return json({
+    versao: 1,
+    membro: {
+      nome:  (membro && membro.name) || '',
+      email,
+      tipos: types,
+      desde: (membro && membro.created_at) || null,
+    },
+    config:  { trilhas, xpPorPonto: TALENTOS_XP_POR_PONTO },
+    nomes:   { niveis: mapa(niveis), perfisTalento: mapa(perfisTal) },
+    desafios,
+    habilidades,
+    titulos: { insignias, talentos: titulosTal },
+    reputacao,
+    ranking,
+    atividade,
+    falhas,
+  });
+}
+
+/* Ranking por XP aprovado: geral, por trilha (nivel_id) e Árvore de Talentos.
+   Posição em "competição" (empates dividem a posição). Só entra quem tem XP > 0. */
+async function perfilRanking(env, email) {
+  const rows = (await env.DB.prepare(
+    'SELECT email, escopo, SUM(xp) AS xp FROM ( ' +
+    "  SELECT email, nivel_id AS escopo, xp FROM trilha_progresso WHERE status = 'aprovado' " +
+    '  UNION ALL ' +
+    "  SELECT email, 'talentos' AS escopo, xp FROM talent_progresso WHERE status = 'aprovado' " +
+    ') GROUP BY email, escopo'
+  ).all()).results || [];
+
+  const porEscopo = { geral: new Map() };
+  for (const r of rows) {
+    const xp = Number(r.xp) || 0;
+    if (xp <= 0) continue;
+    (porEscopo[r.escopo] ||= new Map()).set(r.email, xp);
+    porEscopo.geral.set(r.email, (porEscopo.geral.get(r.email) || 0) + xp);
+  }
+
+  const escopos = {}; const emailsTop = new Set();
+  for (const [escopo, mapa] of Object.entries(porEscopo)) {
+    const lista = [...mapa.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
+    const posDe = (xp) => 1 + lista.filter(([, v]) => v > xp).length;
+    const meu = mapa.get(email) || 0;
+    const acima = lista.filter(([, v]) => v > meu).map(([, v]) => v);
+    const top = lista.slice(0, PERFIL_TOP).map(([e, xp]) => ({ e, pos: posDe(xp), xp }));
+    top.forEach(t => emailsTop.add(t.e));
+    escopos[escopo] = {
+      participantes: lista.length,
+      xp: meu,
+      pos: meu > 0 ? posDe(meu) : null,
+      faltam: acima.length ? Math.min(...acima) - meu : 0,   // XP até a posição de cima
+      top,
+    };
+  }
+
+  /* Iniciais de quem aparece no top — nome cadastrado, ou "?" se não houver. */
+  const nomes = {};
+  const lista = [...emailsTop];
+  if (lista.length) {
+    const ph = lista.map(() => '?').join(',');
+    const rs = (await env.DB.prepare('SELECT email, name FROM members WHERE email IN (' + ph + ')').bind(...lista).all()).results || [];
+    for (const r of rs) nomes[r.email] = r.name || '';
+  }
+  const iniciais = (nome) => {
+    const partes = String(nome || '').trim().split(/\s+/).filter(Boolean);
+    if (!partes.length) return '?';
+    const a = partes[0][0], b = partes.length > 1 ? partes[partes.length - 1][0] : '';
+    return (a + b).toUpperCase();
+  };
+  for (const esc of Object.values(escopos)) {
+    esc.top = esc.top.map(t => ({ pos: t.pos, xp: t.xp, iniciais: iniciais(nomes[t.e]), voce: t.e === email }));
+  }
+  return escopos;
 }
