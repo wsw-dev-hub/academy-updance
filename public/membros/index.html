@@ -83,6 +83,9 @@
     cursor: pointer;
     transition: background-color 280ms ease, border-color 280ms ease, color 280ms ease;
   }
+  .members-topbar .btn-perfil{
+    display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+  }
   .members-topbar .btn-sair:hover{
     background-color: rgba(223, 224, 242, 0.08);
     border-color: var(--udx-primary-hot);
@@ -362,6 +365,10 @@
       <span id="typeBadgeLabel">—</span>
     </span>
     <span class="spacer"></span>
+    <a class="btn-sair btn-perfil" href="/membros/perfil/">
+      <span class="mdi mdi-account-star-outline" aria-hidden="true"></span>
+      Meu perfil
+    </a>
     <button class="btn-sair" id="sair">Sair</button>
   </header>
 
