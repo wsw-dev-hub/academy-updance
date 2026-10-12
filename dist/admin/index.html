@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — Painel</title>
+<link rel="icon" type="image/x-icon" href="/images/icons/udx-icon.ico">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital@1&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.9.96/css/materialdesignicons.min.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  :root{
+    /* ── Paleta oficial UDX ── */
+    --c-orange:  #F27405;
+    --c-pink:    #FA33A1;
+    --c-magenta: #8C0783;
+    --c-purple:  #5708A6;
+    --c-indigo:  #430ABF;
+    --c-navy:    #110273;
+    --c-blue:    #030BA6;
+    --c-cream:   #DFE0F2;
+
+    /* Superfícies e texto */
+    --bg:        #02021a;
+    --bg-elev:   #0a0736;
+    --card:      rgba(17, 2, 115, 0.32);
+    --card-2:    rgba(67, 10, 191, 0.18);
+    --line:      rgba(223, 224, 242, 0.10);
+    --line-soft: rgba(223, 224, 242, 0.06);
+
+    --txt:   #DFE0F2;
+    --muted: #9a97c4;
+    --faint: #6f6c94;
+
+    --accent:      #FA33A1;
+    --accent-soft: rgba(250, 51, 161, 0.16);
+
+    /* Gradientes (espelham --udx-grad-* do format.css) */
+    --grad-hot:  linear-gradient(135deg, #F27405 0%, #FA33A1 55%, #8C0783 100%);
+    --grad-cool: linear-gradient(135deg, #5708A6 0%, #110273 100%);
+    --grad-club: linear-gradient(135deg, #FA33A1 0%, #110273 100%);
+
+    --ok:   #5fe0a4;
+    --warn: #ffce6a;
+    --err:  #ff7591;
+
+    --radius-md:   14px;
+    --radius-lg:   22px;
+    --shadow-card: 0 10px 30px rgba(3, 11, 166, 0.22);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(80% 60% at 15% 0%, rgba(87, 8, 166, .28) 0%, transparent 60%),
+      radial-gradient(70% 50% at 100% 0%, rgba(250, 51, 161, .12) 0%, transparent 55%),
+      var(--bg);
+    color:var(--txt);
+    font-family:'Poppins', sans-serif;
+    font-size:14px; line-height:1.5;
+    padding:1.25rem 1.25rem 3rem;
+    max-width:1360px; margin:0 auto;
+  }
+  a{color:inherit}
+
+  /* ── Cabeçalho ── */
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; gap:.7rem; flex-wrap:wrap;
+    padding:.85rem 1rem;
+    margin:-1.25rem -1.25rem 1.6rem;
+    background:linear-gradient(180deg, rgba(2,2,26,.92) 0%, rgba(2,2,26,.72) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar img{width:34px;height:34px;flex:0 0 auto}
+  .marca{
+    font-family:'Playfair Display', serif; font-style:italic;
+    font-size:1.4rem;
+    background: var(--grad-hot);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .tag{
+    font-size:.62rem; letter-spacing:.16em; text-transform:uppercase;
+    color:#fff; padding:.24rem .6rem; border-radius:999px;
+    background: var(--grad-cool);
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .spacer{flex:1}
+  .ghost-btn{
+    display:inline-flex; align-items:center; gap:.4rem;
+    background:transparent; border:1px solid var(--line); color:var(--txt);
+    font-family:'Poppins', sans-serif; font-size:.82rem; font-weight:500;
+    cursor:pointer; padding:.5rem .9rem; border-radius:10px;
+    transition:transform .15s ease, border-color .2s, background .2s, color .2s;
+  }
+  .ghost-btn:hover{
+    border-color:var(--accent); color:#fff;
+    background:var(--accent-soft); transform:translateY(-1px);
+  }
+  .ghost-btn:active{transform:translateY(0)}
+  .ghost-btn:disabled{opacity:.5;cursor:default;transform:none}
+  .ghost-btn .mdi{font-size:1rem;line-height:1}
+
+  /* ── Cartões de estatística ── */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:.9rem; margin-bottom:1.8rem;
+  }
+  .stat{
+    position:relative; overflow:hidden;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:1.1rem 1.2rem;
+    box-shadow:var(--shadow-card);
+    transition:transform .15s ease, border-color .2s;
+  }
+  .stat:hover{transform:translateY(-2px);border-color:rgba(250,51,161,.35)}
+  .stat::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background:var(--grad-cool);
+  }
+  .stat .ico{
+    position:absolute; right:.9rem; top:.9rem;
+    font-size:1.35rem; color:var(--muted); opacity:.75;
+  }
+  .stat .n{font-size:2rem;font-weight:700;line-height:1;letter-spacing:-.02em}
+  .stat .l{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);margin-top:.55rem}
+  .stat.accent::before{background:var(--grad-hot)}
+  .stat.accent .n{
+    background:var(--grad-hot);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .stat.danger::before{background:linear-gradient(135deg,#ff7591,#F20505)}
+  .stat.danger .n{color:var(--err)}
+
+  /* ── Abas ── */
+  .tabs{
+    display:flex; gap:.3rem; flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    margin-bottom:1.2rem;
+  }
+  .tab{
+    display:inline-flex; align-items:center; gap:.45rem;
+    background:transparent; border:0; border-bottom:2px solid transparent;
+    color:var(--muted);
+    font-family:'Poppins', sans-serif; font-size:.9rem; font-weight:500;
+    cursor:pointer; padding:.65rem .95rem; margin-bottom:-1px;
+    transition:.2s; border-radius:8px 8px 0 0;
+  }
+  .tab .mdi{font-size:1rem}
+  .tab:hover{color:var(--txt);background:rgba(250,51,161,.05)}
+  .tab.active{
+    color:#fff; border-bottom-color:var(--accent);
+    background:linear-gradient(180deg, transparent 0%, rgba(250,51,161,.08) 100%);
+  }
+  .tab .count{font-size:.72rem;color:var(--faint);margin-left:.15rem}
+  .tab.active .count{color:var(--accent)}
+
+  /* ── Painéis / Tabelas ── */
+  .panel{display:none}
+  .panel.active{display:block;animation:fadein .25s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    background:var(--card);
+    box-shadow:var(--shadow-card);
+  }
+  table{width:100%;border-collapse:collapse;min-width:560px}
+  thead th{
+    font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted); text-align:left; font-weight:600;
+    padding:.85rem 1rem;
+    background:rgba(3,11,166,.18);
+    border-bottom:1px solid var(--line); white-space:nowrap;
+    position:sticky; top:0;
+  }
+  tbody td{padding:.8rem 1rem;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr{transition:background .15s}
+  tbody tr:hover{background:rgba(250,51,161,.05)}
+  td.email{font-weight:500;color:#fff}
+  td.dim{color:var(--muted)}
+  td.mono{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted);font-size:.82rem}
+
+  .badge{
+    display:inline-flex; align-items:center; gap:.3rem;
+    font-size:.68rem; font-weight:600; letter-spacing:.03em;
+    padding:.22rem .6rem; border-radius:999px;
+    border:1px solid transparent; white-space:nowrap;
+  }
+  .badge.ok{color:var(--ok);border-color:rgba(95,224,164,.35);background:rgba(95,224,164,.10)}
+  .badge.pending{color:var(--warn);border-color:rgba(255,206,106,.35);background:rgba(255,206,106,.10)}
+  .badge.err{color:var(--err);border-color:rgba(255,117,145,.35);background:rgba(255,117,145,.10)}
+  .badge.neutral{color:var(--muted);border-color:var(--line);background:rgba(223,224,242,.03)}
+
+  /* Inputs / selects inline */
+  .type-sel{
+    background:rgba(2,2,26,.55); color:#fff;
+    border:1px solid var(--line); border-radius:8px;
+    padding:.42rem .55rem;
+    font:inherit; font-size:.82rem;
+    cursor:pointer; transition:border-color .2s, background .2s;
+  }
+  .type-sel:hover{border-color:rgba(250,51,161,.35)}
+  .type-sel:focus{outline:none;border-color:var(--accent);background:rgba(2,2,26,.75);
+    box-shadow:0 0 0 3px rgba(250,51,161,.15)}
+  .type-sel.saving{opacity:.6;pointer-events:none}
+  .type-sel.ok{border-color:var(--ok)}
+  .type-sel.err{border-color:var(--err)}
+
+  /* Checkbox grid de tipos */
+  .type-chk-grid{
+    display:flex; flex-wrap:wrap; gap:4px 8px;
+    padding:5px 6px; border-radius:8px;
+    border:1px solid var(--line);
+    background:rgba(2,2,26,.45);
+    transition:border-color .2s; min-width:220px;
+  }
+  .type-chk-grid.saving{opacity:.6;pointer-events:none}
+  .type-chk-grid.ok{border-color:var(--ok)}
+  .type-chk-grid.err{border-color:var(--err)}
+  .type-chk-item{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 7px; border-radius:6px; cursor:pointer;
+    font-size:.75rem; color:var(--txt);
+    border:1px solid transparent;
+    transition:background .15s, border-color .15s;
+  }
+  .type-chk-item:hover{background:rgba(250,51,161,.08);border-color:rgba(250,51,161,.18)}
+  .type-chk-item input{margin:0;cursor:pointer;accent-color:var(--accent)}
+
+  /* Estados */
+  .state{padding:3rem 1.2rem;text-align:center;color:var(--muted);font-size:.9rem}
+  .state.err{color:var(--err)}
+  .empty{
+    padding:2.4rem 1.2rem; text-align:center;
+    color:var(--faint); font-size:.86rem;
+    background:var(--card); border:1px dashed var(--line);
+    border-radius:var(--radius-md);
+  }
+  .updated{color:var(--faint);font-size:.74rem;margin-top:1rem;text-align:right}
+
+  /* ── Formulário de produto + linhas de vínculo ── */
+  .prod-form h4{ margin:1.4rem 0 .6rem; color:var(--txt); font-size:.9rem; font-weight:600; }
+  .prod-links-wrap{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    gap:.35rem; padding:.5rem;
+    border:1px solid var(--line); border-radius:10px;
+    background: rgba(2,2,26,.35);
+    max-height:340px; overflow-y:auto;
+  }
+  .prod-link-row{
+    display:flex; align-items:center; gap:.5rem;
+    padding:.4rem .55rem; border-radius:8px;
+    border:1px solid transparent; cursor:pointer;
+    transition:background .15s, border-color .15s;
+  }
+  .prod-link-row:hover{ background:rgba(250,51,161,.06); border-color:rgba(250,51,161,.18); }
+  .prod-link-row input[type="checkbox"]{ accent-color:var(--accent); cursor:pointer; }
+  .prod-link-label{ flex:1; min-width:0; font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .prod-link-pos{ padding:.25rem .4rem !important; font-size:.75rem !important; text-align:center; }
+  .prod-link-pos:disabled{ opacity:.4; cursor:not-allowed; }
+
+    /* ── CTA da aba Avaliações (estado sem persistência server-side) ── */
+  .avaliacoes-cta{
+    display:flex; flex-direction:column; align-items:center; gap:1rem;
+    padding:2.6rem 1.4rem;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius-md); box-shadow:var(--shadow-card);
+    text-align:center;
+  }
+  .avaliacoes-cta__icon{
+    width:56px; height:56px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--grad-hot);
+    box-shadow:0 8px 22px rgba(250,51,161,.28);
+  }
+  .avaliacoes-cta__icon .mdi{ font-size:1.7rem; color:#fff; line-height:1; }
+  .avaliacoes-cta h3{
+    margin:0; font-size:1.05rem; font-weight:600; color:#fff;
+    letter-spacing:-.01em;
+  }
+  .avaliacoes-cta p{
+    margin:0; max-width:520px;
+    color:var(--muted); font-size:.86rem; line-height:1.55;
+  }
+  .avaliacoes-cta__link{
+    display:inline-flex; align-items:center; gap:.5rem;
+    margin-top:.4rem; padding:.7rem 1.15rem;
+    border-radius:10px; border:0; cursor:pointer;
+    color:#fff; font-family:'Poppins', sans-serif; font-weight:600; font-size:.9rem;
+    background:var(--grad-hot);
+    box-shadow:0 6px 20px rgba(250,51,161,.32);
+    text-decoration:none;
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .avaliacoes-cta__link:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 26px rgba(250,51,161,.42);
+    color:#fff;
+  }
+  .avaliacoes-cta__link:active{ transform:translateY(0); }
+  .avaliacoes-cta__link .mdi{ font-size:1.05rem; line-height:1; }
+  .avaliacoes-cta__hint{
+    font-size:.72rem; color:var(--faint); letter-spacing:.03em;
+  }
+
+  /* ── Breakpoints alinhados com mediaQuery.css ── */
+  @media (max-width:480px){
+    body{padding:1rem 1rem 2rem}
+    .topbar{margin:-1rem -1rem 1.2rem;padding:.75rem .85rem;gap:.5rem}
+    .marca{font-size:1.15rem}
+    .tag{display:none}
+    .ghost-btn{padding:.45rem .7rem;font-size:.78rem}
+    .stats{grid-template-columns:repeat(2,1fr);gap:.6rem}
+    .stat{padding:.9rem .95rem}
+    .stat .n{font-size:1.5rem}
+    .stat .ico{font-size:1.1rem;top:.7rem;right:.7rem}
+    .tab{padding:.55rem .7rem;font-size:.82rem}
+    .tab .count{display:none}
+    thead th, tbody td{padding:.65rem .75rem}
+    .avaliacoes-cta{padding:2rem 1rem}
+    .avaliacoes-cta h3{font-size:.98rem}
+    .avaliacoes-cta p{font-size:.82rem}
+  }
+  @media (min-width:481px) and (max-width:575px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (min-width:576px) and (max-width:767px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (min-width:768px){ body{font-size:14.5px} }
+  @media (min-width:992px){ .stats{grid-template-columns:repeat(4,1fr)} }
+</style>
+</head>
+<body>
+    <script src="/js/loader.js"></script>
+  <header class="topbar">
+    <img src="/images/icons/udx-icon.png" alt="">
+    <span class="marca">Up Dance</span>
+    <span class="tag">Admin</span>
+    <span class="spacer"></span>
+    <button class="ghost-btn" id="refresh"><span class="mdi mdi-refresh"></span>Atualizar</button>
+    <button class="ghost-btn" id="logout"><span class="mdi mdi-logout"></span>Sair</button>
+  </header>
+
+  <main id="root">
+    <div class="state" id="loading">Carregando dados…</div>
+    <div id="content" hidden>
+      <section class="stats" id="stats"></section>
+
+      <nav class="tabs" id="tabs">
+        <button class="tab active" data-tab="members"><span class="mdi mdi-account-multiple"></span>Membros<span class="count" id="c-members"></span></button>
+        <button class="tab" data-tab="subscribers"><span class="mdi mdi-email-outline"></span>Inscritos<span class="count" id="c-subscribers"></span></button>
+        <button class="tab" data-tab="access" title="Pacotes: cards da área de membros e regras de acesso por tipo"><span class="mdi mdi-package-variant-closed"></span>Pacotes<span class="count" id="c-access"></span></button>
+        <button class="tab" data-tab="produtos" title="Itens contidos nos pacotes: conteúdos que aparecem dentro dos cards"><span class="mdi mdi-cube-outline"></span>Itens<span class="count" id="c-produtos"></span></button>
+        <button class="tab" data-tab="avaliacoes" title="Fichas de avaliação de alunos (editor)"><span class="mdi mdi-clipboard-text-outline"></span>Avaliações<span class="count" id="c-avaliacoes"></span></button>
+        <button class="tab" data-tab="events"><span class="mdi mdi-history"></span>Eventos<span class="count" id="c-events"></span></button>
+      </nav>
+
+      <section class="panel active" id="panel-members"></section>
+      <section class="panel" id="panel-subscribers"></section>
+      <section class="panel" id="panel-access"></section>
+      <section class="panel" id="panel-produtos"></section>
+      <section class="panel" id="panel-avaliacoes"></section>
+      <section class="panel" id="panel-events"></section>
+
+      <p class="updated" id="updated"></p>
+    </div>
+  </main>
+
+<script>
+  "use strict";
+
+  /* ── helpers ── */
+  function esc(v){
+    if(v===null||v===undefined||v==="") return "";
+    return String(v).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function fmtDate(v){
+    if(!v) return "—";
+    var d=new Date(v);
+    if(isNaN(d)) return esc(v);
+    return d.toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+  }
+  function statusBadge(s){
+    var v=(s||"").toLowerCase(), cls="neutral", label=s||"—";
+    if(v==="active"||v==="confirmed"){cls="ok";label=v==="active"?"ativo":"confirmado";}
+    else if(v==="pending"){cls="pending";label="pendente";}
+    return '<span class="badge '+cls+'">'+esc(label)+'</span>';
+  }
+  function eventBadge(type){
+    var t=(type||"").toLowerCase(), cls="neutral";
+    if(t.indexOf("_erro")>-1) cls="err";
+    else if(t.indexOf("login")>-1||t.indexOf("confirmado")>-1||t.indexOf("_ok")>-1) cls="ok";
+    else if(t.indexOf("pendente")>-1||t.indexOf("enviado")>-1) cls="pending";
+    return '<span class="badge '+cls+'">'+esc(type||"—")+'</span>';
+  }
+  function el(id){return document.getElementById(id);}
+
+  /* ── tabela genérica de pessoas (membros / inscritos) ── */
+  function peopleTable(rows){
+    if(!rows||!rows.length) return '<div class="empty">Nenhum registro ainda.</div>';
+    var body=rows.map(function(r){
+      return '<tr>'+
+        '<td class="email">'+esc(r.email)+'</td>'+
+        '<td class="dim">'+(esc(r.name)||"—")+'</td>'+
+        '<td class="dim">'+(esc(r.phone)||"—")+'</td>'+
+        '<td>'+statusBadge(r.status)+'</td>'+
+        '<td class="mono">'+fmtDate(r.created_at)+'</td>'+
+        '<td class="mono">'+fmtDate(r.confirmed_at)+'</td>'+
+      '</tr>';
+    }).join("");
+    return '<div class="table-wrap"><table>'+
+      '<thead><tr><th>E-mail</th><th>Nome</th><th>Telefone</th><th>Status</th><th>Criado em</th><th>Confirmado em</th></tr></thead>'+
+      '<tbody>'+body+'</tbody></table></div>';
+  }
+
+  /* ── tabela de membros (com coluna Tipos editável — múltiplos) ── */
+  // atualSet: Set<string> com os tipos atuais do membro; types: catálogo MEMBER_TYPES
+  function typeChecklist(email, atualSet, types){
+    var atualCsv = [...(atualSet||[])].join(",");
+    var items = (types||[]).map(function(t){
+      var checked = atualSet.has(t) ? ' checked' : '';
+      return '<label class="type-chk-item" title="'+esc(t)+'">'+
+        '<input type="checkbox" class="type-chk" data-email="'+esc(email)+'" value="'+esc(t)+'"'+checked+'>'+
+        '<span>'+esc(t)+'</span>'+
+      '</label>';
+    }).join("");
+    return '<div class="type-chk-grid" data-email="'+esc(email)+'" data-atual="'+esc(atualCsv)+'">'+items+'</div>';
+  }
+
+  function membersTable(rows, types){
+    if(!rows||!rows.length) return '<div class="empty">Nenhum membro ainda.</div>';
+    var body=rows.map(function(r){
+      // r.types (array) vem do backend; se ainda não veio, cai para [r.type] (compat)
+      var atuais = Array.isArray(r.types) ? r.types : (r.type ? [r.type] : []);
+      return '<tr>'+
+        '<td class="email">'+esc(r.email)+'</td>'+
+        '<td class="dim">'+(esc(r.name)||"—")+'</td>'+
+        '<td class="dim">'+(esc(r.phone)||"—")+'</td>'+
+        '<td>'+statusBadge(r.status)+'</td>'+
+        '<td>'+typeChecklist(r.email, new Set(atuais), types)+'</td>'+
+        '<td class="mono">'+fmtDate(r.created_at)+'</td>'+
+        '<td class="mono">'+fmtDate(r.confirmed_at)+'</td>'+
+      '</tr>';
+    }).join("");
+    return '<div class="table-wrap"><table>'+
+      '<thead><tr><th>E-mail</th><th>Nome</th><th>Telefone</th><th>Status</th><th>Tipos</th><th>Criado em</th><th>Confirmado em</th></tr></thead>'+
+      '<tbody>'+body+'</tbody></table></div>';
+  }
+
+  function bindTypeChecklists(container){
+    container.querySelectorAll(".type-chk-grid").forEach(function(grid){
+      var email = grid.dataset.email;
+
+      // um único listener por grid captura todos os cliques nos checkboxes filhos
+      grid.addEventListener("change", function(){
+        var novos = [...grid.querySelectorAll(".type-chk:checked")].map(function(c){ return c.value; });
+        if(!novos.length){
+          alert("Selecione ao menos 1 tipo.");
+          // reverte visualmente: remarca o último estado válido
+          restaurarChecks(grid, grid.dataset.atual);
+          return;
+        }
+        var novoCsv = novos.join(",");
+        if(novoCsv === grid.dataset.atual) return;
+
+        grid.classList.remove("ok","err");
+        grid.classList.add("saving");
+        fetch("/api/admin/member/update-type",{
+          method:"POST", credentials:"same-origin",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ email: email, types: novos })
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          grid.classList.remove("saving");
+          if(d && d.ok){
+            grid.dataset.atual = novoCsv;
+            grid.classList.add("ok");
+            setTimeout(function(){ grid.classList.remove("ok"); }, 1400);
+          } else {
+            restaurarChecks(grid, grid.dataset.atual);
+            grid.classList.add("err");
+            alert((d && d.erro) || "Falha ao atualizar os tipos.");
+          }
+        })
+        .catch(function(){
+          grid.classList.remove("saving");
+          restaurarChecks(grid, grid.dataset.atual);
+          grid.classList.add("err");
+          alert("Falha de conexão.");
+        });
+      });
+    });
+  }
+
+  // helper: remarca os checkboxes do grid conforme o CSV informado
+  function restaurarChecks(grid, csv){
+    var conjunto = new Set((csv||"").split(",").filter(Boolean));
+    grid.querySelectorAll(".type-chk").forEach(function(c){
+      c.checked = conjunto.has(c.value);
+    });
+  }
+
+  /* ── tabela de eventos ── */
+  function accessTable(resources, types){
+  if(!resources||!resources.length){
+    return '<div class="empty">Nenhum <b>pacote</b> cadastrado. Um pacote é o container que vira um card na área de membros e recebe regras de acesso por tipo. Use o formulário abaixo para criar o primeiro.</div>' + resourceFormHtml();
+  }
+  var head = '<th>Pacote <span class="dim" style="font-weight:400;font-size:.7rem">(recurso)</span></th><th>Prefixo</th>' + types.map(function(t){
+    return '<th style="text-align:center">'+esc(t)+'</th>';
+  }).join('') + '<th style="text-align:center">Editar</th>';
+  var body = resources.map(function(r){
+    var allowed = new Set(r.allowed || []);
+    var cells = types.map(function(t){
+      var checked = allowed.has(t) ? ' checked' : '';
+      return '<td style="text-align:center">'+
+        '<input type="checkbox" class="acc-chk" data-key="'+esc(r.key)+'" data-type="'+esc(t)+'"'+checked+'></td>';
+    }).join('');
+    // guarda os campos editáveis em data-attrs — o botão Editar preenche o form
+    var editBtn = '<button class="ghost-btn acc-edit" '+
+      'data-key="'+esc(r.key)+'" '+
+      'data-label="'+esc(r.label||'')+'" '+
+      'data-prefix="'+esc(r.path_prefix||'')+'" '+
+      'data-icon="'+esc(r.icon||'')+'" '+
+      'data-description="'+esc(r.description||'')+'" '+
+      'title="Editar recurso">✎</button>';
+
+    var delBtn = '<button class="ghost-btn acc-del" '+
+      'data-key="'+esc(r.key)+'" '+
+      'data-label="'+esc(r.label||'')+'" '+
+      'title="Excluir pacote"><span class="mdi mdi-trash-can-outline"></span></button>';
+    var iconoTag = r.icon ? '<span class="mdi mdi-'+esc(r.icon)+'" style="margin-right:6px;color:var(--accent)"></span>' : '';
+    var kindChip = '<span class="badge ok" style="margin-left:8px;vertical-align:middle" title="Este cadastro define um pacote — vira card na área de membros">'+
+                     '<span class="mdi mdi-package-variant-closed" style="margin-right:3px"></span>Pacote'+
+                   '</span>';
+    return '<tr>'+
+      '<td class="email">'+iconoTag+esc(r.label)+kindChip+
+        '<div class="dim" style="font-size:.72rem">'+esc(r.key)+'</div>'+
+        (r.description ? '<div class="dim" style="font-size:.72rem;margin-top:2px">'+esc(r.description)+'</div>' : '')+
+      '</td>'+
+      '<td class="dim mono">'+(esc(r.path_prefix)||'—')+'</td>'+
+      cells +
+      '<td style="text-align:center;white-space:nowrap">'+editBtn+' '+delBtn+'</td>'+
+    '</tr>';
+  }).join('');
+  return '<div class="table-wrap"><table>'+
+    '<thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div>'+
+    '<p class="updated">Marque os tipos que podem acessar cada recurso. As mudanças são salvas ao clicar em <b>Salvar acessos</b>.</p>'+
+    '<button class="ghost-btn" id="btnSaveAccess">Salvar acessos</button>'+
+    resourceFormHtml();
+}
+
+function resourceFormHtml(){
+  return ''+
+  '<section style="margin-top:2rem;padding:1.2rem;border:1px solid var(--line);border-radius:12px;background:var(--card)">'+
+    '<h3 style="margin:0 0 .2rem;color:#fff;font-size:1rem">'+
+      '<span class="mdi mdi-package-variant-closed" style="color:var(--accent);margin-right:.4rem"></span>'+
+      'Novo / editar <b>pacote</b> <span class="dim" style="font-weight:400;font-size:.8rem">(recurso)</span>'+
+    '</h3>'+
+    '<p class="dim" style="font-size:.72rem;margin:0 0 .8rem">'+
+      'O pacote se torna um card na área de membros (via <code>path_prefix</code>) e '+
+      'recebe as regras de acesso por tipo. Para cadastrar os <b>itens</b> que aparecem dentro dele, use a aba <b>Itens</b>.'+
+    '</p>'+
+    '<div style="display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">'+
+      '<label style="display:block"><span class="dim" style="font-size:.72rem">Chave (a-z 0-9 hífen)</span>'+
+        '<input id="resKey" class="type-sel" style="width:100%" placeholder="ex.: area-premium" autocomplete="off"></label>'+
+      '<label style="display:block"><span class="dim" style="font-size:.72rem">Rótulo</span>'+
+        '<input id="resLabel" class="type-sel" style="width:100%" placeholder="ex.: Área Premium"></label>'+
+      '<label style="display:block"><span class="dim" style="font-size:.72rem">Prefixo (opcional)</span>'+
+        '<input id="resPrefix" class="type-sel" style="width:100%" placeholder="/membros/premium/"></label>'+
+      '<label style="display:block"><span class="dim" style="font-size:.72rem">Ícone MDI (sem prefixo)</span>'+
+        '<input id="resIcon" class="type-sel" style="width:100%" placeholder="ex.: shield-star" autocomplete="off"></label>'+
+    '</div>'+
+    '<label style="display:block;margin-top:.6rem"><span class="dim" style="font-size:.72rem">Descrição</span>'+
+      '<textarea id="resDesc" class="type-sel" style="width:100%;min-height:60px" '+
+      'placeholder="Descrição curta que aparece no card do membro."></textarea></label>'+
+    '<div style="margin-top:.8rem;display:flex;gap:.6rem;flex-wrap:wrap">'+
+      '<button class="ghost-btn" id="btnSaveResource"><span class="mdi mdi-content-save"></span>Salvar pacote</button>'+
+      '<button class="ghost-btn" id="btnClearResource">Limpar</button>'+
+      '<span id="resMsg" class="dim" style="font-size:.8rem;align-self:center"></span>'+
+    '</div>'+
+    '<p class="dim" style="font-size:.72rem;margin-top:.6rem">'+
+      'Salvar cria um recurso novo ou atualiza um existente com a mesma chave. '+
+      'Ícones: consulte <a href="https://pictogrammers.com/library/mdi/" target="_blank" style="color:var(--accent)">pictogrammers.com/library/mdi</a> — use apenas o nome (ex.: <code>star-four-points-outline</code>).'+
+    '</p>'+
+  '</section>';
+}
+
+  function loadAccess(){
+  el("panel-access").innerHTML = '<div class="empty">Carregando…</div>';
+  fetch("/api/admin/access/list",{credentials:"same-origin"})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d || !d.ok){ el("panel-access").innerHTML='<div class="empty">Falha ao carregar.</div>'; return; }
+      el("c-access").textContent = "("+(d.resources||[]).length+")";
+      el("panel-access").innerHTML = accessTable(d.resources, d.memberTypes);
+
+      var btn = document.getElementById("btnSaveAccess");
+      if (btn) btn.addEventListener("click", function(){ saveAccess(d.resources.map(function(r){return r.key;})); });
+
+      // Editar: pré-preenche o form a partir dos data-attrs
+      document.querySelectorAll(".acc-edit").forEach(function(b){
+        b.addEventListener("click", function(){
+          document.getElementById("resKey").value    = b.dataset.key         || "";
+          document.getElementById("resLabel").value  = b.dataset.label       || "";
+          document.getElementById("resPrefix").value = b.dataset.prefix      || "";
+          document.getElementById("resIcon").value   = b.dataset.icon        || "";
+          document.getElementById("resDesc").value   = b.dataset.description || "";
+          document.getElementById("resKey").focus();
+        });
+      });
+
+      // Excluir: confirma e chama /api/admin/resources/delete
+      document.querySelectorAll(".acc-del").forEach(function(b){
+        b.addEventListener("click", function(){
+          var label = b.dataset.label || b.dataset.key;
+          if (!confirm(
+            'Excluir o pacote "'+label+'"?\n\n' +
+            'As regras de acesso deste pacote e os vínculos com itens (produtos) ' +
+            'serão removidos automaticamente. Esta ação não pode ser desfeita.'
+          )) return;
+          fetch("/api/admin/resources/delete", {
+            method:"POST", credentials:"same-origin",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({ key: b.dataset.key })
+          })
+          .then(function(r){ return r.json(); })
+          .then(function(d){
+            if (d && d.ok) {
+              accessLoaded = false;
+              loadAccess();
+              // A aba Produtos também exibe o total de vínculos por item —
+              // força reload dela para refletir a exclusão em cascata.
+              produtosLoaded = false;
+              var msg = document.getElementById("resMsg");
+              if (msg) msg.textContent = 'Pacote "'+label+'" excluído.';
+            } else {
+              alert((d && d.erro) || "Falha ao excluir.");
+            }
+          })
+          .catch(function(){ alert("Falha de conexão."); });
+        });
+      });
+      
+      // Salvar recurso (novo ou existente)
+      var btnSave = document.getElementById("btnSaveResource");
+      if (btnSave) btnSave.addEventListener("click", function(){ saveResource(); });
+
+      var btnClear = document.getElementById("btnClearResource");
+      if (btnClear) btnClear.addEventListener("click", function(){
+        ["resKey","resLabel","resPrefix","resIcon","resDesc"].forEach(function(id){
+          document.getElementById(id).value = "";
+        });
+        document.getElementById("resMsg").textContent = "";
+      });
+    })
+    .catch(function(){ el("panel-access").innerHTML='<div class="empty">Falha de conexão.</div>'; });
+}
+
+function saveResource(){
+  var body = {
+    key:         document.getElementById("resKey").value,
+    label:       document.getElementById("resLabel").value,
+    path_prefix: document.getElementById("resPrefix").value,
+    icon:        document.getElementById("resIcon").value,
+    description: document.getElementById("resDesc").value,
+  };
+  var msg = document.getElementById("resMsg");
+  msg.textContent = "Salvando…";
+  fetch("/api/admin/resources/save",{
+    method:"POST", credentials:"same-origin",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify(body)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(d && d.ok){
+      msg.textContent = "Pacote salvo. Recarregando…";
+      accessLoaded = false;
+      loadAccess();
+    } else {
+      msg.textContent = (d && d.erro) || "Falha ao salvar.";
+    }
+  })
+  .catch(function(){ msg.textContent = "Falha de conexão."; });
+}
+
+  function saveAccess(keys){
+    // agrupa checkboxes por recurso e envia um POST por recurso
+    var byKey = {};
+    document.querySelectorAll(".acc-chk").forEach(function(c){
+      if(c.checked) (byKey[c.dataset.key] = byKey[c.dataset.key] || []).push(c.dataset.type);
+    });
+    var tasks = keys.map(function(k){
+      return fetch("/api/admin/access/save",{
+        method:"POST", credentials:"same-origin",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ resource_key:k, types: byKey[k] || [] })
+      }).then(function(r){ return r.json(); });
+    });
+    Promise.all(tasks).then(function(results){
+      var falhas = results.filter(function(x){ return !x || !x.ok; });
+      alert(falhas.length ? "Algumas alterações falharam." : "Acessos salvos.");
+    });
+  }
+
+  function eventsTable(rows){
+    if(!rows||!rows.length) return '<div class="empty">Nenhum evento registrado.</div>';
+    var body=rows.map(function(r){
+      return '<tr>'+
+        '<td>'+eventBadge(r.type)+'</td>'+
+        '<td class="email">'+(esc(r.email)||"—")+'</td>'+
+        '<td class="dim">'+(esc(r.detail)||"—")+'</td>'+
+        '<td class="mono">'+fmtDate(r.created_at)+'</td>'+
+      '</tr>';
+    }).join("");
+    return '<div class="table-wrap"><table>'+
+      '<thead><tr><th>Tipo</th><th>E-mail</th><th>Detalhe</th><th>Quando</th></tr></thead>'+
+      '<tbody>'+body+'</tbody></table></div>';
+  }
+
+  /* ── cartões de estatística ── */
+  function renderStats(s){
+    s=s||{};
+    var cards=[
+      {n:s.membros,          l:"Membros",            cls:"",       ico:"account-group"},
+      {n:s.membros_ativos,   l:"Membros ativos",     cls:"accent", ico:"account-check"},
+      {n:s.news_confirmados, l:"Newsletter conf.",   cls:"",       ico:"email-check"},
+      {n:s.erros,            l:"Erros registrados",  cls:"danger", ico:"alert-octagon"}
+    ];
+    el("stats").innerHTML=cards.map(function(c){
+      return '<div class="stat '+c.cls+'">'+
+        '<span class="mdi mdi-'+c.ico+' ico"></span>'+
+        '<div class="n">'+(c.n==null?0:c.n)+'</div>'+
+        '<div class="l">'+c.l+'</div>'+
+      '</div>';
+    }).join("");
+  }
+
+  /* ── abas ── */
+  /* DEPOIS */
+var eventsLoaded = false;
+var accessLoaded = false;
+var produtosLoaded = false;
+
+function setupTabs(){
+  var tabs=document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active");});
+      t.classList.add("active");
+      el("panel-"+t.dataset.tab).classList.add("active");
+
+      // lazy-load da aba de acessos
+      if (t.dataset.tab === "access" && !accessLoaded) {
+        accessLoaded = true;
+        loadAccess();
+      }
+
+      // lazy-load da aba de produtos
+      if (t.dataset.tab === "produtos" && !produtosLoaded) {
+        produtosLoaded = true;
+        loadProdutos();
+      }
+
+      // lazy-load da aba de avaliações
+      if (t.dataset.tab === "avaliacoes" && !avaliacoesLoaded) {
+        avaliacoesLoaded = true;
+        loadAvaliacoes();
+      }
+
+      // lazy-load da aba de eventos
+      if (t.dataset.tab === "events" && !eventsLoaded) {
+        eventsLoaded = true;
+        el("panel-events").innerHTML = '<div class="empty">Carregando…</div>';
+        fetch("/api/admin/events", { credentials:"same-origin" })
+          .then(function(r){ return r.json(); })
+          .then(function(d){
+            var events = d.events || [];
+            el("c-events").textContent = "(" + events.length + ")";
+            el("panel-events").innerHTML = eventsTable(events);
+          })
+          .catch(function(){ eventsLoaded = false; el("panel-events").innerHTML = '<div class="empty">Falha ao carregar.</div>'; });
+      }
+    });
+  });
+}
+
+  /* ── carregamento dos dados ── */
+  function load(){
+    el("loading").className="state";
+    el("loading").textContent="Carregando dados…";
+    el("loading").hidden=false;
+    el("content").hidden=true;
+
+    fetch("/api/admin/data",{credentials:"same-origin",headers:{"Accept":"application/json"}})
+      .then(function(r){
+        if(r.status===401||r.status===403){ location.href="/admin-login/"; return null; }
+        if(!r.ok) throw new Error("HTTP "+r.status);
+        return r.json();
+      })
+      /* DEPOIS */
+      .then(function(d){
+        if(!d) return;
+        renderStats(d.stats);
+
+        var members=d.members||[], subs=d.subscribers||[];
+        el("c-members").textContent="("+members.length+")";
+        el("c-subscribers").textContent="("+subs.length+")";
+        el("c-events").textContent="";                                         // vazio até o lazy-load
+
+        el("panel-members").innerHTML=membersTable(members, d.memberTypes || []); bindTypeChecklists(el("panel-members"));
+        el("panel-subscribers").innerHTML=peopleTable(subs);
+        el("panel-events").innerHTML='<div class="empty">Clique na aba para carregar.</div>';
+        eventsLoaded = false;        
+        accessLoaded = false;
+
+        el("c-access").textContent = "";
+        el("panel-access").innerHTML = '<div class="empty">Clique na aba para carregar.</div>';                                          // permite recarregar no "Atualizar"
+
+        el("c-produtos").textContent = "";
+        el("panel-produtos").innerHTML = '<div class="empty">Clique na aba para carregar.</div>';
+        produtosLoaded = false;
+
+        el("c-avaliacoes").textContent = "";
+        el("panel-avaliacoes").innerHTML = avaliacoesPanelHtml();
+        avaliacoesLoaded = false;
+
+        el("updated").textContent="Atualizado em "+new Date().toLocaleString("pt-BR");
+        el("loading").hidden=true;
+        el("content").hidden=false;
+      })
+      .catch(function(err){
+        el("loading").className="state err";
+        el("loading").textContent="Não foi possível carregar os dados ("+err.message+"). Tente atualizar.";
+      });
+  }
+
+  /* ── sair ── */
+  el("logout").addEventListener("click",function(){
+    var b=el("logout"); b.disabled=true;
+    fetch("/api/admin/logout",{method:"POST",credentials:"same-origin"})
+      .catch(function(){})
+      .finally(function(){ location.href="/admin-login/"; });
+  });
+
+  el("refresh").addEventListener("click",load);
+
+  /* ── Aba Produtos ── */
+  function loadProdutos(){
+    el("panel-produtos").innerHTML = '<div class="empty">Carregando…</div>';
+    fetch("/api/admin/produtos/list", { credentials:"same-origin" })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || !d.ok){ el("panel-produtos").innerHTML='<div class="empty">Falha ao carregar.</div>'; return; }
+        el("c-produtos").textContent = "("+(d.products||[]).length+")";
+        el("panel-produtos").innerHTML = produtosPanelHtml(d.products || [], d.resources || []);
+        wireProdutosPanel(d.products || [], d.resources || []);
+      })
+      .catch(function(){ produtosLoaded=false; el("panel-produtos").innerHTML='<div class="empty">Falha de conexão.</div>'; });
+  }
+
+  function produtosPanelHtml(products, resources){
+    var lista = products.length ? productsTable(products) : '<div class="empty">Nenhum produto cadastrado ainda.</div>';
+    return lista + productFormHtml(resources);
+  }
+
+  function productsTable(products){
+    var body = products.map(function(p){
+      var vinc = (p.vinculos || []).length;
+      var iconHtml = p.icon ? '<span class="mdi mdi-'+esc(p.icon)+'" style="color:var(--accent);margin-right:6px"></span>' : '';
+      var kindChip = '<span class="badge neutral" style="margin-left:8px;vertical-align:middle" title="Este cadastro define um item — aparece dentro dos pacotes vinculados">'+
+                       '<span class="mdi mdi-cube-outline" style="margin-right:3px"></span>Item'+
+                     '</span>';
+      return '<tr>'+
+        '<td class="email">'+iconHtml+esc(p.label)+kindChip+
+          '<div class="dim" style="font-size:.72rem">'+esc(p.slug)+'</div>'+
+          (p.description ? '<div class="dim" style="font-size:.72rem;margin-top:2px">'+esc(p.description)+'</div>' : '')+
+        '</td>'+
+        '<td class="dim mono" style="max-width:260px;overflow:hidden;text-overflow:ellipsis">'+
+          '<a href="'+esc(p.url)+'" target="_blank" rel="noopener" style="color:var(--accent)">'+esc(p.url)+'</a></td>'+
+        '<td style="text-align:center">'+ (p.external ? '<span class="badge ok">externo</span>' : '<span class="badge neutral">interno</span>') +'</td>'+
+        '<td style="text-align:center">'+ (p.active   ? '<span class="badge ok">ativo</span>'   : '<span class="badge neutral">inativo</span>') +'</td>'+
+        '<td style="text-align:center"><span class="badge '+ (vinc ? 'pending' : 'neutral') +'">'+vinc+'</span></td>'+
+        '<td style="text-align:center;white-space:nowrap">'+
+          '<button class="ghost-btn prod-edit" data-id="'+p.id+'" title="Editar"><span class="mdi mdi-pencil"></span></button> '+
+          '<button class="ghost-btn prod-del"  data-id="'+p.id+'" data-label="'+esc(p.label)+'" title="Excluir"><span class="mdi mdi-trash-can-outline"></span></button>'+
+        '</td>'+
+      '</tr>';
+    }).join("");
+    return '<div class="table-wrap"><table>'+
+      '<thead><tr>'+
+        '<th>Item <span class="dim" style="font-weight:400;font-size:.7rem">(produto)</span></th><th>URL</th>'+
+        '<th style="text-align:center">Tipo</th>'+
+        '<th style="text-align:center">Status</th>'+
+        '<th style="text-align:center" title="Em quantos pacotes este item aparece">Pacotes</th>'+
+        '<th style="text-align:center">Ações</th>'+
+      '</tr></thead><tbody>'+body+'</tbody></table></div>';
+  }
+
+  function productFormHtml(resources){
+    var linkRows = resources.map(function(r){
+      return '<label class="prod-link-row" data-key="'+esc(r.key)+'">'+
+        '<input type="checkbox" class="prod-link-chk">'+
+        '<span class="prod-link-label">'+esc(r.label)+
+          '<span class="dim" style="font-size:.7rem;margin-left:.4rem">'+esc(r.key)+'</span>'+
+        '</span>'+
+        '<input type="number" class="prod-link-pos type-sel" value="0" min="0" style="width:70px" title="Posição" disabled>'+
+      '</label>';
+    }).join('');
+    return ''+
+      '<section class="prod-form" id="prodForm" style="margin-top:2rem;padding:1.2rem;border:1px solid var(--line);border-radius:14px;background:var(--card)">'+
+          '<h3 style="margin:0 0 .2rem;color:#fff;font-size:1rem">'+
+          '<span class="mdi mdi-cube-outline" style="color:var(--accent);margin-right:.4rem"></span>'+
+          'Novo / editar <b>item</b> <span class="dim" style="font-weight:400;font-size:.8rem">(produto)</span>'+
+        '</h3>'+
+        '<p class="dim" style="font-size:.72rem;margin:0 0 .8rem">'+
+          'Um item é um conteúdo que aparece dentro de um ou mais <b>pacotes</b>. '+
+          'Marque abaixo em quais pacotes ele deve aparecer e em que posição.'+
+        '</p>'+
+          '<span class="mdi mdi-package-variant" style="color:var(--accent);margin-right:.4rem"></span>Novo / editar produto</h3>'+
+        '<input type="hidden" id="prodId">'+
+        '<div style="display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">'+
+          '<label style="display:block"><span class="dim" style="font-size:.72rem">Slug (a-z 0-9 hífen)</span>'+
+            '<input id="prodSlug" class="type-sel" style="width:100%" placeholder="ex.: curso-hhd-basico" autocomplete="off"></label>'+
+          '<label style="display:block"><span class="dim" style="font-size:.72rem">Rótulo</span>'+
+            '<input id="prodLabel" class="type-sel" style="width:100%" placeholder="ex.: Curso HHD Básico"></label>'+
+          '<label style="display:block"><span class="dim" style="font-size:.72rem">URL / Checkout</span>'+
+            '<input id="prodUrl" class="type-sel" style="width:100%" placeholder="https://…"></label>'+
+          '<label style="display:block"><span class="dim" style="font-size:.72rem">Ícone MDI (sem prefixo)</span>'+
+            '<input id="prodIcon" class="type-sel" style="width:100%" placeholder="ex.: package-variant" autocomplete="off"></label>'+
+        '</div>'+
+        '<label style="display:block;margin-top:.6rem"><span class="dim" style="font-size:.72rem">Descrição</span>'+
+          '<textarea id="prodDesc" class="type-sel" style="width:100%;min-height:60px" placeholder="Descrição curta que aparece no card do membro."></textarea></label>'+
+        '<div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:.8rem">'+
+          '<label class="type-chk-item"><input type="checkbox" id="prodExternal"><span>Link externo (abrir em nova aba)</span></label>'+
+          '<label class="type-chk-item"><input type="checkbox" id="prodActive" checked><span>Produto ativo</span></label>'+
+        '</div>'+
+        '<h4><span class="mdi mdi-source-branch" style="color:var(--accent);margin-right:.3rem"></span>'+
+          'Vincular a pacotes '+
+          '<span class="dim" style="font-weight:400;font-size:.75rem">(o item aparece dentro do card do pacote, na posição informada)</span></h4>'+
+        '<div class="prod-links-wrap" id="prodLinks">'+
+          (resources.length ? linkRows : '<div class="empty" style="padding:1.2rem">Nenhum pacote cadastrado. Cadastre um pacote primeiro na aba <b>Pacotes</b>.</div>') +
+        '</div>'+
+        '<div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">'+
+          '<button class="ghost-btn" id="btnProdSave"><span class="mdi mdi-content-save"></span>Salvar item</button>'+
+          '<button class="ghost-btn" id="btnProdSaveLinks" disabled title="Salve o produto antes"><span class="mdi mdi-link-variant"></span>Salvar vínculos</button>'+
+          '<button class="ghost-btn" id="btnProdClear"><span class="mdi mdi-broom"></span>Limpar</button>'+
+          '<span id="prodMsg" class="dim" style="font-size:.8rem"></span>'+
+        '</div>'+
+      '</section>';
+  }
+
+  function wireProdutosPanel(products){
+    var byId = {}; products.forEach(function(p){ byId[p.id] = p; });
+
+    document.querySelectorAll(".prod-link-row").forEach(function(row){
+      var chk = row.querySelector(".prod-link-chk");
+      var pos = row.querySelector(".prod-link-pos");
+      chk.addEventListener("change", function(){
+        pos.disabled = !chk.checked;
+        if (!chk.checked) pos.value = 0;
+      });
+    });
+
+    document.querySelectorAll(".prod-edit").forEach(function(b){
+      b.addEventListener("click", function(){
+        var p = byId[b.dataset.id]; if (!p) return;
+        preencherFormProduto(p);
+      });
+    });
+
+    document.querySelectorAll(".prod-del").forEach(function(b){
+      b.addEventListener("click", function(){
+        if (!confirm('Excluir o produto "'+b.dataset.label+'"?\nOs vínculos serão removidos automaticamente (CASCADE).')) return;
+        fetch("/api/admin/produtos/delete", {
+          method:"POST", credentials:"same-origin",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ id: Number(b.dataset.id) })
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (d && d.ok) { produtosLoaded = false; loadProdutos(); }
+          else alert((d && d.erro) || "Falha ao excluir.");
+        })
+        .catch(function(){ alert("Falha de conexão."); });
+      });
+    });
+
+    document.getElementById("btnProdSave").addEventListener("click", salvarProduto);
+    document.getElementById("btnProdSaveLinks").addEventListener("click", salvarVinculos);
+    document.getElementById("btnProdClear").addEventListener("click", limparFormProduto);
+  }
+
+  function preencherFormProduto(p){
+    document.getElementById("prodId").value       = p.id;
+    document.getElementById("prodSlug").value     = p.slug || "";
+    document.getElementById("prodLabel").value    = p.label || "";
+    document.getElementById("prodUrl").value      = p.url || "";
+    document.getElementById("prodIcon").value     = p.icon || "";
+    document.getElementById("prodDesc").value     = p.description || "";
+    document.getElementById("prodExternal").checked = !!p.external;
+    document.getElementById("prodActive").checked   = p.active !== 0;
+
+    var mapa = {};
+    (p.vinculos || []).forEach(function(v){ mapa[v.resource_key] = v.position; });
+    document.querySelectorAll(".prod-link-row").forEach(function(row){
+      var chk = row.querySelector(".prod-link-chk");
+      var pos = row.querySelector(".prod-link-pos");
+      var k = row.dataset.key;
+      if (Object.prototype.hasOwnProperty.call(mapa, k)) {
+        chk.checked = true; pos.disabled = false; pos.value = mapa[k];
+      } else {
+        chk.checked = false; pos.disabled = true; pos.value = 0;
+      }
+    });
+    var btnLinks = document.getElementById("btnProdSaveLinks");
+    btnLinks.disabled = false; btnLinks.title = "";
+    document.getElementById("prodMsg").textContent = "Editando produto #" + p.id + ".";
+    document.getElementById("prodForm").scrollIntoView({ behavior:"smooth", block:"start" });
+    document.getElementById("prodSlug").focus();
+  }
+
+  function limparFormProduto(){
+    ["prodId","prodSlug","prodLabel","prodUrl","prodIcon","prodDesc"].forEach(function(id){
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("prodExternal").checked = false;
+    document.getElementById("prodActive").checked   = true;
+    document.querySelectorAll(".prod-link-row").forEach(function(row){
+      row.querySelector(".prod-link-chk").checked = false;
+      var pos = row.querySelector(".prod-link-pos"); pos.disabled = true; pos.value = 0;
+    });
+    var btnLinks = document.getElementById("btnProdSaveLinks");
+    btnLinks.disabled = true; btnLinks.title = "Salve o produto antes";
+    document.getElementById("prodMsg").textContent = "";
+  }
+
+  function salvarProduto(){
+    var idRaw = document.getElementById("prodId").value;
+    var body = {
+      slug:        document.getElementById("prodSlug").value,
+      label:       document.getElementById("prodLabel").value,
+      url:         document.getElementById("prodUrl").value,
+      icon:        document.getElementById("prodIcon").value,
+      description: document.getElementById("prodDesc").value,
+      external:    document.getElementById("prodExternal").checked ? 1 : 0,
+      active:      document.getElementById("prodActive").checked   ? 1 : 0,
+    };
+    if (idRaw) body.id = Number(idRaw);
+
+    var msg = document.getElementById("prodMsg");
+    msg.textContent = "Salvando…";
+    fetch("/api/admin/produtos/save", {
+      method:"POST", credentials:"same-origin",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(body)
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d && d.ok) {
+        document.getElementById("prodId").value = d.id;
+        var btnLinks = document.getElementById("btnProdSaveLinks");
+        btnLinks.disabled = false; btnLinks.title = "";
+        msg.textContent = (d.criado ? "Produto criado" : "Produto atualizado") + " (#"+d.id+"). Salve os vínculos, se desejar.";
+      } else {
+        msg.textContent = (d && d.erro) || "Falha ao salvar.";
+      }
+    })
+    .catch(function(){ msg.textContent = "Falha de conexão."; });
+  }
+
+  function salvarVinculos(){
+    var id = Number(document.getElementById("prodId").value);
+    if (!id) return;
+    var links = [];
+    document.querySelectorAll(".prod-link-row").forEach(function(row){
+      var chk = row.querySelector(".prod-link-chk");
+      if (!chk.checked) return;
+      var pos = Number(row.querySelector(".prod-link-pos").value) || 0;
+      links.push({ resource_key: row.dataset.key, position: pos });
+    });
+    var msg = document.getElementById("prodMsg");
+    msg.textContent = "Salvando vínculos…";
+    fetch("/api/admin/produtos/vinculos/save", {
+      method:"POST", credentials:"same-origin",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ product_id: id, links: links })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d && d.ok) {
+        msg.textContent = "Vínculos salvos ("+d.total+"). Recarregando…";
+        produtosLoaded = false; loadProdutos();
+      } else {
+        msg.textContent = (d && d.erro) || "Falha ao salvar vínculos.";
+      }
+    })
+    .catch(function(){ msg.textContent = "Falha de conexão."; });
+  }
+
+    function avaliacoesPanelHtml(){
+    return '<div class="empty">Clique na aba para carregar.</div>';
+  }
+
+  var avaliacoesLoaded = false;
+
+  function loadAvaliacoes(){
+    el("panel-avaliacoes").innerHTML = '<div class="empty">Carregando…</div>';
+    fetch("/api/admin/avaliacoes/list", { credentials:"same-origin" })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || !d.ok){ el("panel-avaliacoes").innerHTML = '<div class="empty">Falha ao carregar.</div>'; return; }
+        var total = (d.tecnicas || []).length + (d.performaticas || []).length;
+        el("c-avaliacoes").textContent = "(" + total + ")";
+        el("panel-avaliacoes").innerHTML = avaliacoesPanelRealHtml(d);
+        bindAvaliacoesActions();
+      })
+      .catch(function(){ avaliacoesLoaded = false; el("panel-avaliacoes").innerHTML = '<div class="empty">Falha de conexão.</div>'; });
+  }
+
+  function avaliacoesPanelRealHtml(d){
+    var linhas = (d.tecnicas || []).map(function(t){
+      var badge = t.status === 'published'
+        ? '<span class="badge ok">publicada</span>'
+        : (t.status === 'archived' ? '<span class="badge neutral">arquivada</span>' : '<span class="badge pending">rascunho</span>');
+      return '<tr>' +
+        '<td class="email">' + esc(t.aluno_nome) + '<div class="dim" style="font-size:.72rem">' + esc(t.aluno_email) + '</div></td>' +
+        '<td class="dim">' + (esc(t.semestre) || '—') + '</td>' +
+        '<td class="dim">' + (esc(t.modalidade_turma) || '—') + '</td>' +
+        '<td class="mono">v.' + esc(String(t.versao)) + '</td>' +
+        '<td>' + badge + '</td>' +
+        '<td class="mono">' + fmtDate(t.updated_at) + '</td>' +
+        '<td style="text-align:center;white-space:nowrap">' +
+          '<a class="ghost-btn" href="/admin/avaliacoes/?id=' + t.id + '" title="Abrir no editor"><span class="mdi mdi-pencil"></span></a> ' +
+          '<button class="ghost-btn aval-del" data-id="' + t.id + '" data-tipo="tecnica" data-label="' + esc(t.aluno_nome) + '" title="Excluir"><span class="mdi mdi-trash-can-outline"></span></button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    var linhasPerf = (d.performaticas || []).map(function(p){
+      var badge = p.status === 'published'
+        ? '<span class="badge ok">publicada</span>'
+        : (p.status === 'archived' ? '<span class="badge neutral">arquivada</span>' : '<span class="badge pending">rascunho</span>');
+      return '<tr>' +
+        '<td class="email">' + esc(p.aluno_nome) + '<div class="dim" style="font-size:.72rem">' + esc(p.aluno_email) + '</div></td>' +
+        '<td class="dim">' + (esc(p.semestre) || '—') + '</td>' +
+        '<td class="dim">' + (esc(p.modalidade_turma) || '—') + '</td>' +
+        '<td class="mono">v.' + esc(String(p.versao)) + (p.tecnica_id ? ' <span class="dim" style="font-size:.7rem">↳ tec #' + esc(String(p.tecnica_id)) + '</span>' : '') + '</td>' +
+        '<td>' + badge + '</td>' +
+        '<td class="mono">' + fmtDate(p.updated_at) + '</td>' +
+        '<td style="text-align:center;white-space:nowrap">' +
+          '<a class="ghost-btn" href="/admin/avaliacoes/?perf_id=' + p.id + '" title="Abrir no editor"><span class="mdi mdi-pencil"></span></a> ' +
+          '<button class="ghost-btn aval-del" data-id="' + p.id + '" data-tipo="performatica" data-label="' + esc(p.aluno_nome) + '" title="Excluir"><span class="mdi mdi-trash-can-outline"></span></button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    var tabelaTec = linhas ? '<div class="table-wrap"><table>' +
+      '<thead><tr><th>Aluno(a)</th><th>Semestre</th><th>Modalidade</th><th>Versão</th><th>Status</th><th>Atualizado em</th><th style="text-align:center">Ações</th></tr></thead>' +
+      '<tbody>' + linhas + '</tbody></table></div>' : '<div class="empty">Nenhuma ficha técnica cadastrada.</div>';
+    var tabelaPerf = linhasPerf ? '<div class="table-wrap" style="margin-top:1rem"><table>' +
+      '<thead><tr><th>Aluno(a)</th><th>Semestre</th><th>Modalidade</th><th>Versão</th><th>Status</th><th>Atualizado em</th><th style="text-align:center">Ações</th></tr></thead>' +
+      '<tbody>' + linhasPerf + '</tbody></table></div>' : '';
+
+    return '<section class="avaliacoes-cta" style="margin-bottom:1rem">' +
+      '<div class="avaliacoes-cta__icon"><span class="mdi mdi-clipboard-text-outline" aria-hidden="true"></span></div>' +
+      '<h3>Fichas de avaliação</h3>' +
+      '<p>Gerencie fichas técnicas e performáticas. Clique em "Nova ficha" para abrir o editor em branco.</p>' +
+      '<a class="avaliacoes-cta__link" href="/admin/avaliacoes/">' +
+        '<span class="mdi mdi-plus" aria-hidden="true"></span>Nova ficha</a>' +
+    '</section>' +
+    '<h4 style="margin:1rem 0 .5rem;color:#fff;font-size:.9rem">Fichas técnicas</h4>' + tabelaTec +
+    (tabelaPerf ? '<h4 style="margin:1.4rem 0 .5rem;color:#fff;font-size:.9rem">Fichas performáticas</h4>' + tabelaPerf : '');
+  }
+
+  function bindAvaliacoesActions(){
+    document.querySelectorAll('.aval-del').forEach(function(b){
+      b.addEventListener('click', function(){
+        if (!confirm('Excluir a ficha de "' + b.dataset.label + '"? Esta ação não pode ser desfeita.')) return;
+        fetch('/api/admin/avaliacoes/delete', {
+          method:'POST', credentials:'same-origin',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ id: Number(b.dataset.id), tipo: b.dataset.tipo })
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (d && d.ok){ avaliacoesLoaded = false; loadAvaliacoes(); }
+          else alert((d && d.erro) || 'Falha ao excluir.');
+        })
+        .catch(function(){ alert('Falha de conexão.'); });
+      });
+    });
+  }
+  
+  setupTabs();
+  load();
+</script>
+</body>
+</html>

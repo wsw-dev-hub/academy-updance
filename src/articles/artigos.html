@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Up Dance | Blog</title>
+
+<!-- Favicon -->
+<link rel="icon"       type="image/png" href="/public/images/icons/udx-icon.ico">
+<link rel="shortcut icon" type="image/png" href="/public/images/icons/udx-icon.ico">
+
+<!-- Bootstrap 5 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+<!-- Material Design Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.9.96/css/materialdesignicons.min.css">
+
+<!-- Folhas de estilo do projeto -->
+<link rel="stylesheet" href="/css/blog.css">       <!-- 1º: define :root (tokens) -->
+<link rel="stylesheet" href="/style.css">          <!-- 2º: usa tokens no body -->
+<link rel="stylesheet" href="/css/trailsFormat.css">
+<link rel="stylesheet" href="/css/format.css">     <!-- 3º: complementa tipografia -->
+<link rel="stylesheet" href="/css/mediaQuery.css"> <!-- 4º: sobrescreve por largura -->
+<!--<script type="module" src="/public/main.js" defer></script>-->
+<!--<link rel="stylesheet" href="css/slider-carrossel.css">-->
+
+<!-- jQuery (versão única, sem duplicata) -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<script src="/js/loader.js"></script>
+<!-- ======================================================
+     HEADER
+====================================================== -->
+<div class="container-fluid p-0">
+    <header class="row g-0 blog-header">
+
+        <!-- Logo -->
+        <div class="col-4 col-md-3 col-lg-2">
+            <a href="/index.html" class="blog-logo-link">
+                <img src="/images/icons/udx-icon.png"
+                     alt="Up Dance — voltar para Destaques"
+                     class="blog-logo-img">
+            </a>
+        </div>
+
+        <!-- Nav / Hamburger -->
+        <div class="col-8 col-md-9 col-lg-10 d-flex justify-content-end align-items-center pe-0">
+
+            <!-- Menu desktop (≥ lg) -->
+            <ul class="menu-list d-none d-lg-inline-flex" role="menubar">
+                <li role="none">
+                    <a id="btnAcessar" class="fa-submit" href="/entrar/" role="menuitem">
+                        <span class="blog-menu-icon mdi mdi-account-outline" aria-hidden="true"></span>Acessar
+                    </a>
+                </li>
+                <li role="none">
+                    <a id="btnCadastrar" class="fa-submit" href="/cadastro/" role="menuitem">Newsletter</a>
+                </li>
+            </ul>
+
+            <!-- Botão hambúrguer (< lg) -->
+            <button class="btn-mobile-menu d-flex d-lg-none"
+                    id="btnMobileMenu"
+                    aria-label="Abrir menu"
+                    aria-expanded="false"
+                    aria-controls="mobileNav">
+                <span class="mdi mdi-menu" aria-hidden="true"></span>
+            </button>
+        </div>
+
+        <!-- Nav dropdown mobile -->
+        <nav class="mobile-nav col-12 d-lg-none" id="mobileNav" aria-label="Menu principal">
+            <ul>
+                <li id="btnMobilAcess"><a href="/entrar/"><span class="mdi mdi-account-outline" aria-hidden="true"></span> Acessar</a></li>
+                <li><a href="/cadastro/">Receba Nossa Newsletter</a></li>
+            </ul>
+        </nav>
+
+    </header>
+</div>
+
+<a id="topo"></a>
+
+<!-- ======================================================
+     HERO / PAGE TITLE
+====================================================== -->
+<div id="hero-blog" class="container-fluid p-0">
+
+    <section class="page-title" aria-label="Título da página">
+        <div class="row auto-container">
+            <div class="col-12">
+                <div class="container content">
+                    <h1>Bem-vindo <!--<span class="destaque">Wellington Santos</span>--></h1>
+                    <nav aria-label="Trilha de navegação">
+                        <ul class="page-perfil-scrum">
+                            <li><a href="/index.html">Destaques</a></li>
+                            <li>Artigos</li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--<div class="sidebar_cleanner"></div>-->
+    <!-- ======================================================
+         CONTEÚDO PRINCIPAL
+    ====================================================== -->
+    <section aria-label="Lista de artigos">
+        <div id="main-content" class="main-blog-content">
+            <div class="row" id="blog-list-infos">
+
+                <!-- ── COLUNA PRINCIPAL ─────────────────────────────── -->
+                <div class="content-side col-12 col-lg-8">
+                    <div class="container">
+                        <div class="blog-list">
+
+                            <!-- Card 1 -->
+                            <div class="news-block-two grid-box">
+                                <div class="inner-box">
+                                    <div class="card-category">
+                                        <span class="mdi mdi-brain card-categ" aria-hidden="true"></span>
+                                        Reflexão
+                                    </div>
+                                    <div class="upper-content">
+                                        <a href="/src/posts/o-que-e-ser-artista-hoje-um-olhar-entre-a-visibilidade-e-a-essencia.html">
+                                            <h4 class="text-white">O Que É Ser Artista Hoje? Um Olhar Entre a Visibilidade e a Essência.</h4>
+                                        </a>
+                                        <div class="text">Vivemos em uma época em que a palavra "artista" parece estar em toda parte. Basta publicar vídeos, acumular seguidores, conquistar visualizações ou</div>
+                                        <ul class="post-meta">
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-calendar-outline" aria-hidden="true"></span> 05/07/2020
+                                            </li>
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-account-outline" aria-hidden="true"></span> Wellington Santos
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="images">
+                                        <a href="/src/posts/o-que-e-ser-artista-hoje-um-olhar-entre-a-visibilidade-e-a-essencia.html">
+                                            <img src="/images/titulos/art.png" alt="O Que É Ser Artista Hoje? Um Olhar Entre a Visibilidade e a Essência." loading="lazy">
+                                        </a>
+                                    </div>
+                                    <div class="lower-content">
+                                         <a href="/src/posts/o-que-e-ser-artista-hoje-um-olhar-entre-a-visibilidade-e-a-essencia.html">
+                                            <div class="theme-btn btn-style-one">Saiba Mais</div>
+                                        </a>
+                                        <!--<input type="submit" name="lvBlogPosts$ctrl0$btnArtigo"
+                                               value="Saiba mais" id="lvBlogPosts_btnArtigo_0"
+                                               class="theme-btn btn-style-one">-->
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <!-- Card 2 -->
+                            <div class="news-block-two grid-box">
+                                <div class="inner-box">
+                                    <div class="card-category">
+                                        <span class="mdi mdi-state-machine card-categ" aria-hidden="true"></span>
+                                        Performance
+                                    </div>
+                                    <div class="upper-content">
+                                        <a href="/src/posts/warm-up-aquecer-antes-de-dancar-um-habito-simples-que-faz-toda-diferenca.html">
+                                            <h4 class="text-white">Warm-up, Aquecer Antes de Dançar: Um Hábito Simples que Faz Toda Diferença.</h4>
+                                        </a>
+                                        <div class="text">É comum que, ao chegar para uma aula de dança, alguns alunos queiram ir direto para a parte mais empolgante: aprender a coreografia.</div>
+                                        <ul class="post-meta">
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-calendar-outline" aria-hidden="true"></span> 05/07/2026
+                                            </li>
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-account-outline" aria-hidden="true"></span> Wellington Santos
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="images">
+                                        <a href="/src/posts/warm-up-aquecer-antes-de-dancar-um-habito-simples-que-faz-toda-diferenca.html">
+                                            <img src="/images/blog/warm-up.jpg" alt="9 Lições Estratégicas Escondidas no Filme Matrix" loading="lazy">
+                                        </a>
+                                    </div>
+                                    <div class="lower-content">
+                                        <a href="/src/posts/warm-up-aquecer-antes-de-dancar-um-habito-simples-que-faz-toda-diferenca.html">
+                                            <div class="theme-btn btn-style-one">Saiba Mais</div>
+                                        </a>
+                                        <!--<input type="submit" name="lvBlogPosts$ctrl0$btnArtigo"
+                                               value="Saiba mais" id="lvBlogPosts_btnArtigo_0"
+                                               class="theme-btn btn-style-one">-->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card 3 -->
+                            <div class="news-block-two grid-box">
+                                <div class="inner-box">
+                                    <div class="card-category">
+                                        <span class="mdi mdi-meditation card-categ" aria-hidden="true"></span>
+                                        Percepção</div>
+                                    <div class="upper-content">
+                                        <a href="/src/posts/timidez-nao-e-um-problema-como-usa-la-em-seu-favor-na-danca.html">
+                                            <h4 class="text-white">Timidez Não É Um Problema: Como Usá-la Em Seu Favor Na Danca?</h4>
+                                        </a>
+                                        <div class="text">Ao entrar em uma aula de dança, é comum que os olhares se voltem para quem demonstra mais confiança. Geralmente, 
+                                            é aquele aluno que chega conversando</div>
+                                        <ul class="post-meta">
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-calendar-outline" aria-hidden="true"></span> 05/07/2020
+                                            </li>
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-account-outline" aria-hidden="true"></span> Wellington Santos
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="images">
+                                        <a href="/src/posts/timidez-nao-e-um-problema-como-usa-la-em-seu-favor-na-danca.html">
+                                            <img src="/images/titulos/timidez.jpg" alt="Timidez Não É Um Problema: Como Usá-la Em Seu Favor Na Danca?" loading="lazy">
+                                        </a>
+                                    </div>
+                                    <div class="lower-content">
+                                        <a href="/src/posts/timidez-nao-e-um-problema-como-usa-la-em-seu-favor-na-danca.html">
+                                            <div class="theme-btn btn-style-one">Saiba Mais</div>
+                                        </a>
+                                        <!--<input type="submit" name="lvBlogPosts$ctrl0$btnArtigo"
+                                               value="Saiba mais" id="lvBlogPosts_btnArtigo_0"
+                                               class="theme-btn btn-style-one">-->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 4 -->
+                            <div class="news-block-two grid-box">
+                                <div class="inner-box">
+                                    <div class="card-category">
+                                        <span class="mdi mdi-state-machine card-categ" aria-hidden="true"></span>
+                                        Performance</div>
+                                    <div class="upper-content">
+                                        <a href="/src/posts/quando-a-repeticao-deixa-de-ser-uma-aliada-para-o-desempenho.html">
+                                            <h4 class="text-white">Quando a Repetição Deixa de Ser uma Aliada Para o Desempenho?</h4>
+                                        </a>
+                                        <div class="text">Existe uma frase bastante conhecida no universo da dança, dos esportes e da música que diz:
+                                                            "A prática leva à perfeição."</div>
+                                        <ul class="post-meta">
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-calendar-outline" aria-hidden="true"></span> 05/07/2020
+                                            </li>
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-account-outline" aria-hidden="true"></span> Wellington Santos
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="images">
+                                        <a href="/src/posts/quando-a-repeticao-deixa-de-ser-uma-aliada-para-o-desempenho.html">
+                                            <img src="/images/titulos/repeticao.png" alt="Quando a Repetição Deixa de Ser uma Aliada Para o Desempenho?" loading="lazy">
+                                        </a>
+                                    </div>
+                                    <div class="lower-content">
+                                        <a href="/src/posts/quando-a-repeticao-deixa-de-ser-uma-aliada-para-o-desempenho.html">
+                                            <div class="theme-btn btn-style-one">Saiba Mais</div>
+                                        </a>
+                                        <!--<input type="submit" name="lvBlogPosts$ctrl0$btnArtigo"
+                                               value="Saiba mais" id="lvBlogPosts_btnArtigo_0"
+                                               class="theme-btn btn-style-one">-->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 5 -->
+                            <div class="news-block-two grid-box">
+                                <div class="inner-box">
+                                    <div class="card-category">
+                                        <span class="mdi mdi-gift-outline card-categ" aria-hidden="true"></span>
+                                        Dicas & Sacadas</div>
+                                    <div class="upper-content">
+                                        <a href="/src/posts/os-6-fundamentos-que-nao-podem-faltar-nos-seus-treinos.html">
+                                            <h4 class="text-white">Os 6 Fundamentos que Não Podem Faltar nos Seus Treinos.</h4>
+                                        </a>
+                                        <div class="text">É comum associar evolução técnica à execução de movimentos cada vez mais complexos e cheios de efeitos visuais. Entretanto, 
+                                            quase todo dançarino experiente sabe que o verdadeiro</div>
+                                        <ul class="post-meta">
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-calendar-outline" aria-hidden="true"></span> 05/07/2020
+                                            </li>
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-account-outline" aria-hidden="true"></span> Wellington Santos
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="images">
+                                        <a href="/src/posts/os-6-fundamentos-que-nao-podem-faltar-nos-seus-treinos.html">
+                                            <img src="/images/titulos/treinos.png" alt="Os 6 Fundamentos que Não Podem Faltar nos Treinos." loading="lazy">
+                                        </a>
+                                    </div>
+                                    <div class="lower-content">
+                                        <a href="/src/posts/os-6-fundamentos-que-nao-podem-faltar-nos-seus-treinos.html">
+                                            <div class="theme-btn btn-style-one">Saiba Mais</div>
+                                        </a>
+                                        <!--<input type="submit" name="lvBlogPosts$ctrl0$btnArtigo"
+                                               value="Saiba mais" id="lvBlogPosts_btnArtigo_0"
+                                               class="theme-btn btn-style-one">-->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3 -->
+                            <div class="news-block-two grid-box">
+                                <div class="inner-box">
+                                    <span class="card-category">Alta Performance</span>
+                                    <div class="upper-content">
+                                        <h4 class="text-white">Dentro da Matrix: Foco, Valor e Inovação na Dança</h4>
+                                        <div class="text">Uma jornada pela mente que é também uma aula sobre foco, proposta de valor e inovação disruptiva aplicada à vida real.</div>
+                                        <ul class="post-meta">
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-calendar-outline" aria-hidden="true"></span> 05/07/2020
+                                            </li>
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-account-outline" aria-hidden="true"></span> Wellington Santos
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="images">
+                                        <img src="/images/blog/1.jpg" alt="Dentro da Matrix: Foco, Valor e Inovação na Dança" loading="lazy">
+                                    </div>
+                                    <div class="lower-content">
+                                        <input type="submit" name="lvBlogPosts$ctrl2$btnArtigo"
+                                               value="Saiba mais" id="lvBlogPosts_btnArtigo_2"
+                                               class="theme-btn btn-style-one">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 4 -->
+                            <div class="news-block-two grid-box">
+                                <div class="inner-box">
+                                    <span class="card-category">Profissional</span>
+                                    <div class="upper-content">
+                                        <h4 class="text-white">Você é o que Faz Quando Ninguém Está Olhando</h4>
+                                        <div class="text">Pequenas decisões diárias de disciplina e integridade que formam o caráter de quem se destaca em qualquer área.</div>
+                                        <ul class="post-meta">
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-calendar-outline" aria-hidden="true"></span> 05/07/2020
+                                            </li>
+                                            <li class="style-two text-white">
+                                                <span class="mdi mdi-account-outline" aria-hidden="true"></span> Wellington Santos
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="images">
+                                        <img src="/images/blog/1.jpg" alt="Você é o que Faz Quando Ninguém Está Olhando" loading="lazy">
+                                    </div>
+                                    <div class="lower-content">
+                                        <input type="submit" name="lvBlogPosts$ctrl3$btnArtigo"
+                                               value="Saiba mais" id="lvBlogPosts_btnArtigo_3"
+                                               class="theme-btn btn-style-one">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><!-- /.blog-list -->
+
+                        <!-- Sentinela + indicador de scroll infinito -->
+                        <div id="scroll-sentinel"></div>
+                        <div id="loading-indicator" class="loading-indicator" aria-live="polite">
+                            <span class="mdi mdi-loading mdi-spin" aria-hidden="true"></span>
+                            <span>Carregando mais artigos...</span>
+                        </div>
+                    </div><!-- /.container -->
+                </div><!-- /.content-side -->
+
+                <!-- ── SIDEBAR ──────────────────────────────────────── -->
+                <div class="sidebar-side col-12 col-lg-4">
+                    <aside class="sidebar" aria-label="Barra lateral">
+
+                        <!-- Widget: Busca -->
+                        <div class="row widget-box" id="widget-search">
+                            <div class="sidebar-widget search-box">
+                                <div class="form-group-blog">
+                                    <!--<span class="mdi mdi-magnify search-icon" aria-hidden="true"></span>-->
+                                    <input name="txtBusca" type="search" id="txtBusca"
+                                           placeholder="Pesquisar artigos..."
+                                           aria-label="Campo de busca">
+                                    <input type="submit" name="btnBuscar" value="" id="btnBuscar" class="fa-scr" aria-label="Buscar">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar_cleanner"></div>
+
+                        <!-- Widget: Comece Por Aqui -->
+                        <div class="row widget-box" id="widget-comece">
+                            <div class="widget-header">
+                                <span class="icon mdi mdi-book-multiple-outline" aria-hidden="true"></span>
+                                <h5 class="text-white">Comece Por Aqui</h5>
+                            </div>
+                            <ul class="lista-titulos">
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <span class="temas"><a href="#">Mentalize</a></span>
+                                            <a href="#"><h6>Tudo o que Não Te Contaram Sobre o Talento</h6></a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <span class="temas"><a href="#">Inteligência Emocional</a></span>
+                                            <a href="#"><h6>9 Maneiras de Sair da Matrix</h6></a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <span class="temas"><a href="#">Profissional</a></span>
+                                            <a href="#"><h6>Você é O que Você Faz Quando Ninguém Está Olhando</h6></a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <span class="temas"><a href="#">Otimização de Treinos</a></span>
+                                            <a href="#"><h6>3 Coisas que Não Podem Faltar nos Seus Treinos</h6></a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <span class="temas"><a href="#">Dicas &amp; Sacadas</a></span>
+                                            <a href="#"><h6>Os Segredos da Arte Performática</h6></a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="sidebar_cleanner"></div>
+
+                        <!-- Widget: Novas Publicações -->
+                        <div class="row widget-box" id="widget-novas">
+                            <div class="widget-header">
+                                <span class="icon mdi mdi-newspaper-variant-multiple-outline" aria-hidden="true"></span>
+                                <h5 class="text-white">Novas Publicações</h5>
+                            </div>
+                            <ul class="lista-posts">
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <article class="post">
+                                                <figure class="post-thumb">
+                                                    <img src="/images/resource/post-thumb-3.jpg" alt="Artigo recente" loading="lazy">
+                                                    <a href="blog-single.html" class="overlay-box" aria-label="Ver artigo">
+                                                        <span class="icon mdi mdi-link-variant" aria-hidden="true"></span>
+                                                    </a>
+                                                </figure>
+                                                <div class="text"><a href="blog-single.html">Business structured nontp frank team</a></div>
+                                                <div class="post-info">July 25, 2019</div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <article class="post">
+                                                <figure class="post-thumb">
+                                                    <img src="/images/resource/post-thumb-3.jpg" alt="Artigo recente" loading="lazy">
+                                                    <a href="blog-single.html" class="overlay-box" aria-label="Ver artigo">
+                                                        <span class="icon mdi mdi-link-variant" aria-hidden="true"></span>
+                                                    </a>
+                                                </figure>
+                                                <div class="text"><a href="blog-single.html">Business structured nontp frank team</a></div>
+                                                <div class="post-info">July 25, 2019</div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <article class="post">
+                                                <figure class="post-thumb">
+                                                    <img src="/images/resource/post-thumb-3.jpg" alt="Artigo recente" loading="lazy">
+                                                    <a href="blog-single.html" class="overlay-box" aria-label="Ver artigo">
+                                                        <span class="icon mdi mdi-link-variant" aria-hidden="true"></span>
+                                                    </a>
+                                                </figure>
+                                                <div class="text"><a href="blog-single.html">Business structured nontp frank team</a></div>
+                                                <div class="post-info">July 25, 2019</div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="sidebar_cleanner"></div>
+
+                        <!-- Widget: Newsletter -->
+                        <div class="row widget-box" id="widget-email">
+                            <div class="sidebar-widget search-box">
+                                <div class="widget-header">
+                                    <h6 class="text-white newsletter-cta">
+                                        Cadastre-se e <span class="destaque">receba</span> nossas
+                                        newsletters com <span class="destaque">matérias exclusivas</span> toda semana!
+                                    </h6>
+                                </div>
+                                <div class="form-group-blog">
+                                    <div class="email-input-wrap">
+                                        <span class="icon mdi mdi-email-fast-outline" aria-hidden="true"></span>
+                                        <input name="txtEmail" type="email" id="txtEmail"
+                                               placeholder="Digite seu e-mail"
+                                               aria-label="Endereço de e-mail">
+                                    </div>
+                                    <input type="submit" name="btnCadastroEmail" value="Cadastrar"
+                                           id="btnCadastroEmail" class="fa-submit">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar_cleanner"></div>
+
+                        <!-- Widget: Clube do Groove -->
+                        <div class="row widget-box blog-club-content" id="widget-clube">
+                            <div class="widget-header">
+                                <span class="icon mdi mdi-message-video" aria-hidden="true"></span>
+                                <h5 class="text-white">Clube do Groove</h5>
+                                <p><a href="#" aria-label="Ver todos os vídeos do Clube do Groove">ver todos →</a></p>
+                            </div>
+                            <div class="blog-club-mask">
+                                <div class="play-circle" role="button" aria-label="Reproduzir">
+                                    <span class="icon mdi mdi-play-circle-outline" aria-hidden="true"></span>
+                                </div>
+                                <div class="slider">
+                                    <div class="slider_box">
+                                        <article class="slider_item active" slider-bg="/images/titulos/expressao.png">
+                                            <div class="slider_content"></div>
+                                        </article>
+                                        <article class="slider_item" slider-bg="/images/titulos/dgroove.png">
+                                            <div class="slider_content"></div>
+                                        </article>
+                                        <article class="slider_item" slider-bg="/images/titulos/boost-a-move.png">
+                                            <div class="slider_content"></div>
+                                        </article>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="blog-club-footer">
+                                <div class="prev" role="button" aria-label="Slide anterior">&#8249;</div>
+                                <div class="go"   role="button" aria-label="Próximo slide">&#8250;</div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar_cleanner"></div>
+
+                        <!-- Widget: Navegue por Assuntos -->
+                        <div class="row widget-box" id="widget-assuntos">
+                            <div class="widget-header">
+                                <span class="icon mdi mdi-layers-triple-outline" aria-hidden="true"></span>
+                                <h5 class="text-white">Navegue por Assuntos</h5>
+                            </div>
+                            <ul class="lista-tags">
+                                <li class="desc">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <a href="#"><h6>Bem-Estar</h6></a>
+                                            <a href="#"><h6>Dicas &amp; Sacadas</h6></a>
+                                            <a href="#"><h6>Alta Performance</h6></a>
+                                            <a href="#"><h6>Produção Visual</h6></a>
+                                            <a href="#"><h6>Warm-Ups</h6></a>
+                                            <a href="#"><h6>Mentorias</h6></a>
+                                            <a href="#"><h6>Desafios</h6></a>
+                                            <a href="#"><h6>Concepção Coreográfica</h6></a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </aside>
+                </div><!-- /.sidebar-side -->
+
+            </div><!-- /#blog-list-infos -->
+        </div><!-- /#main-content -->
+    </section>
+
+    <div class="clear-footer"></div>
+<!--</div> /#hero-blog -->
+
+<!-- ======================================================
+     RODAPÉ — usa classes .blog-footer* já estilizadas em /css/blog.css
+====================================================== -->
+<footer class="blog-footer" aria-label="Rodape">
+    <div class="auto-container">
+        <div class="row blog-footer__cols">
+
+            <div class="col-12 col-md-6 col-lg-4 blog-footer__col">
+                <!--<a href="#topo" class="blog-logo-link" aria-label="Up Dance Xperience">
+                    <svg class="blog-logo-img" viewBox="0 0 188 46" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="udxgf" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#FA33A1"/>
+                                <stop offset="0.55" stop-color="#8C0783"/>
+                                <stop offset="1" stop-color="#430ABF"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="3" width="40" height="40" rx="11" fill="url(#udxgf)"/>
+                        <path d="M11 14 v11 a9 9 0 0 0 18 0 v-11" fill="none" stroke="#fff" stroke-width="4.4" stroke-linecap="round"/>
+                        <text x="50" y="21" font-family="Poppins, sans-serif" font-size="15" font-weight="700" letter-spacing="0.5" fill="#DFE0F2">UP DANCE</text>
+                        <text x="50" y="37" font-family="Poppins, sans-serif" font-size="10.5" font-weight="600" letter-spacing="4.2" fill="#FA33A1">XPERIENCE</text>
+                    </svg>
+                </a>-->
+                <div class="col-4 col-md-3 col-lg-2">
+                    <a href="/index.html" class="blog-logo-link">
+                        <img src="/images/icons/udx-icon.png"
+                            alt="Up Dance — voltar para Destaques"
+                            class="blog-logo-img">
+                    </a>
+                </div>
+                <p style="color: var(--udx-text-muted); font-size: 13px; line-height: 1.7; margin: 14px 0 18px; max-width: 280px;">
+                    Conteudo e formacao para dancarinos, professores e criadores.
+                    A danca levada a serio &mdash; do aquecimento ao palco.
+                </p>
+                <h3 class="blog-footer__title">Siga a UDX</h3>
+                <!--<ul class="blog-footer__list">
+                    <li><span class="mdi mdi-instagram" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">@updancexperience</a></li>
+                    <li><span class="mdi mdi-youtube" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">Up Dance no YouTube</a></li>
+                    <li><span class="mdi mdi-spotify" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">Playlists oficiais</a></li>
+                    <li><span class="mdi mdi-tiktok" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">@updancexperience</a></li>
+                </ul>-->
+            </div>
+
+            <div class="col-5 col-md-6 col-lg-2 blog-footer__col">
+                <h3 class="blog-footer__title">Explorar</h3>
+                <ul class="blog-footer__list">
+                    <li><a href="#topo">Destaques</a></li>
+                    <li><a href="/src/articles/artigos.html">Artigos</a></li>
+                    <li><a href="#clube">Clube do Groove</a></li>
+                    <li><a href="#trilhas">Trilhas</a></li>
+                    <li><a href="#newsletter">Newsletter</a></li>
+                </ul>
+            </div>
+
+            <div class="col-5 col-md-6 col-lg-3 blog-footer__col">
+                <h3 class="blog-footer__title">Contato</h3>
+                <ul class="blog-footer__list">
+                    <li><span class="mdi mdi-email-outline" aria-hidden="true"></span>
+                        <a href="mailto:updancexperience@gmail.com.com">updancexperience@gmail.com</a></li>
+                    <!--li><span class="mdi mdi-whatsapp" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">WhatsApp da equipe</a></li>
+                    <li><span class="mdi mdi-map-marker-outline" aria-hidden="true"></span> Rio de Janeiro, RJ</li>
+                    <li><span class="mdi mdi-clock-outline" aria-hidden="true"></span> Seg a Sex, 9h&ndash;18h</li>-->
+                </ul>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3 blog-footer__col">
+                <h3 class="blog-footer__title">Da Galeria</h3>
+                <ul class="blog-footer__gallery" aria-hidden="true">
+                    <li><span></span></li><li><span></span></li><li><span></span></li>
+                    <li><span></span></li><li><span></span></li><li><span></span></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+    <div class="blog-footer__bar">
+        <small>
+            &copy; <span id="udx-year">2026</span> <b>Up Dance Xperience</b> &middot;
+            Todos os direitos reservados &middot;
+            Feito com <i>groove</i> no Rio de Janeiro.
+        </small>
+    </div>
+</footer>
+
+<!-- ======================================================
+     MENU FLUTUANTE RADIAL (mobile/tablet)
+     Aparece após o usuário rolar e o header sair da viewport
+====================================================== -->
+<div class="udx-fab" id="udxFab" data-pane="trilhas" aria-hidden="true">
+
+    <!-- Sugestão contextual (equivalente ao "Depositar via PIX") -->
+    <!--<div class="udx-fab__hint" id="udxFabHint" role="status">
+        <span class="mdi mdi-email-fast-outline" aria-hidden="true"></span>
+        <span class="udx-fab__hint-text">Receba a Newsletter semanal</span>
+        <a href="#newsletter" class="udx-fab__hint-go" aria-label="Ir para newsletter">
+            <span class="mdi mdi-chevron-right" aria-hidden="true"></span>
+        </a>
+        <button class="udx-fab__hint-close" id="udxFabHintClose" aria-label="Fechar sugestão">
+            <span class="mdi mdi-close" aria-hidden="true"></span>
+        </button>
+    </div>-->
+
+    
+
+    <nav class="udx-fab__radial" id="udxFabRadial" aria-label="Atalhos do blog">
+        <!-- Itens injetados via JS conforme a pílula ativa -->
+        <button class="udx-fab__core" id="udxFabCore"
+                aria-label="Abrir menu de atalhos" aria-expanded="false" aria-controls="udxFabRadial">
+            <span class="mdi mdi-menu udx-fab__core-icon" aria-hidden="true"></span>
+        </button>
+    </nav>
+
+    <!-- Pílula de abas (equivalente ao Principal/Trading/IA) -->
+    <div class="udx-fab__tabs" role="tablist" aria-label="Sessões do blog">
+        <span class="udx-fab__tabs-thumb" aria-hidden="true"></span>
+        <button class="udx-fab__tab is-active" data-pane="trilhas"   role="tab" aria-selected="true">Trilhas</button>
+        <button class="udx-fab__tab"           data-pane="destaques" role="tab" aria-selected="false">Apps</button>
+        <button class="udx-fab__tab"           data-pane="clube"     role="tab" aria-selected="false">Clube</button>
+    </div>
+
+</div>
+
+<!-- Voltar ao topo -->
+<button class="to-top" id="toTop" aria-label="Voltar ao topo"><span class="mdi mdi-arrow-up" aria-hidden="true"></span></button>
+
+<!--</div>-->
+<!-- ======================================================
+     SCRIPTS — ao final do body (não bloqueiam o render)
+====================================================== -->
+<script id="dsq-count-scr" src="//https-updancexperience-com.disqus.com/count.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" defer></script>
+<!--<script src="/js/jquery-slider-carrossel.js" defer></script>
+<script src="/js/slider-carrossel.js" defer></script>-->
+
+
+<!-- Atualiza o ano automaticamente -->
+<script>
+/* Ano automatico */
+(function () {
+    var y = document.getElementById("udx-year");
+    if (y) y.textContent = new Date().getFullYear();
+}());
+
+/* Menu mobile */
+(function () {
+    "use strict";
+    var btn = document.getElementById("btnMobileMenu");
+    var nav = document.getElementById("mobileNav");
+    if (!btn || !nav) return;
+    btn.addEventListener("click", function () {
+        var isOpen = nav.classList.toggle("open");
+        btn.setAttribute("aria-expanded", isOpen);
+        var icon = btn.querySelector(".mdi");
+        icon.classList.toggle("mdi-menu", !isOpen);
+        icon.classList.toggle("mdi-close", isOpen);
+    });
+    /* fecha ao clicar em link */
+    nav.querySelectorAll("a").forEach(function (a) {
+        a.addEventListener("click", function () {
+            nav.classList.remove("open");
+            btn.setAttribute("aria-expanded", "false");
+            var ic = btn.querySelector(".mdi");
+            ic.classList.add("mdi-menu");
+            ic.classList.remove("mdi-close");
+        });
+    });
+}());
+
+/* Voltar ao topo */
+(function () {
+    "use strict";
+    var btn = document.getElementById("toTop");
+    if (!btn) return;
+    window.addEventListener("scroll", function () {
+        btn.classList.toggle("show", window.pageYOffset > 600);
+    }, { passive: true });
+    btn.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+}());
+
+/* ===========================================================
+   Menu flutuante radial (FAB) — pílulas trocam camadas
+   1. Trilhas / Destaques / Clube → 5 itens cada
+   2. Polegar deslizante atrás da pílula ativa
+   3. Substituição com implosão + pulso + ejeção
+=========================================================== */
+(function () {
+    "use strict";
+
+    var fab    = document.getElementById("udxFab");
+    var radial = document.getElementById("udxFabRadial");
+    var core   = document.getElementById("udxFabCore");
+    if (!fab || !radial || !core) return;
+
+    var tabsContainer = fab.querySelector(".udx-fab__tabs");
+    var thumb         = fab.querySelector(".udx-fab__tabs-thumb");
+    var tabs          = fab.querySelectorAll(".udx-fab__tab");
+
+    /* href de "Acessar" copiado do header (mesmo comportamento do original) */
+    var headerAcessar = document.getElementById("btnAcessar");
+    var acessarHref = (headerAcessar && headerAcessar.getAttribute("href")) || "/entrar/";
+
+    var PANES = {
+        trilhas: [
+            { pos:"tl",  icon:"mdi-compass-outline",                    label:"Trilhas",  href:"#trilhas"  },
+            { pos:"top", icon:"mdi-newspaper-variant-multiple-outline", label:"Recentes", href:"#recentes" },
+            { pos:"tr",  icon:"mdi-message-video",                      label:"Clube",    href:"#clube"    },
+            { pos:"bl",  icon:"mdi-account-outline",                    label:"Acessar",  href: acessarHref },
+            { pos:"br",  icon:"mdi-arrow-up",                           label:"Topo",     href:"#topo"     }
+        ],
+        destaques: [
+            { pos:"tl",  icon:"mdi-book-open-variant",                  label:"Ebooks",   href:"/destaques/ebooks"   },
+            { pos:"top", icon:"mdi-school-outline",                     label:"Tutorial", href:"/destaques/tutorial" },
+            { pos:"tr",  icon:"mdi-map-marker-path",                    label:"Guias",    href:"/destaques/guias"    },
+            { pos:"bl",  icon:"mdi-lightbulb-on-outline",               label:"Dicas",    href:"/destaques/dicas"    },
+            { pos:"br",  icon:"mdi-web",                                label:"Online",   href:"/destaques/online"   }
+        ],
+        clube: [
+            { pos:"tl",  icon:"mdi-music-circle-outline",               label:"UDX",      href:"/clube/udx"      },
+            { pos:"top", icon:"mdi-broadcast",                          label:"Lives",    href:"/clube/lives"    },
+            { pos:"tr",  icon:"mdi-account-circle-outline",             label:"Quem Sou", href:"/clube/sobre"    },
+            { pos:"bl",  icon:"mdi-play-circle-outline",                label:"Aulas",    href:"/clube/aulas"    },
+            { pos:"br",  icon:"mdi-storefront-outline",                 label:"Produtos", href:"/clube/produtos" }
+        ]
+    };
+
+    var swapLock = false;
+    function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+    function renderPane(name){
+        var items = radial.querySelectorAll(".udx-fab__item");
+        for (var i = 0; i < items.length; i++) items[i].remove();
+
+        PANES[name].forEach(function(it){
+            var a = document.createElement("a");
+            a.className = "udx-fab__item udx-fab__item--" + it.pos;
+            a.href = it.href;
+            a.setAttribute("aria-label", it.label);
+            a.innerHTML = '<span class="mdi ' + it.icon + '" aria-hidden="true"></span><em>' + it.label + '</em>';
+            a.addEventListener("click", closeRadial);
+            radial.insertBefore(a, core);
+        });
+
+        fab.setAttribute("data-pane", name);
+    }
+
+    function moveThumbTo(tab){
+        var tabsRect = tabsContainer.getBoundingClientRect();
+        var tabRect  = tab.getBoundingClientRect();
+        var offsetX  = tabRect.left - tabsRect.left;
+        thumb.style.width = tabRect.width + "px";
+        thumb.style.transform = "translateX(" + offsetX + "px)";
+    }
+
+    /* Visibilidade controlada por scroll (mesma lógica do original) */
+    function updateVisibility(){
+        var threshold = Math.max(window.innerHeight * 0.6, 380);
+        var show = window.pageYOffset > threshold;
+        fab.classList.toggle("is-visible", show);
+        fab.setAttribute("aria-hidden", show ? "false" : "true");
+        if (!show) closeRadial();
+    }
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    window.addEventListener("resize", updateVisibility);
+    updateVisibility();
+
+    function openRadial(){
+        radial.classList.add("is-open");
+        fab.classList.add("is-open");
+        core.setAttribute("aria-expanded", "true");
+        core.querySelector(".udx-fab__core-icon").classList.replace("mdi-menu", "mdi-close");
+        requestAnimationFrame(function(){
+            var active = fab.querySelector(".udx-fab__tab.is-active");
+            if (active) moveThumbTo(active);
+        });
+    }
+    function closeRadial(){
+        radial.classList.remove("is-open", "is-collapsing");
+        fab.classList.remove("is-open");
+        core.setAttribute("aria-expanded", "false");
+        var ic = core.querySelector(".udx-fab__core-icon");
+        if (ic.classList.contains("mdi-close")) ic.classList.replace("mdi-close", "mdi-menu");
+    }
+
+    /* Coreografia da substituição: implosão → pulso → ejeção */
+    async function substitutePane(paneName){
+        if (swapLock) return;
+        swapLock = true;
+
+        radial.classList.add("is-collapsing");
+        fab.setAttribute("data-pane", paneName);
+
+        await wait(420);
+
+        renderPane(paneName);
+
+        core.classList.remove("is-pulsing");
+        void core.offsetWidth;
+        core.classList.add("is-pulsing");
+
+        void radial.offsetWidth;
+
+        await wait(80);
+        radial.classList.remove("is-collapsing");
+
+        await wait(640);
+        swapLock = false;
+    }
+
+    /* Handlers */
+    core.addEventListener("click", function(e){
+        e.stopPropagation();
+        if (radial.classList.contains("is-open")) closeRadial();
+        else openRadial();
+    });
+
+    tabs.forEach(function(tab){
+        tab.addEventListener("click", function(e){
+            e.stopPropagation();
+            if (tab.classList.contains("is-active") && radial.classList.contains("is-open")) return;
+
+            tabs.forEach(function(t){
+                t.classList.remove("is-active");
+                t.setAttribute("aria-selected", "false");
+            });
+            tab.classList.add("is-active");
+            tab.setAttribute("aria-selected", "true");
+
+            moveThumbTo(tab);
+
+            if (radial.classList.contains("is-open")) {
+                substitutePane(tab.dataset.pane);
+            } else {
+                renderPane(tab.dataset.pane);
+                openRadial();
+            }
+        });
+    });
+
+    document.addEventListener("click", function(e){
+        if (!fab.contains(e.target)) closeRadial();
+    });
+
+    window.addEventListener("resize", function(){
+        var active = fab.querySelector(".udx-fab__tab.is-active");
+        if (active) moveThumbTo(active);
+    });
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function(){
+            var active = fab.querySelector(".udx-fab__tab.is-active");
+            if (active) moveThumbTo(active);
+        });
+    }
+
+    /* Render inicial */
+    renderPane("trilhas");
+}());
+
+/* Newsletter banner */
+(function () {
+    "use strict";
+    var form = document.getElementById("newsForm");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var input = document.getElementById("newsEmail");
+        var email = (input.value || "").trim();
+        var ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (!ok) { input.focus(); input.style.borderBottom = "1px solid var(--udx-primary-hot)"; return; }
+        form.innerHTML = `<div style="display:flex;align-items:center;gap:10px;color:var(--udx-text);font-size:14px;padding:10px 6px;"><span class="mdi mdi-check-circle" style="color:#FA33A1;font-size:24px;"></span>Pronto! Voce esta na lista. Confira sua caixa de entrada.</div>`;
+    });
+}());
+
+/* Clube — botao play (placeholder) */
+(function () {
+    "use strict";
+    var play = document.querySelector(".club-banner__play");
+    if (!play) return;
+    play.addEventListener("click", function () {
+        play.innerHTML = `<span class="mdi mdi-progress-clock" aria-hidden="true"></span>`;
+        setTimeout(function () {
+            play.innerHTML = `<span class="mdi mdi-play" aria-hidden="true"></span>`;
+        }, 1500);
+    });
+}());
+
+/* Reveal-on-scroll suave para as secoes */
+(function () {
+    "use strict";
+    if (!("IntersectionObserver" in window)) return;
+    var els = document.querySelectorAll(".section, .home-hero, .news-banner");
+    els.forEach(function (el) {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(14px)";
+        el.style.transition = "opacity 600ms ease, transform 600ms ease";
+    });
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+            if (e.isIntersecting) {
+                e.target.style.opacity = "1";
+                e.target.style.transform = "translateY(0)";
+                io.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.08 });
+    els.forEach(function (el) { io.observe(el); });
+}());
+</script>
+
+<!-- ======================================================
+     SCRIPTS
+====================================================== -->
+<script id="dsq-count-scr" src="//https-updancexperience-com.disqus.com/count.js" async></script>
+<script src="js/jquery-slider-carrossel.js"></script>
+<script src="js/slider-carrossel.js"></script>
+
+<!-- Scroll infinito com injeção de widgets no mobile -->
+<script>
+(function () {
+    'use strict';
+
+    var PAGE_SIZE = 4;
+    var page      = 2;
+    var loading   = false;
+    var ended     = false;
+    var MAX_PAGES = 12;
+
+    var blogList  = document.querySelector('.blog-list');
+    var sentinel  = document.getElementById('scroll-sentinel');
+    var indicator = document.getElementById('loading-indicator');
+
+    /* Sequência de widgets injetados no mobile entre lotes de posts */
+    var WIDGET_STEPS = [
+        ['widget-comece'],
+        ['widget-search'],
+        ['widget-clube'],
+        ['widget-email'],
+        ['widget-novas'],
+        ['widget-assuntos']
+    ];
+
+    /* Pool de posts de amostra
+       Em produção, substitua por: fetch('/api/posts?page=' + page + '&size=' + PAGE_SIZE) */
+    var SAMPLE = [
+        { date: '10/09/2021', author: 'Wellington Santos', category: 'Alta Performance',
+          title: 'Como Manter o Foco em Períodos de Alta Pressão',
+          text: 'Estratégias mentais utilizadas por dançarinos profissionais para sustentar alto nível de atenção mesmo sob pressão extrema durante temporadas.' },
+        { date: '20/10/2021', author: 'Wellington Santos', category: 'Bem-Estar',
+          title: 'Técnicas de Recuperação Muscular para Bailarinos',
+          text: 'Um guia completo sobre as melhores práticas de recuperação para otimizar sua performance e evitar lesões crônicas ao longo da temporada.' },
+        { date: '05/11/2021', author: 'Wellington Santos', category: 'Expressão',
+          title: 'A Arte da Expressão Corporal Consciente',
+          text: 'Como desenvolver sua linguagem corporal e transformar movimentos técnicos em experiências emocionais autênticas que conectam com o público.' },
+        { date: '18/11/2021', author: 'Wellington Santos', category: 'Nutrição',
+          title: 'Nutrição Estratégica para Dançarinos de Alta Performance',
+          text: 'Descubra como a alimentação inteligente potencializa treinos e melhora a resistência cênica e a recuperação entre ensaios.' },
+        { date: '02/12/2021', author: 'Wellington Santos', category: 'Mentalidade',
+          title: 'Mentalidade de Crescimento no Universo da Dança',
+          text: 'Por que alguns dançarinos evoluem mais rápido e como você pode desenvolver o mindset que transforma limitações em oportunidades.' },
+        { date: '15/12/2021', author: 'Wellington Santos', category: 'Neurociência',
+          title: 'Coreografia e Neurociência: O Cérebro que Dança',
+          text: 'Estudos recentes revelam como a prática regular da dança reconfigura o cérebro e aprimora funções cognitivas essenciais para a vida.' }
+    ];
+    var poolIdx = 0;
+
+    function isMobile() { return window.innerWidth < 992; }
+    function nextPost()  { return SAMPLE[poolIdx++ % SAMPLE.length]; }
+
+    function buildCard(p) {
+        var wrap = document.createElement('div');
+        wrap.className = 'news-block-two grid-box';
+        wrap.innerHTML =
+            '<div class="inner-box">' +
+            '  <span class="card-category">' + (p.category || 'Artigo') + '</span>' +
+            '  <div class="upper-content">' +
+            '    <h4 class="text-white">' + p.title + '</h4>' +
+            '    <div class="text">' + p.text + '</div>' +
+            '    <ul class="post-meta">' +
+            '      <li class="style-two text-white">' +
+            '        <span class="mdi mdi-calendar-outline" aria-hidden="true"></span> ' + p.date +
+            '      </li>' +
+            '      <li class="style-two text-white">' +
+            '        <span class="mdi mdi-account-outline" aria-hidden="true"></span> ' + p.author +
+            '      </li>' +
+            '    </ul>' +
+            '  </div>' +
+            '  <div class="images">' +
+            '    <img src="/images/blog/1.jpg" alt="' + p.title + '" loading="lazy">' +
+            '  </div>' +
+            '  <div class="lower-content">' +
+            '    <input type="submit" value="Saiba mais" class="theme-btn btn-style-one">' +
+            '  </div>' +
+            '</div>';
+        return wrap;
+    }
+
+    function cloneWidget(id) {
+        var original = document.getElementById(id);
+        if (!original) return null;
+        var clone = original.cloneNode(true);
+        clone.removeAttribute('id');
+        clone.querySelectorAll('[id]').forEach(function (el) {
+            el.id = el.id + '-mob';
+        });
+        clone.classList.add('mobile-widget-inline');
+        return clone;
+    }
+
+    function injectWidgets(step) {
+        var ids = WIDGET_STEPS[step];
+        if (!ids) return;
+        ids.forEach(function (id) {
+            var clone = cloneWidget(id);
+            if (clone) blogList.appendChild(clone);
+        });
+    }
+
+    function loadMore() {
+        if (loading || ended) return;
+        loading = true;
+        indicator.style.display = 'flex';
+
+        setTimeout(function () {
+            var widgetStep = page - 2;
+            if (isMobile() && widgetStep < WIDGET_STEPS.length) {
+                injectWidgets(widgetStep);
+            }
+            if (page > MAX_PAGES) {
+                ended = true;
+                indicator.innerHTML = '<span class="scroll-end-msg">&#10003; Você viu todos os artigos disponíveis.</span>';
+                indicator.style.display = 'flex';
+                return;
+            }
+            for (var i = 0; i < PAGE_SIZE; i++) {
+                blogList.appendChild(buildCard(nextPost()));
+            }
+            page++;
+            loading = false;
+            indicator.style.display = 'none';
+        }, 900);
+    }
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting) loadMore();
+        }, { rootMargin: '350px' }).observe(sentinel);
+    } else {
+        window.addEventListener('scroll', function () {
+            if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 450) {
+                loadMore();
+            }
+        });
+    }
+
+}());
+</script>
+
+
+<script src="/js/auth-modal.js" defer></script>
+
+<!-- Newsletter: botão "Cadastrar" leva à página de cadastro carregando o e-mail digitado -->
+<script>
+(function () {
+    'use strict';
+    // Delegação por "name" (não por id): funciona no widget original e nos
+    // clones do mobile, onde os ids ganham sufixo mas os names são preservados.
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[name="btnCadastroEmail"]');
+        if (!btn) return;
+        e.preventDefault();
+        var widget = btn.closest('.widget-box') || document;
+        var input  = widget.querySelector('[name="txtEmail"]');
+        var email  = input ? (input.value || '').trim() : '';
+        var destino = '/cadastro/';
+        if (email) destino += '?email=' + encodeURIComponent(email);
+        window.location.href = destino;
+    });
+}());
+</script>
+</body>
+</html>

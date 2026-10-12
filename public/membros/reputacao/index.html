@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meu Progresso — Up Dance</title>
+<link rel="icon" type="image/x-icon" href="/images/icons/udx-icon.ico">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital@1&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.9.96/css/materialdesignicons.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/blog.css">
+<link rel="stylesheet" href="/css/trailsFormat.css">
+<link rel="stylesheet" href="/css/format.css">
+<link rel="stylesheet" href="/css/talentTree.css">
+<link rel="stylesheet" href="/css/niveis.css">
+<link rel="stylesheet" href="/css/reputacao.css">
+
+<style>
+  .members-topbar{
+    position: sticky; top: 0; z-index: 300;
+    display: flex; align-items: center; gap: .8rem;
+    padding: 12px 22px;
+    background: rgba(2, 2, 26, 0.96);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--udx-border);
+    box-shadow: 0 2px 24px rgba(0, 0, 0, 0.50);
+    flex-wrap: wrap;
+  }
+  .members-topbar img{ width: 34px; height: 34px; }
+  .members-topbar .marca{
+    font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.25rem;
+    background: linear-gradient(to top, #fb8460, #f13aa1);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .members-topbar .type-badge{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 50px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--seg-grad); color: #fff; box-shadow: 0 6px 18px var(--seg-glow);
+    max-width: 60vw; white-space: normal; line-height: 1.15; font-size: 12px;
+  }
+  .members-topbar .type-badge .mdi{ font-size: 14px; }
+  .members-topbar .spacer{ flex: 1; }
+  .members-topbar .btn-voltar, .members-topbar .btn-sair{
+    background: transparent; color: var(--udx-text);
+    border: 1.5px solid rgba(223, 224, 242, 0.40);
+    padding: 8px 16px; border-radius: var(--udx-radius-sm);
+    font-family: var(--udx-font); font-size: .88rem; font-weight: 500;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background-color 280ms ease, border-color 280ms ease, color 280ms ease;
+  }
+  .members-topbar .btn-voltar{ margin-bottom: 12px; }
+  .members-topbar .btn-voltar:hover, .members-topbar .btn-sair:hover{
+    background-color: rgba(223, 224, 242, 0.08);
+    border-color: var(--udx-primary-hot); color: #fff;
+  }
+  .members-topbar .btn-voltar .mdi{ font-size: 16px; }
+  .members-main{ padding-bottom: 40px; }
+  .members-hero .type-chip{
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 10px; padding: 6px 14px; border-radius: 50px;
+    background: rgba(2, 2, 26, 0.55); border: 1px solid var(--udx-border);
+    color: var(--udx-text); font-size: 12px; font-weight: 600;
+  }
+  .members-hero .type-chip .mdi{ font-size: 15px; color: var(--seg-accent); }
+  .estagio-tag{
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; padding: 6px 14px; border-radius: 50px;
+    background: var(--seg-grad-soft); border: 1px solid var(--seg-accent);
+    color: #fff; font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .estagio-tag .mdi{ font-size: 14px; color: var(--seg-accent); }
+  .members-footer{
+    padding: 20px 22px; text-align: center;
+    color: var(--udx-text-muted); font-size: .8rem;
+    border-top: 1px solid var(--udx-border);
+  }
+
+  /* Ranking sazonal em breve (herdado da Fase 1) */
+  .rep-em-breve{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    border:1px dashed var(--udx-border); border-radius:var(--udx-radius);
+    background:rgba(2,2,26,0.4);
+  }
+  .rep-em-breve .mdi{ font-size:28px; color:var(--seg-accent); }
+  .rep-em-breve h3{ margin:0 0 4px; font-size:1rem; }
+  .rep-em-breve p{ margin:0; color:var(--udx-text-muted); font-size:.85rem; }
+
+  /* Abas de estilo */
+  .style-tabs{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;
+  }
+  .style-tab{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 14px; border-radius:50px; cursor:pointer;
+    background:rgba(2,2,26,0.55); border:1px solid var(--udx-border);
+    color:var(--udx-text); font-family:var(--udx-font); font-size:.85rem; font-weight:600;
+    transition:background-color 240ms ease, border-color 240ms ease, transform 240ms ease;
+  }
+  .style-tab:hover{ transform:translateY(-1px); }
+  .style-tab[aria-selected="true"]{
+    background:linear-gradient(135deg, var(--st-cor,#430ABF), var(--st-cor-alt,#8C0783));
+    border-color:transparent; color:#fff;
+  }
+  .style-tab .mdi{ font-size:16px; }
+  .style-tab .n-avaliacoes{
+    padding:2px 8px; border-radius:20px; background:rgba(255,255,255,.1); font-size:11px; font-weight:700;
+  }
+
+  /* Painel de estilo com PD atual e escala */
+  .style-panel{
+    padding:20px 22px; border-radius:var(--udx-radius);
+    background:linear-gradient(135deg, rgba(2,2,26,.65), rgba(2,2,26,.35));
+    border:1px solid var(--udx-border); position:relative; overflow:hidden;
+  }
+  .style-panel::before{
+    content:''; position:absolute; inset:0; opacity:.10; pointer-events:none;
+    background:linear-gradient(135deg, var(--st-cor,#430ABF), transparent 60%);
+  }
+  .style-panel__head{
+    display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .style-panel__head .mdi{ font-size:32px; color:var(--st-cor,#8C0783); }
+  .style-panel__head h3{ margin:0; font-size:1.2rem; }
+  .style-panel__head p{ margin:0; color:var(--udx-text-muted); font-size:.82rem; }
+  .style-panel__stats{
+    display:flex; gap:20px; flex-wrap:wrap; margin-left:auto;
+  }
+  .style-panel__stat{ text-align:right; }
+  .style-panel__stat b{ display:block; font-size:1.3rem; color:#fff; }
+  .style-panel__stat span{ font-size:.72rem; color:var(--udx-text-muted); text-transform:uppercase; letter-spacing:.06em; }
+
+  .style-panel__proximo{
+    margin:14px 0 18px; padding:12px 14px; border-radius:var(--udx-radius-sm);
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);
+    font-size:.86rem; color:var(--udx-text);
+  }
+  .style-panel__proximo b{ color:var(--st-cor,#FA33A1); }
+  .style-panel__proximo .gap-info{
+    font-size:.78rem; color:var(--udx-text-muted); margin-top:4px;
+  }
+
+  /* Escala vertical dos 7 marcos */
+  .marcos{
+    display:flex; flex-direction:column; gap:8px;
+    margin:0; padding:0; list-style:none;
+  }
+  .marco{
+    display:flex; align-items:center; gap:14px;
+    padding:10px 14px; border-radius:var(--udx-radius-sm);
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+    transition:background-color 240ms ease, border-color 240ms ease;
+  }
+  .marco.is-earned{
+    background:linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+    border-color:var(--st-cor,#FA33A1);
+  }
+  .marco.is-locked{ opacity:.55; }
+  .marco__idx{
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.06); font-weight:700; font-size:.9rem;
+    flex-shrink:0;
+  }
+  .marco.is-earned .marco__idx{ background:var(--st-cor,#FA33A1); color:#fff; }
+  .marco__nome{ flex:1; }
+  .marco__nome b{ display:block; font-size:.95rem; }
+  .marco__nome small{ font-size:.75rem; color:var(--udx-text-muted); }
+  .marco__badge{
+    padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700;
+    background:rgba(255,255,255,.06); color:var(--udx-text-muted);
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .marco.is-earned .marco__badge{
+    background:var(--st-cor,#FA33A1); color:#fff;
+  }
+  .marco__badge .mdi{ font-size:14px; }
+
+  /* Cards de transversal (herdado Fase 1) */
+  .trans-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
+  .trans-card{
+    position:relative; padding:16px 18px; border-radius:var(--udx-radius);
+    background:rgba(2,2,26,0.55); border:1px solid var(--udx-border);
+    transition:border-color 280ms ease, transform 280ms ease;
+    overflow:hidden;
+  }
+  .trans-card::before{
+    content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(135deg, var(--tc, #430ABF) 0%, transparent 55%);
+    opacity:.18;
+  }
+  .trans-card.is-earned{ border-color:var(--tc, #FA33A1); }
+  .trans-card.is-locked{ opacity:.55; }
+  .trans-card__head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .trans-card__head .mdi{ font-size:24px; color:var(--tc, #FA33A1); }
+  .trans-card__head h4{ margin:0; font-size:1rem; }
+  .trans-card__desc{ margin:0 0 10px; font-size:.87rem; color:var(--udx-text); }
+  .trans-card__crit{ margin:0; font-size:.78rem; color:var(--udx-text-muted); font-style:italic; }
+  .trans-card__tag{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:10px; padding:3px 9px; border-radius:50px;
+    background:rgba(255,255,255,0.06); border:1px solid var(--udx-border);
+    font-size:11px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--udx-text-muted);
+  }
+  .trans-card__tag.is-on{ color:#fff; background:var(--tc,#FA33A1); border-color:transparent; }
+  .trans-card__tag .mdi{ font-size:14px; }
+  .trans-card__gate{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:8px; padding:3px 9px; border-radius:50px;
+    background:rgba(242,116,5,.14); border:1px solid rgba(242,116,5,.5);
+    color:#F27405; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+  }
+  .trans-card__scopes{
+    display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;
+  }
+  .trans-card__scope-chip{
+    padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700;
+    background:var(--tc, #FA33A1); color:#fff;
+  }
+</style>
+</head>
+
+<body class="page-membros page-reputacao">
+
+  <header class="members-topbar">
+    <img src="/images/icons/udx-icon.png" alt="">
+    <span class="marca">Up Dance</span>
+    <span class="type-badge">
+      <span class="mdi mdi-shield-star-outline" aria-hidden="true"></span>
+      <span>Meu Progresso</span>
+    </span>
+    <span class="spacer"></span>
+    <a class="btn-voltar" href="/membros/" aria-label="Voltar para a Área de Membros">
+      <span class="mdi mdi-arrow-left" aria-hidden="true"></span>
+      Área de Membros
+    </a>
+    <button class="btn-sair" id="sair">Sair</button>
+  </header>
+
+  <main class="members-main">
+
+    <section class="trails-hero">
+      <div class="auto-container">
+        <div class="trails-hero__inner members-hero">
+          <span class="estagio-tag">
+            <span class="mdi mdi-shield-star-outline" aria-hidden="true"></span>
+            Reputação &amp; Desempenho
+          </span>
+          <div class="eyebrow"><b>07</b><span>Meu Progresso</span></div>
+          <h1>Reputação &amp; <em>Desempenho</em></h1>
+          <p class="lead">Seu <b>Desempenho</b> reflete a sua forma recente, com base nas notas
+            que a coordenação lança nos desafios. Sua <b>Reputação</b> passa a ser sazonal em
+            breve. Os <b>títulos por estilo</b> acompanham sua evolução em cada linguagem;
+            os <b>transversais</b> registram conquistas especiais ao longo da jornada.</p>
+          <div class="type-chip" id="userChip" hidden>
+            <span class="mdi mdi-account-check-outline" aria-hidden="true"></span>
+            <span>Conectado como <b id="userEmail">—</b></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="repApp" hidden>
+      <!-- Abas por perfil (para PR/PD por perfil) -->
+      <section class="trails-section" style="padding-bottom:0">
+        <div class="auto-container">
+          <div class="tt-profile-tabs" id="repTabs" role="tablist"></div>
+        </div>
+      </section>
+
+      <!-- Desempenho e Reputação (moedas estatísticas por perfil) -->
+      <section class="trails-section" style="padding-top:14px">
+        <div class="auto-container">
+          <div class="trails-section__head ts__h">
+            <div class="eyebrow"><span class="mdi mdi-chart-line" aria-hidden="true"></span><span>Suas moedas</span></div>
+            <h2>Desempenho <em>&amp; Reputação</em></h2>
+            <p class="lead">O Desempenho mostra a sua forma recente. A Reputação acumula com
+              volume e qualidade — em breve alimenta o ranking sazonal.</p>
+          </div>
+          <div class="rep-cols" id="repMetrics"></div>
+        </div>
+      </section>
+
+      <!-- Ranking sazonal (em breve) -->
+      <section class="trails-section" style="padding-top:0">
+        <div class="auto-container">
+          <div class="rep-em-breve" role="note">
+            <span class="mdi mdi-clock-outline" aria-hidden="true"></span>
+            <div>
+              <h3>Ranking sazonal — em breve</h3>
+              <p>Os títulos de reputação (Reconhecido(a), Referência, Autoridade, Lenda) passam
+                a ser conquistados dentro de uma <b>temporada de atividades exclusivas</b>.
+                Sua pontuação acumulada segue sendo registrada.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Títulos por Estilo -->
+      <section class="trails-section" style="padding-top:14px">
+        <div class="auto-container">
+          <div class="trails-section__head ts__h">
+            <div class="eyebrow"><span class="mdi mdi-star-four-points" aria-hidden="true"></span><span>Sua jornada por estilo</span></div>
+            <h2>Títulos <em>por estilo</em></h2>
+            <p class="lead">Cada estilo tem 7 marcos de reconhecimento. O marco desbloqueia
+              quando o seu Desempenho no estilo atinge o mínimo e você tem avaliações
+              suficientes daquele estilo. Reavaliações podem alterar seu marco atual.</p>
+          </div>
+          <div class="style-tabs" id="styleTabs" role="tablist"></div>
+          <div id="stylePanel"></div>
+        </div>
+      </section>
+
+      <!-- Títulos Transversais -->
+      <section class="trails-section" style="padding-top:14px">
+        <div class="auto-container">
+          <div class="trails-section__head ts__h">
+            <div class="eyebrow"><span class="mdi mdi-star-shooting" aria-hidden="true"></span><span>Conquistas transversais</span></div>
+            <h2>Títulos <em>transversais</em></h2>
+            <p class="lead">Marcos especiais concedidos automaticamente quando você cumpre
+              critérios específicos. Alguns exigem que você já esteja no nível intermediário.</p>
+          </div>
+          <div class="trans-grid" id="repTransversais"></div>
+        </div>
+      </section>
+
+      <!-- Títulos legados -->
+      <section class="trails-section" style="padding-top:0" id="repLegadoSec" hidden>
+        <div class="auto-container">
+          <div class="trails-section__head ts__h">
+            <div class="eyebrow"><span class="mdi mdi-history" aria-hidden="true"></span><span>Histórico</span></div>
+            <h2>Títulos <em>anteriores</em></h2>
+            <p class="lead">Títulos concedidos antes da reforma do sistema. Ficam preservados
+              como registro histórico.</p>
+          </div>
+          <ul class="tt-titles" id="repLegado"></ul>
+        </div>
+      </section>
+    </div><!-- /#repApp -->
+
+    <div id="repEmpty" hidden>
+      <section class="trails-section">
+        <div class="auto-container">
+          <div class="tt-panel">
+            <div class="tt-panel__empty">
+              <span class="mdi mdi-clipboard-text-clock-outline" aria-hidden="true"></span>
+              Ainda não há avaliações lançadas. Assim que a coordenação avaliar seus desafios,
+              sua reputação e seu desempenho aparecem aqui.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="members-footer">
+    © Up Dance — Meu Progresso. Este conteúdo é pessoal e intransferível.
+  </footer>
+
+  <div class="tt-toast" id="repToast" role="status" aria-live="polite"></div>
+
+  <script src="/js/reputacao.data.js"></script>
+  <script>
+  (function (win, doc) {
+    'use strict';
+    var REP = win.UDX_REP;
+    var API = { me: '/api/me', estado: '/api/reputacao/estado' };
+    var $ = function (s, c) { return (c || doc).querySelector(s); };
+    function el(t, cls, html){ var n=doc.createElement(t); if(cls)n.className=cls; if(html!=null)n.innerHTML=html; return n; }
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+    var estado = null;
+    var escopoAtivo = '_global';
+    var estiloAtivo = 'hhd';
+
+    function bandaClasse(pd){
+      var b = REP.bandaDesempenho(pd);
+      if (!b) return 'rep-band-0';
+      return 'rep-band-' + b.id.split('-')[1];
+    }
+    function dadosDoEscopo(id){
+      return id === '_global' ? estado.global : (estado.porPerfil[id] || { pr:0, pd:0, n:0 });
+    }
+    function dadosDoEstilo(id){
+      return (estado.porEstilo && estado.porEstilo[id]) || { pd: 0, n: 0 };
+    }
+
+    // Todos os títulos concedidos naquele estilo, indexados por titulo_id.
+    function titulosEstiloConcedidos(estilo){
+      var mp = {};
+      (estado.titulos || []).forEach(function(t){
+        if (t.eixo === 'estilo' && t.escopo === estilo) mp[t.titulo_id] = t;
+      });
+      return mp;
+    }
+    function transversaisConcedidos(){
+      // Retorna Map<titulo_id, Set<escopo>> — Guardião pode ter vários.
+      var mp = {};
+      (estado.titulos || []).forEach(function(t){
+        if (t.eixo === 'transversal'){
+          (mp[t.titulo_id] = mp[t.titulo_id] || []).push(t.escopo);
+        }
+      });
+      return mp;
+    }
+    function legadoConcedido(){
+      return (estado.titulos || []).filter(function(t){
+        return t.eixo === 'reputacao' || t.eixo === 'desempenho';
+      });
+    }
+
+    function renderTabs(){
+      var tabs = $('#repTabs'); tabs.innerHTML = '';
+      var ids = ['_global'].concat(Object.keys(estado.porPerfil));
+      ids.forEach(function(id){
+        var b = el('button', 'tt-profile-tab', '<span class="mdi mdi-account-star-outline"></span>' + esc(REP.perfilLabel(id)));
+        b.setAttribute('role','tab');
+        b.setAttribute('aria-selected', id === escopoAtivo ? 'true' : 'false');
+        b.addEventListener('click', function(){ escopoAtivo = id; renderTabs(); renderMetrics(); });
+        tabs.appendChild(b);
+      });
+    }
+
+    function walletItem(nome, gradClasse, valorHTML){
+      var it = el('div', 'tt-wallet__item ' + gradClasse);
+      it.appendChild(el('div', 'tt-wallet__icon', '<span class="mdi ' + (gradClasse==='rep-grad-pr'?'mdi-shield-star':'mdi-speedometer') + '"></span>'));
+      var info = el('div', 'tt-wallet__info');
+      info.appendChild(el('span', 'tt-wallet__name', esc(nome)));
+      info.appendChild(el('div', 'tt-wallet__value', valorHTML));
+      it.appendChild(info);
+      return { item: it, info: info };
+    }
+    function barra(frac){
+      var wrap = el('div', 'tt-wallet__bar');
+      wrap.appendChild(el('div', 'tt-wallet__fill'));
+      wrap.firstChild.style.width = Math.round(frac*100) + '%';
+      return wrap;
+    }
+
+    function renderMetrics(){
+      var box = $('#repMetrics'); box.innerHTML = '';
+      var d = dadosDoEscopo(escopoAtivo);
+
+      var banda = REP.bandaDesempenho(d.pd);
+      var pill = banda
+        ? '<span class="rep-pill ' + bandaClasse(d.pd) + '"><span class="mdi ' + banda.icone + '"></span>' + esc(banda.nome) + '</span>'
+        : '<span class="rep-pill rep-pill--muted">Sem banda ainda</span>';
+      var pd = walletItem('Desempenho', bandaClasse(d.pd), '<b>' + d.pd + '</b>/100 &nbsp;' + pill);
+      pd.info.appendChild(barra(d.pd/100));
+      var pdLine = el('div', 'rep-metric__next');
+      pdLine.innerHTML = '<span>Forma recente</span><span>' + d.n + ' avaliação(ões)</span>';
+      pd.info.appendChild(pdLine);
+      box.appendChild(pd.item);
+
+      var pr = walletItem('Reputação', 'rep-grad-pr', '<b>' + fmt(d.pr) + '</b> pts');
+      var prLine = el('div', 'rep-metric__next');
+      prLine.innerHTML = '<span>Acumulada — ranking sazonal em breve</span>';
+      pr.info.appendChild(prLine);
+      box.appendChild(pr.item);
+    }
+
+    // Abas de estilo — sempre exibe os 5 estilos, mesmo se N=0 (para
+    // deixar visível quais estilos existem e quantas avaliações há).
+    function renderStyleTabs(){
+      var tabs = $('#styleTabs'); tabs.innerHTML = '';
+      ['hhd','pop','lock','break','house'].forEach(function(estilo){
+        var meta = REP.estilos[estilo];
+        var d = dadosDoEstilo(estilo);
+        var b = el('button', 'style-tab',
+          '<span class="mdi ' + meta.icone + '"></span>' +
+          '<span>' + esc(meta.nome) + '</span>' +
+          '<span class="n-avaliacoes">' + d.n + '</span>');
+        b.style.setProperty('--st-cor', meta.cor);
+        b.style.setProperty('--st-cor-alt', meta.corAlt);
+        b.setAttribute('role','tab');
+        b.setAttribute('aria-selected', estilo === estiloAtivo ? 'true' : 'false');
+        b.addEventListener('click', function(){ estiloAtivo = estilo; renderStyleTabs(); renderStylePanel(); });
+        tabs.appendChild(b);
+      });
+    }
+
+    function renderStylePanel(){
+      var box = $('#stylePanel'); box.innerHTML = '';
+      var meta = REP.estilos[estiloAtivo];
+      var d = dadosDoEstilo(estiloAtivo);
+      var conquistados = titulosEstiloConcedidos(estiloAtivo);
+
+      var panel = el('div', 'style-panel');
+      panel.style.setProperty('--st-cor', meta.cor);
+      panel.style.setProperty('--st-cor-alt', meta.corAlt);
+
+      var head = el('div', 'style-panel__head');
+      head.innerHTML =
+        '<span class="mdi ' + meta.icone + '"></span>' +
+        '<div><h3>' + esc(meta.nome) + '</h3>' +
+        '<p>Sua evolução escalonada nesse estilo</p></div>' +
+        '<div class="style-panel__stats">' +
+          '<div class="style-panel__stat"><b>' + d.pd + '</b><span>PD do estilo</span></div>' +
+          '<div class="style-panel__stat"><b>' + d.n  + '</b><span>Avaliações</span></div>' +
+        '</div>';
+      panel.appendChild(head);
+
+      // Próximo marco
+      var prox = REP.proximoMarcoEstilo(d.pd, d.n);
+      var box2 = el('div', 'style-panel__proximo');
+      if (prox){
+        var nomeProx = REP.nomeMarco(estiloAtivo, prox.marco.marco);
+        var gaps = [];
+        if (prox.gapPD > 0) gaps.push('+' + prox.gapPD + ' de PD');
+        if (prox.gapN  > 0) gaps.push('+' + prox.gapN  + ' avaliação(ões)');
+        box2.innerHTML =
+          'Próximo marco: <b>' + esc(nomeProx) + '</b>' +
+          '<div class="gap-info">' +
+          (gaps.length ? 'Faltam ' + gaps.join(' e ') + '.' : 'Pronto para conquistar na próxima avaliação.') +
+          '</div>';
+      } else {
+        box2.innerHTML = '<b>Todos os 7 marcos deste estilo conquistados.</b>' +
+          '<div class="gap-info">Continue mantendo a forma para não perdê-los.</div>';
+      }
+      panel.appendChild(box2);
+
+      // Escala vertical dos 7 marcos
+      var ul = el('ul', 'marcos');
+      for (var k = 1; k <= 7; k++){
+        var e = REP.escalaEstilo[k-1];
+        var id = 'est-' + estiloAtivo + '-' + k;
+        var nome = REP.nomeMarco(estiloAtivo, k);
+        var earned = !!conquistados[id];
+        var isNext = prox && prox.marco.marco === k;
+        var li = el('li', 'marco' + (earned ? ' is-earned' : (isNext ? '' : ' is-locked')));
+        li.innerHTML =
+          '<div class="marco__idx">' + k + '</div>' +
+          '<div class="marco__nome"><b>' + esc(nome) + '</b>' +
+          '<small>PD ≥ ' + e.minPD + ' · N ≥ ' + e.minN + '</small></div>' +
+          '<span class="marco__badge">' +
+            (earned
+              ? '<span class="mdi mdi-check-circle"></span>Conquistado'
+              : (isNext ? '<span class="mdi mdi-target"></span>Próximo'
+                        : '<span class="mdi mdi-lock-outline"></span>Bloqueado')) +
+          '</span>';
+        ul.appendChild(li);
+      }
+      panel.appendChild(ul);
+      box.appendChild(panel);
+    }
+
+    function renderTransversais(){
+      var box = $('#repTransversais'); box.innerHTML = '';
+      var conquistados = transversaisConcedidos();
+      REP.titulosTransversais.forEach(function(t){
+        var escopos = conquistados[t.id] || [];
+        var earned = escopos.length > 0;
+        var card = el('div', 'trans-card' + (earned ? ' is-earned' : ' is-locked'));
+        card.style.setProperty('--tc', t.cor);
+        card.appendChild(el('div', 'trans-card__head',
+          '<span class="mdi ' + t.icone + '"></span><h4>' + esc(t.nome) + '</h4>'));
+        card.appendChild(el('p', 'trans-card__desc', esc(t.descricao)));
+        card.appendChild(el('p', 'trans-card__crit', esc(t.criterio)));
+
+        if (t.gate){
+          card.appendChild(el('span', 'trans-card__gate',
+            '<span class="mdi mdi-lock-check-outline"></span>' +
+            'Exige Nível Intermediário'));
+        }
+
+        if (t.escopoPorEstilo){
+          if (escopos.length){
+            var scopes = el('div', 'trans-card__scopes');
+            escopos.sort().forEach(function(s){
+              scopes.appendChild(el('span', 'trans-card__scope-chip', esc(REP.estiloLabel(s))));
+            });
+            card.appendChild(scopes);
+          } else {
+            card.appendChild(el('span', 'trans-card__tag',
+              '<span class="mdi mdi-lock-outline"></span> Nenhum estilo ainda'));
+          }
+        } else {
+          var tag = el('span', 'trans-card__tag' + (earned ? ' is-on' : ''),
+            earned
+              ? '<span class="mdi mdi-check-circle"></span> Conquistado · ' + esc(REP.perfilLabel(t.escopo))
+              : '<span class="mdi mdi-lock-outline"></span> Não conquistado');
+          card.appendChild(tag);
+        }
+        box.appendChild(card);
+      });
+    }
+
+    function renderLegado(){
+      var ul = $('#repLegado'); var sec = $('#repLegadoSec');
+      ul.innerHTML = '';
+      var itens = legadoConcedido();
+      if (!itens.length){ sec.hidden = true; return; }
+      sec.hidden = false;
+      itens.sort(function(a,b){ return a.eixo < b.eixo ? -1 : 1; });
+      itens.forEach(function(t){
+        var m = REP.metaTitulo(t.titulo_id);
+        var li = el('li', 'tt-title is-earned',
+          '<span class="mdi ' + m.icone + '"></span> ' + esc(m.nome) +
+          ' <small style="opacity:.7">· ' + (t.eixo === 'reputacao' ? 'Reputação' : 'Desempenho') +
+          ' · ' + esc(REP.perfilLabel(t.escopo)) + '</small>');
+        ul.appendChild(li);
+      });
+    }
+
+    function toast(msg){
+      var t = $('#repToast'); t.textContent = msg; t.classList.add('is-open');
+      setTimeout(function(){ t.classList.remove('is-open'); }, 2600);
+    }
+
+    function carregar(){
+      fetch(API.me, { credentials:'same-origin' }).then(function(r){ return r.ok?r.json():null; }).then(function(me){
+        if (me && me.email){ $('#userEmail').textContent = me.email; $('#userChip').hidden = false; }
+      }).catch(function(){});
+
+      fetch(API.estado, { credentials:'same-origin' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(j){
+          if (!j || !j.reputacao){ $('#repEmpty').hidden = false; return; }
+          estado = j.reputacao;
+          estado.porEstilo = estado.porEstilo || {};
+          var temDados = (estado.global && estado.global.n > 0)
+                       || Object.keys(estado.porPerfil||{}).length > 0
+                       || Object.keys(estado.porEstilo).length > 0;
+          if (!temDados){ $('#repEmpty').hidden = false; return; }
+          $('#repApp').hidden = false;
+          // Estilo ativo inicial: o de maior N; se todos zero, mantém hhd.
+          var maxN = -1;
+          ['hhd','pop','lock','break','house'].forEach(function(e){
+            var n = (estado.porEstilo[e] && estado.porEstilo[e].n) || 0;
+            if (n > maxN){ maxN = n; estiloAtivo = e; }
+          });
+          renderTabs(); renderMetrics();
+          renderStyleTabs(); renderStylePanel();
+          renderTransversais(); renderLegado();
+        })
+        .catch(function(){ $('#repEmpty').hidden = false; toast('Não foi possível carregar agora.'); });
+    }
+
+    var sair = $('#sair');
+    if (sair) sair.addEventListener('click', function(){
+      fetch('/api/member/logout', { method:'POST', credentials:'same-origin' }).catch(function(){}).finally(function(){ location.href='/'; });
+    });
+    carregar();
+  }(window, document));
+  </script>
+</body>
+</html>

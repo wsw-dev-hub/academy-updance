@@ -1,0 +1,813 @@
+/* ============================================================
+           MODAL: #effortFeedbackModal — assinatura "Trilhas"
+           ------------------------------------------------------------
+           Tokens locais derivados de .trail-card / --udx-grad-trilhas
+           (blog.css). TODO seletor é escopado por #effortFeedbackModal:
+           nenhuma regra vaza para outros modais da plataforma.
+        ============================================================ */
+        #explosionFeedbackModal,
+        #effortFeedbackModal,
+        #fundamentalsFeedbackModal {
+            /* CROMÁTICA — assinatura "Apps/Destaques", a mesma que index.html
+               usa em h1.page-heading::after, .chart-section h3::before e
+               .level-tag strong. A folha usava --udx-grad-trilhas (1ª aba do
+               FAB): o modal abria de dentro de uma .chart-section carmim/indigo
+               e trocava de família cromática sem motivo no conteúdo. */
+            --modal-gradient:    var(--udx-grad-apps);
+            --modal-glow:        rgba(102, 16, 242, 0.45);   /* = .chart-section h3::before */
+            --modal-glow-strong: rgba(102, 16, 242, 0.55);   /* = h1.page-heading::after   */
+            --modal-glow-hover:  rgba(250, 51, 161, 0.18);   /* = .chart-section:hover     */
+            --modal-accent:      var(--udx-primary-hot);     /* = ícones dos card-title    */
+            --modal-accent-deep: var(--udx-primary);
+
+            /* SUPERFÍCIES — valores literais de .chart-section / .udx-card.
+               --modal-card era rgba(17,2,115,.18) (índigo saturado), mais
+               claro que o próprio corpo do modal: os blocos "flutuavam". */
+            --modal-surface:     rgba(2, 2, 26, 0.88);
+            --modal-card:        rgba(2, 2, 26, 0.55);
+            --modal-card-lead:   rgba(17, 2, 115, 0.22);   /* só o bloco-veredito */
+            --modal-rail:        rgba(2, 2, 26, 0.55);
+
+            /* BORDAS — reusa o token de hover da página em vez de um rosa
+               literal inventado, que divergia de .chart-section:hover. */
+            --modal-border:      var(--udx-border);
+            --modal-border-hot:  var(--udx-border-hover);
+            --modal-chip-bg:     rgba(111, 66, 193, 0.14);
+            --modal-chip-brd:    rgba(111, 66, 193, 0.32);
+
+            /* TINTA — --modal-ink-body era usado por .udx-report__para SEM
+               fallback e nunca fora definido: a declaração caía como inválida
+               em tempo de valor computado e o parágrafo perdia a cor. */
+            --modal-ink:         var(--udx-text);
+            --modal-ink-muted:   var(--udx-text-muted);
+            --modal-ink-body:    var(--udx-text);
+
+            /* TONS SEMÂNTICOS — fallbacks porque estes dois tokens não são
+               referenciados por nenhuma outra folha do projeto. */
+            --modal-tom-ok:      var(--udx-cyan);
+            --modal-tom-subir:   var(--udx-primary-hot);
+            --modal-tom-descer:  var(--udx-primary-orange, #F27405);
+            --modal-tom-alerta:  var(--udx-primary-heat, #F20505);
+
+            /* RITMO — padding de .chart-section (24px 22px 18px) reduzido para
+               a escala interna do modal; --modal-rail-w = largura da barra
+               lateral de .chart-section h3::before. */
+            --modal-gap:         16px;
+            --modal-pad:         22px 20px 18px;
+            --modal-rail-w:      5px;
+        }
+
+        /* ───────── Casca ───────── */
+        #explosionFeedbackModal .modal-content,
+        #effortFeedbackModal .modal-content,
+        #fundamentalsFeedbackModal .modal-content {
+            background: var(--modal-surface);
+            border: 1px solid var(--modal-border);
+            border-radius: var(--udx-radius-lg);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.65),
+                0 0 0 1px rgba(111, 66, 193, 0.28);   /* anel indigo, não rosa-trilhas */
+            overflow: hidden;
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+        }
+
+        /* ───────── Cabeçalho ─────────
+           Fio superior com o degradê das trilhas (mesma leitura da barra
+           lateral de .chart-section h3, mas na cromática trilhas). */
+        #explosionFeedbackModal .modal-header,
+        #effortFeedbackModal .modal-header,
+        #fundamentalsFeedbackModal .modal-header {
+            position: relative;
+            border-bottom: 1px solid var(--modal-chip-brd);
+            padding: 1.25rem 1.75rem;
+            /* Véu carmim → indigo: os mesmos dois extremos de --udx-grad-apps,
+               nas opacidades de véu. Antes era rosa-choque → vermelho-sangue. */
+            background: linear-gradient(135deg,
+                rgba(191, 4, 73, 0.10) 0%,
+                rgba(111, 66, 193, 0.10) 100%);
+        }
+        /* Fio superior = a mesma peça de h1.page-heading::after (5px + glow
+           indigo amplificado), que é "o ponto de maior peso visual da página".
+           O modal é a continuação daquele título, não um objeto de outra linha. */
+        #explosionFeedbackModal .modal-header::after,
+        #effortFeedbackModal .modal-header::after,
+        #fundamentalsFeedbackModal .modal-header::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 5px;
+            background-image: var(--modal-gradient);
+            box-shadow: 0 0 22px var(--modal-glow-strong);
+        }
+        #explosionFeedbackModal .modal-title,
+        #effortFeedbackModal .modal-title,
+        #fundamentalsFeedbackModal .modal-title {
+            color: var(--modal-ink);
+            font-family: var(--udx-font);
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.3;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        #explosionFeedbackModal .modal-title .mdi,
+        #effortFeedbackModal .modal-title .mdi,
+        #fundamentalsFeedbackModal .modal-title .mdi {
+            color: var(--modal-accent);
+            font-size: 1.35rem;
+            line-height: 1;
+        }
+
+        /* .btn-close do Bootstrap é um SVG em background-image: `color` não
+           tem efeito. Usa-se o filtro nativo do tema + opacidade/rotação. */
+        #explosionFeedbackModal .btn-close,
+        #effortFeedbackModal .btn-close,
+        #fundamentalsFeedbackModal .btn-close {
+            filter: var(--bs-btn-close-filter, none);
+            opacity: 0.65;
+            transition: opacity 220ms ease, transform 220ms ease;
+        }
+        #explosionFeedbackModal .btn-close:hover,
+        #effortFeedbackModal .btn-close:hover,
+        #fundamentalsFeedbackModal .btn-close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+        #explosionFeedbackModal .btn-close:focus-visible,
+        #effortFeedbackModal .btn-close:focus-visible,
+        #fundamentalsFeedbackModal .btn-close:focus-visible {
+            box-shadow: 0 0 0 0.2rem rgba(250, 51, 161, 0.35);
+        }
+
+        /* ───────── Corpo ─────────
+           SEM max-height: .modal-dialog-scrollable já calcula o limite a
+           partir da altura do diálogo. Fixar 65vh duplicava a restrição. */
+        #explosionFeedbackModal .modal-body,
+        #effortFeedbackModal .modal-body,
+        #fundamentalsFeedbackModal .modal-body {
+            padding: 1.5rem 1.75rem;
+            background: var(--modal-rail);
+            color: var(--modal-ink);
+            scrollbar-width: thin;
+            scrollbar-color: var(--modal-accent) transparent;
+            /* Rede de segurança: se o bloco legado de format.css ainda estiver
+               presente, .modal-body (0,1,0) impunha max-height:65vh + overflow
+               próprio, duplicando o contêiner de rolagem de
+               .modal-dialog-scrollable. Reafirmar aqui (1,1,0) neutraliza. */
+            max-height: 70vh;
+            /* CORREÇÃO: `visible` (1,1,0) derrotava o `auto` (0,2,0) de
+               .modal-dialog-scrollable .modal-body. Sem filho rolável, o
+               .modal-content (max-height:100% + overflow:hidden) recortava
+               todo o relatório abaixo da dobra, sem barra de rolagem.
+               Neutralizar a duplicação exigia só o max-height:none acima. */
+            overflow-y: auto;
+            /* Item flex em coluna: sem min-height:0 o conteúdo define o piso
+               de altura e o auto acima nunca chega a ativar. */
+            min-height: 0;
+            overscroll-behavior: contain;
+        }
+        #explosionFeedbackModal .modal-body::-webkit-scrollbar,
+        #effortFeedbackModal .modal-body::-webkit-scrollbar,
+        #fundamentalsFeedbackModal .modal-body::-webkit-scrollbar { width: 6px; }
+        #explosionFeedbackModal .modal-body::-webkit-scrollbar-thumb,
+        #effortFeedbackModal .modal-body::-webkit-scrollbar-thumb,
+        #fundamentalsFeedbackModal .modal-body::-webkit-scrollbar-thumb {
+            background-image: var(--modal-gradient);
+            border-radius: 3px;
+        }
+
+        /* ───────── Rodapé ───────── */
+        #explosionFeedbackModal .modal-footer,
+        #effortFeedbackModal .modal-footer,
+        #fundamentalsFeedbackModal .modal-footer {
+            border-top: 1px solid var(--modal-border);
+            padding: 1rem 1.75rem;
+            background: rgba(2, 2, 26, 0.85);
+        }
+        #explosionFeedbackModal .modal-footer .btn-secondary,
+        #effortFeedbackModal .modal-footer .btn-secondary,
+        #fundamentalsFeedbackModal .modal-footer .btn-secondary {
+            background-image: var(--modal-gradient);
+            background-color: var(--modal-accent-deep);
+            border: 1px solid var(--modal-chip-brd);
+            border-radius: var(--udx-radius-sm);
+            color: #ffffff;
+            font-weight: 600;
+            padding: 8px 20px;
+            transition: box-shadow 280ms ease, transform 280ms ease, filter 280ms ease;
+        }
+        #explosionFeedbackModal .modal-footer .btn-secondary:hover,
+        #effortFeedbackModal .modal-footer .btn-secondary:hover,
+        #fundamentalsFeedbackModal .modal-footer .btn-secondary:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(214, 1, 38, 0.42);
+        }
+
+        /* ============================================================
+           RELATÓRIO (#effortFeedbackModalBody > .udx-report)
+           Markup gerado por formatEffortFeedbackHtml (effortFeedback.js).
+           Cada bloco replica .trail-card: superfície, borda, raio, gap,
+           overlay de degradê no hover e chip de ícone.
+        ============================================================ */
+        #explosionFeedbackModalBody,
+        #effortFeedbackModalBody,
+        #fundamentalsFeedbackModalBody {
+            font-family: var(--udx-font);
+            color: var(--modal-ink);
+            font-size: 0.92rem;
+            line-height: 1.65;
+            /* O markup atual é HTML estruturado (data-render="html"), não texto
+               pré-formatado. Sem isto, o pre-wrap remanescente de format.css
+               torna significativas as quebras do código-fonte gerado. */
+            white-space: normal;
+        }
+        /* ───────── Disposição ─────────
+           Grid de 2 colunas. Quase tudo ocupa a linha inteira; a exceção é o
+           DÍPTICO Fortes × Fracas, que é comparativo por natureza e ganha
+           leitura paralela. Testado: os dois blocos são adjacentes no DOM nos
+           dois modos, então o par se forma SEM `order` — ordem visual e ordem
+           de foco/leitor de tela permanecem idênticas.
+           align-items:start impede que o bloco mais curto do par estique. */
+        /* Coluna única é o PADRÃO. O par comparativo Fortes × Fracas e os
+           sub-grids de faixas/caracteristicas só existem quando há medida de
+           linha para eles — ver @media (min-width: 992px) adiante. Abaixo de
+           992px o .modal-dialog vale 500px (o .modal-lg só entra em 992px),
+           o que dava ~26ch por coluna. */
+        .udx-report {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            align-items: start;
+            gap: var(--modal-gap);
+        }
+        .udx-report__block[data-bloco="fortes"],
+        .udx-report__block[data-bloco="fracas"] { grid-column: span 1; }
+
+        /* Superfície e hover copiados de .chart-section:
+           mesma cor, mesmas sombras-token, e SEM transform — a página nunca
+           translada cards, e um lift de 3px em 7 blocos empilhados dentro de
+           um contêiner rolável produz salto a cada passagem do cursor. */
+        .udx-report__block {
+            grid-column: 1 / -1;
+            position: relative;
+            background: var(--modal-card);
+            border: 1px solid var(--modal-border);
+            border-radius: var(--udx-radius-md);
+            padding: var(--modal-pad);
+            box-shadow: var(--udx-shadow-card);
+            overflow: hidden;
+            /* Fecha o contexto de empilhamento no próprio bloco: o ::after
+               (z-index:0) e os filhos (z-index:1) deixam de competir com os
+               do bloco vizinho no contexto do .modal-content. */
+            isolation: isolate;
+            transition: border-color 280ms ease, box-shadow 280ms ease;
+        }
+        .udx-report__block::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: var(--modal-gradient);
+            opacity: 0;
+            transition: opacity 280ms ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .udx-report__block > * { position: relative; z-index: 1; }
+        .udx-report__block:hover {
+            border-color: var(--modal-border-hot);
+            box-shadow: var(--udx-shadow-hover), 0 0 22px var(--modal-glow-hover);
+        }
+        .udx-report__block:hover::after { opacity: 0.06; }
+
+        /* NÍVEL 1 — o veredito é a conclusão do relatório e precisa se ler
+           antes de tudo. Ganha superfície índigo, fio superior (mesma peça do
+           cabeçalho, em escala reduzida) e o accent rosa da página. */
+        .udx-report__block[data-bloco="veredito"] {
+            --modal-accent: var(--udx-primary-hot);
+            background: var(--modal-card-lead);
+            border-color: var(--modal-chip-brd);
+            padding-top: 26px;
+        }
+        .udx-report__block[data-bloco="veredito"]::before {
+            content: "";
+            position: absolute;
+            left: 0; right: 0; top: 0;
+            height: 3px;
+            background-image: var(--modal-gradient);
+            box-shadow: 0 0 12px var(--modal-glow);
+            z-index: 1;
+        }
+
+        /* Cabeçalho do bloco: chip 28px (versão compacta de .trail-card__icon)
+           + título com a métrica de .trail-card h3. */
+        /* Cabeçalho do bloco = a MESMA peça de .chart-section h3: barra
+           vertical de 5px em --udx-grad-apps com glow indigo. O chip
+           (reduzido a 26px) fica como portador do ícone MDI, papel que na
+           página cabe ao <i> colorido em --udx-primary-hot dos card-title.
+           Antes o bloco só tinha o chip — vocabulário de .trail-card, que a
+           página de análise não usa em lugar nenhum. */
+        .udx-report__head {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: calc(var(--modal-rail-w) + 11px);
+            margin-bottom: 14px;
+        }
+        .udx-report__head::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            bottom: 2px;
+            width: var(--modal-rail-w);
+            border-radius: 3px;
+            background-image: var(--modal-gradient);
+            box-shadow: 0 0 12px var(--modal-glow);
+        }
+        .udx-report__chip {
+            flex: 0 0 auto;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--modal-chip-bg);
+            border: 1px solid var(--modal-chip-brd);
+            color: var(--modal-accent);
+        }
+        .udx-report__chip .mdi { font-size: 15px; line-height: 1; }
+        /* Tinta plena: em --modal-ink-muted o título competia em contraste com
+           os próprios itens da lista, que já são muted. */
+        .udx-report__title {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--modal-ink);
+            line-height: 1.3;
+        }
+        .udx-report__block[data-bloco="veredito"] .udx-report__title {
+            font-size: 12px;
+            letter-spacing: 0.10em;
+        }
+
+        /* Lista: INDENTAÇÃO PENDURADA por grid — o marcador ocupa uma coluna
+           fixa e as linhas seguintes alinham sob a primeira letra do texto
+           (o <pre> anterior não conseguia fazer isso). */
+        .udx-report__list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+        }
+        .udx-report__item {
+            display: grid;
+            grid-template-columns: 1.35em 1fr;
+            column-gap: 8px;
+            align-items: start;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--modal-ink-muted);
+        }
+        .udx-report__item.is-flush { grid-template-columns: 1fr; }
+        /* Blindagem: se a barra for emitida como IRMÃ de .udx-report__text
+           (e não filha), sem esta regra ela ocuparia a coluna do marcador
+           (~19px). Inócua quando a barra é filha do texto. */
+        .udx-report__item > .udx-report__bar            { grid-column: 2 / -1; }
+        .udx-report__item.is-flush > .udx-report__bar   { grid-column: 1 / -1; }
+
+        /* ── Prosa (modo Simplificado) ──────────────────────────────────
+           Blocos 100% dissertativos não passam por .udx-report__list: o
+           renderizador emite .udx-report__prose > .udx-report__para. Sem
+           regra própria herdavam a margem padrão do <p> do Bootstrap
+           (1rem) e a medida de linha do corpo, ilegível em bloco longo. */
+        
+        .udx-report__para:first-child::first-letter {
+            font-weight: 600;
+            color: var(--modal-accent);
+        }
+        /* Sem números, o olho precisa de mais ar entre os blocos; o modo
+           Especialista é enumerativo e comporta o ritmo padrão. */
+        .udx-report--simplificado { gap: calc(var(--modal-gap) + 4px); }
+        .udx-report--especialista { gap: var(--modal-gap); }
+
+        /* ── Seletor de modo (Simplificado / Especialista) ──────────────
+           Pílula segmentada: repouso espelha .section-link (blog.css);
+           item ativo recebe o degradê das trilhas. */
+        .udx-mode-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 3px;
+            border: 1px solid var(--udx-border);
+            border-radius: 50px;
+            background: rgba(2, 2, 26, 0.45);
+            
+        }
+        .udx-mode-switch__btn {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            color: var(--udx-text-muted);
+            font-family: var(--udx-font);
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+            padding: 7px 14px;
+            margin-bottom: 0;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 240ms ease, background-color 240ms ease,
+                        box-shadow 240ms ease;
+        }
+        .udx-mode-switch__btn .mdi { font-size: 15px; line-height: 1; }
+        .udx-mode-switch__btn:hover { color: var(--udx-text); }
+        /* Dupla ancoragem: .is-active (classe que o JS alterna) e
+           [aria-pressed="true"] (estado semântico). Se um dos dois for
+           esquecido em algum ponto, o visual não sai de sincronia. */
+        /* Pílula ativa = .chart-section .level-tag strong (mesmo degradê,
+           mesma sombra indigo). A instância do seletor que vive DENTRO da
+           .chart-section ficava lado a lado com a pílula "Nível detectado"
+           em degradê diferente — duas pílulas, duas famílias de cor. */
+        .udx-mode-switch__btn.is-active,
+        .udx-mode-switch__btn[aria-pressed="true"] {
+            background-image: var(--udx-grad-apps);
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(102, 16, 242, 0.35);
+        }
+        .udx-mode-switch__btn:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(102, 16, 242, 0.35);
+        }
+        :root[data-bs-theme="light"] .udx-mode-switch {
+            background: rgba(87, 8, 166, 0.05);
+            border-color: rgba(64, 1, 36, 0.12);
+        }
+        :root[data-bs-theme="light"] .udx-mode-switch__btn { color: #5e4a55; }
+        :root[data-bs-theme="light"] .udx-mode-switch__btn:hover { color: #270140; }
+        @media (prefers-reduced-motion: reduce) {
+            .udx-mode-switch__btn { transition: none; }
+        }
+        .udx-report__marker {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+            color: var(--modal-accent);
+        }
+        .udx-report__text { min-width: 0; overflow-wrap: anywhere; }
+
+        /* Tons semânticos — vêm de item.tom no modelo de blocos. */
+        .udx-report__item[data-tom="ok"]     .udx-report__marker { color: var(--modal-tom-ok); }
+        .udx-report__item[data-tom="subir"]  .udx-report__marker { color: var(--modal-tom-subir); }
+        .udx-report__item[data-tom="descer"] .udx-report__marker { color: var(--modal-tom-descer); }
+        .udx-report__item[data-tom="alerta"] .udx-report__marker { color: var(--modal-tom-alerta); }
+        .udx-report__item[data-tom="alerta"] .udx-report__text   { color: var(--modal-ink); font-weight: 500; }
+        .udx-report__item[data-tom="paragrafo"] .udx-report__text { color: var(--modal-ink); }
+        .udx-report__item[data-tom="vazio"]  .udx-report__text   { font-style: italic; opacity: 0.75; }
+        .udx-report__item[data-tom="nota"]   .udx-report__text {
+            font-size: 12px;
+            opacity: 0.72;
+            padding-left: 0;
+        }
+
+        /* ───────── Barra proporcional ─────────
+           Alimentada por --udx-bar (0–100%), já clampada em
+           formatEffortFeedbackHtml. Era markup órfão: <span> vazio, sem
+           regra, portanto invisível. */
+        .udx-report__bar {
+            display: block;
+            width: 100%;
+            height: 4px;
+            margin-top: 6px;
+            border-radius: 999px;
+            background: var(--modal-chip-bg);
+            overflow: hidden;
+        }
+        .udx-report__bar::before {
+            content: "";
+            display: block;
+            height: 100%;
+            width: var(--udx-bar, 0%);
+            border-radius: inherit;
+            background-image: var(--modal-gradient);
+        }
+
+        /* ───────── Prosa (modo Simplificado) ─────────
+           Blocos 100% dissertativos: formatEffortFeedbackHtml troca <ul>/<li>
+           por <div class="udx-report__prose"> quando todos os itens têm
+           tom="paragrafo". Sem estas regras os <p> herdavam o reset do
+           Bootstrap (margin-bottom:1rem) e a tinta plena do body. */
+        .udx-report__prose { display: grid; gap: 10px; }
+        .udx-report__para {
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.7;
+            /* Reconecta o token descrito nas linhas 36–41 e calibrado no modo
+               claro (linha 554). Prosa longa em ink-muted fica abaixo do
+               contraste confortável; ink-body é o meio-termo previsto. */
+            color: var(--modal-ink-body);
+        }
+        .udx-report__block[data-bloco="veredito"] .udx-report__para {
+            font-size: 0.95rem;
+            color: var(--modal-ink);
+        }
+
+        /* Veredito: destaque de leitura (texto em corpo maior, tinta plena). */
+        .udx-report__block[data-bloco="veredito"] .udx-report__item {
+            font-size: 0.95rem;
+            color: var(--modal-ink);
+        }
+        .udx-report__block[data-bloco="veredito"] { border-color: var(--modal-chip-brd); }
+
+        /* ───────── Famílias visuais (data-bloco) ─────────
+           _NARR_BLOCO_FAMILIA (effortFeedback.js) mapeia os ids simp_* para
+           estas oito famílias, afirmando em comentário que já estariam
+           tonalizadas aqui — só `veredito` estava. Sem elas, os oito blocos
+           caem todos em --modal-accent e a hierarquia de cor desaparece.
+           Redefinir a variável (e não `color`) propaga para chip, marcador,
+           borda de foco e barra de uma vez só. */
+        .udx-report__block[data-bloco="veredito"]        { --modal-accent: var(--udx-primary-hot); }
+        .udx-report__block[data-bloco="perfil"]          { --modal-accent: var(--udx-primary-hot); }
+        .udx-report__block[data-bloco="caracteristicas"] { --modal-accent: var(--udx-cyan); }
+        .udx-report__block[data-bloco="convergencias"]   { --modal-accent: var(--udx-cyan); }
+        .udx-report__block[data-bloco="fortes"]          { --modal-accent: var(--udx-cyan); }
+        /* Reencaminhado para os tokens --modal-tom-*, que JÁ carregam fallback
+           (linhas 45–48). Sem isso, um token --udx-* ausente tornaria
+           --modal-accent inválido em tempo de valor computado: a variável
+           HERDA o accent do ancestral e a hierarquia some sem erro visível. */
+        .udx-report__block[data-bloco="fracas"]          { --modal-accent: var(--modal-tom-descer); }
+        .udx-report__block[data-bloco="sugestoes"]       { --modal-accent: var(--modal-tom-alerta); }
+        .udx-report__block[data-bloco="faixas"]          { --modal-accent: var(--udx-text-muted, #9a8fa5); }
+
+        /* Sub-grid interno também condicionado: dentro de um diálogo de 500px
+           essas listas caíam para ~28ch. Movido para o bloco de 992px. */
+        @media (min-width: 992px) {
+            .udx-report {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .udx-report__block[data-bloco="faixas"] .udx-report__list,
+            .udx-report__block[data-bloco="caracteristicas"] .udx-report__list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                column-gap: 22px;
+            }
+        }
+        /* O rodapé é filho direto de .udx-report (agora um grid de 2 colunas):
+           sem grid-column ele cairia numa célula de meia largura. Alinhamento
+           à esquerda e filete tracejado espelham a nota de fonte da página. */
+        .udx-report__footer {
+            grid-column: 1 / -1;
+            margin: 6px 0 0;
+            padding-top: 12px;
+            border-top: 1px dashed var(--modal-border);
+            font-size: 11px;
+            line-height: 1.5;
+            color: var(--modal-ink-muted);
+            opacity: 0.8;
+            text-align: left;
+        }
+        .udx-report__empty {
+            margin: 0;
+            font-size: 13px;
+            color: var(--modal-ink-muted);
+        }
+
+        /* ───────── Gatilho externo (fora do #modal — não escopável) ─────────
+           Vive dentro da .chart-section, imediatamente abaixo do <pre> de
+           resumo. Em vermelho-sangue plano lia-se como alerta/destrutivo, e
+           era o único elemento vermelho da página. Vira secundário-outline
+           (repouso neutro) que assume o degradê "Apps" no hover — mesma
+           progressão de .btn-udx-primary. */
+        .btn-udx-modal {
+            background: transparent;
+            color: var(--udx-text);
+            border: 1.5px solid var(--udx-border-hover);
+            font-weight: 600;
+            border-radius: var(--udx-radius-sm);
+            padding: 10px 18px;
+            transition: color 240ms ease, border-color 240ms ease,
+                        background-color 240ms ease, box-shadow 240ms ease;
+        }
+        .btn-udx-modal:hover,
+        .btn-udx-modal:focus-visible {
+            background-image: var(--udx-grad-apps);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 6px 20px rgba(102, 16, 242, 0.38);
+        }
+
+                /* ============================================================
+           #fundamentalsFeedbackModal — envelope colapsável <details>
+           ------------------------------------------------------------
+           N3 (D1=c, D2=a): mantém <details class="udx-fund-block">
+           como envolvente dos 8 fundamentos (colapsável — reduz
+           densidade visual do modal), enquanto o interior é migrado
+           para o vocabulário .udx-report* (mesmo tratamento visual
+           dos demais modais). Estas regras replicam a superfície de
+           .udx-report__block APENAS dentro do escopo do modal de
+           fundamentos, sem vazar para os cards .udx-report__block
+           irmãos (veredito, ressalvas — que já recebem seu próprio
+           tratamento pelas regras globais acima).
+        ============================================================ */
+        #fundamentalsFeedbackModal .udx-fund-block {
+            grid-column: 1 / -1;
+            position: relative;
+            background: var(--modal-card);
+            border: 1px solid var(--modal-border);
+            border-radius: var(--udx-radius-md);
+            padding: var(--modal-pad);
+            box-shadow: var(--udx-shadow-card);
+            overflow: hidden;
+            isolation: isolate;
+            transition: border-color 280ms ease, box-shadow 280ms ease;
+        }
+        #fundamentalsFeedbackModal .udx-fund-block::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: var(--modal-gradient);
+            opacity: 0;
+            transition: opacity 280ms ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #fundamentalsFeedbackModal .udx-fund-block > * { position: relative; z-index: 1; }
+        #fundamentalsFeedbackModal .udx-fund-block:hover {
+            border-color: var(--modal-border-hot);
+            box-shadow: var(--udx-shadow-hover), 0 0 22px var(--modal-glow-hover);
+        }
+        #fundamentalsFeedbackModal .udx-fund-block:hover::after { opacity: 0.06; }
+
+        /* Summary: paridade com .udx-report__head (barra vertical +
+           gap horizontal). A chevron ocupa o papel funcional do chip
+           (afirma o affordance de colapso — não é ícone de categoria). */
+        #fundamentalsFeedbackModal .udx-fund-block__summary {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: calc(var(--modal-rail-w) + 11px);
+            cursor: pointer;
+            list-style: none;
+        }
+        #fundamentalsFeedbackModal .udx-fund-block__summary::-webkit-details-marker {
+            display: none;
+        }
+        #fundamentalsFeedbackModal .udx-fund-block__summary::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            bottom: 2px;
+            width: var(--modal-rail-w);
+            border-radius: 3px;
+            background-image: var(--modal-gradient);
+            box-shadow: 0 0 12px var(--modal-glow);
+        }
+        #fundamentalsFeedbackModal .udx-fund-block__chevron {
+            color: var(--modal-accent);
+            font-size: 20px;
+            line-height: 1;
+            flex: 0 0 auto;
+            transition: transform 220ms ease;
+        }
+        #fundamentalsFeedbackModal .udx-fund-block[open] .udx-fund-block__chevron {
+            transform: rotate(90deg);
+        }
+        #fundamentalsFeedbackModal .udx-fund-block__title {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--modal-ink);
+            line-height: 1.3;
+        }
+        #fundamentalsFeedbackModal .udx-fund-block__meta {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--modal-ink-muted);
+        }
+        #fundamentalsFeedbackModal .udx-fund-block-body {
+            padding: 14px 0 0 0;
+            display: grid;
+            gap: 10px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #fundamentalsFeedbackModal .udx-fund-block,
+            #fundamentalsFeedbackModal .udx-fund-block::after,
+            #fundamentalsFeedbackModal .udx-fund-block__chevron {
+                transition: none;
+            }
+        }
+
+        /* Família visual da nova data-bloco="ressalvas" (D4=b) —
+           accent alerta, mesmo padrão do .udx-report__block[data-bloco="sugestoes"]. */
+        .udx-report__block[data-bloco="ressalvas"]      { --modal-accent: var(--modal-tom-alerta); }
+
+        /* Neutralização compacta do .badge Bootstrap dentro do modal
+           de fundamentos: mantém a semântica funcional (cor de banda
+           via .bg-*) mas ajusta padding/borda/tamanho para não quebrar
+           a linha vertical do summary e a leitura do overview. */
+        #fundamentalsFeedbackModal .udx-fund-block__summary .badge,
+        #fundamentalsFeedbackModal .udx-report__block[data-bloco="veredito"] .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            vertical-align: middle;
+        }
+        
+        /* ───────── Modo Claro ─────────
+           Antes só .modal-content/.modal-header/#…Body eram invertidos:
+           .modal-body, .modal-footer e o botão do rodapé permaneciam
+           escuros, criando faixas pretas dentro de um modal branco. */
+        :root[data-bs-theme="light"] #explosionFeedbackModal,
+        :root[data-bs-theme="light"] #effortFeedbackModal,
+        :root[data-bs-theme="light"] #fundamentalsFeedbackModal {
+            --modal-surface:   #ffffff;
+            --modal-rail:      #ffffff;
+            --modal-border:    rgba(64, 1, 36, 0.12);
+            --modal-ink:       #270140;
+            --modal-ink-muted: #5e4a55;
+            --modal-ink-body:  #3a1a4d;
+            --modal-card:      rgba(111, 66, 193, 0.05);
+            --modal-card-lead: rgba(111, 66, 193, 0.10);
+            --modal-chip-brd:  rgba(111, 66, 193, 0.24);
+            --modal-tom-ok:    #0a7f8c;
+            /* --tom-descer/-alerta e --chip-bg eram calibrados para fundo
+               escuro; sobre #ffffff ficavam abaixo do contraste mínimo.
+               Escurecidos aqui mantendo o matiz (laranja/carmim da paleta). */
+            --modal-tom-descer: #b8560f;
+            --modal-tom-alerta: #bf0449;
+            --modal-chip-bg:    rgba(250, 51, 161, 0.10);
+        }
+        :root[data-bs-theme="light"] #explosionFeedbackModal .modal-content,
+        :root[data-bs-theme="light"] #effortFeedbackModal .modal-content,
+        :root[data-bs-theme="light"] #fundamentalsFeedbackModal .modal-content {
+            border-color: rgba(191, 4, 73, 0.25);
+            box-shadow: 0 20px 60px rgba(64, 1, 36, 0.18);
+        }
+        :root[data-bs-theme="light"] #explosionFeedbackModal .modal-header,
+        :root[data-bs-theme="light"] #effortFeedbackModal .modal-header,
+        :root[data-bs-theme="light"] #fundamentalsFeedbackModal .modal-header {
+            background: linear-gradient(135deg,
+                rgba(191, 4, 73, 0.10) 0%,
+                rgba(111, 66, 193, 0.10) 100%);
+        }
+        :root[data-bs-theme="light"] #explosionFeedbackModal .modal-footer,
+        :root[data-bs-theme="light"] #effortFeedbackModal .modal-footer,
+        :root[data-bs-theme="light"] #fundamentalsFeedbackModal .modal-footer {
+            background: rgba(87, 8, 166, 0.04);
+        }
+        :root[data-bs-theme="light"] .udx-report__block:hover::after { opacity: 0.06; }
+
+        /* ───────── Acessibilidade ───────── */
+        @media (prefers-reduced-motion: reduce) {
+            #explosionFeedbackModal .btn-close,
+            #effortFeedbackModal .btn-close,
+            #fundamentalsFeedbackModal .btn-close,
+            #explosionFeedbackModal .modal-footer .btn-secondary,
+            #effortFeedbackModal .modal-footer .btn-secondary,
+            #fundamentalsFeedbackModal .modal-footer .btn-secondary,
+            .udx-report__block,
+            .udx-report__block::after,
+            .udx-mode-switch__btn,
+            .btn-udx-modal {
+                transition: none;
+            }
+        }
+
+        /* ───────── Responsivo ───────── */
+        @media (max-width: 575.98px) {
+            #explosionFeedbackModal,
+            #effortFeedbackModal,
+            #fundamentalsFeedbackModal {
+                --modal-pad: 16px 14px;
+                --modal-gap: 10px;
+            }
+            #explosionFeedbackModal .modal-header,
+            #effortFeedbackModal .modal-header,
+            #fundamentalsFeedbackModal .modal-header,
+            #explosionFeedbackModal .modal-body,
+            #effortFeedbackModal .modal-body,
+            #fundamentalsFeedbackModal .modal-body,
+            #explosionFeedbackModal .modal-footer,
+            #effortFeedbackModal .modal-footer,
+            #fundamentalsFeedbackModal .modal-footer { padding-left: 1rem; padding-right: 1rem; }
+            #explosionFeedbackModal .modal-title,
+            #effortFeedbackModal .modal-title,
+            #fundamentalsFeedbackModal .modal-title { font-size: 0.95rem; }
+            .udx-report__item { grid-template-columns: 1.15em 1fr; column-gap: 6px; }
+        }
