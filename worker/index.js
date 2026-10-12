@@ -1907,7 +1907,9 @@ async function lerReputacao(env, email) {
    GET /api/perfil/resumo — painel "Meu perfil" do membro logado.
    Junta, numa chamada, o que já existe espalhado pelo sistema:
    envios de desafios (trilhas + Árvore de Talentos), habilidades,
-   títulos/insígnias, reputação, ranking por XP e atividade recente.
+   títulos/insígnias, reputação, ranking por XP, participações em
+   eventos promovidos pela plataforma (tabelas eventos e
+   evento_participacoes) e atividade recente.
    Cada seção é lida à parte: se uma consulta falhar, as demais
    seguem e o nome da seção volta em `falhas`.
    Ranking: nunca devolve e-mail de terceiros — só iniciais e XP.
@@ -1927,7 +1929,7 @@ async function perfilResumo(request, env) {
   };
   const todos = (sql, ...args) => env.DB.prepare(sql).bind(...args).all().then(r => r.results || []);
 
-  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, atividade] = await Promise.all([
+  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, atividade, eventos] = await Promise.all([
     secao('membro', () => env.DB.prepare(
       'SELECT name, created_at FROM members WHERE email = ?'
     ).bind(email).first(), null),
@@ -1989,6 +1991,15 @@ async function perfilResumo(request, env) {
         const ref = (i >= 0 ? semAutor.slice(i + 2) : semAutor).split(' ')[0].slice(0, 80);
         return { tipo: a.tipo, em: a.em, ref: ref || null };
       }), []),
+
+    /* Eventos da plataforma (presenciais ou on-line) em que o membro se
+       inscreveu. Inscrições canceladas e eventos inativos ficam de fora. */
+    secao('eventos', () => todos(
+      'SELECT e.id, e.titulo, e.modalidade, e.tipo, e.inicio, e.fim, e.local, e.link, ' +
+      '       p.situacao, p.papel, p.resultado ' +
+      '  FROM evento_participacoes p JOIN eventos e ON e.id = p.evento_id ' +
+      " WHERE p.email = ? AND e.ativo = 1 AND p.situacao <> 'cancelado' " +
+      ' ORDER BY e.inicio DESC LIMIT 60', email), []),
   ]);
 
   const mapa = (rows) => Object.fromEntries((rows || []).map(r => [r.id, r.nome]));
@@ -2013,6 +2024,7 @@ async function perfilResumo(request, env) {
     reputacao,
     ranking,
     atividade,
+    eventos,
     falhas,
   });
 }

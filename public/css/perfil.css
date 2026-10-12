@@ -340,6 +340,44 @@
   font-size: 11px; font-weight: 600; color: #fff; background: var(--banda-cor, rgba(223,224,242,.12));
 }
 
+/* ---------------- eventos da plataforma ---------------- */
+.page-perfil .pf-ev-grupo{ margin: 14px 0 8px; font-size: 12.5px; font-weight: 600; color: var(--pf-muted); }
+.page-perfil .pf-ev-grupo:first-of-type{ margin-top: 0; }
+.page-perfil .pf-evento{
+  display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: start;
+  padding: 11px 12px; border-radius: 11px;
+  background: var(--pf-surface-2); border: 1px solid var(--pf-line);
+}
+.page-perfil .pf-evento.is-proximo{ border-color: rgba(143, 124, 255, .45); }
+.page-perfil .pf-data{
+  display: grid; place-items: center; align-content: center;
+  width: 52px; height: 56px; border-radius: 10px;
+  background: rgba(223,224,242,.06); border: 1px solid var(--pf-line);
+}
+.page-perfil .is-proximo .pf-data{ background: var(--seg-grad); border-color: transparent; }
+.page-perfil .pf-data b{ font-size: 1.25rem; font-weight: 600; color: #fff; line-height: 1; }
+.page-perfil .pf-data span{ margin-top: 3px; font-size: 11px; color: var(--udx-text); }
+.page-perfil .pf-evento__titulo{ display: block; font-size: 13.5px; font-weight: 600; color: #fff; line-height: 1.35; overflow-wrap: anywhere; }
+.page-perfil .pf-evento__info{ display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; font-size: 12px; color: var(--pf-muted); }
+.page-perfil .pf-evento__info span{ display: inline-flex; align-items: center; gap: 4px; }
+.page-perfil .pf-evento__info .mdi{ font-size: 14px; }
+.page-perfil .pf-evento__selos{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; align-items: center; }
+.page-perfil .pf-estado{
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: 50px; font-size: 11px; font-weight: 600;
+  color: var(--udx-text); background: rgba(223,224,242,.08);
+}
+.page-perfil .pf-estado .mdi{ font-size: 13px; }
+.page-perfil .pf-estado[data-s="presente"]{ color: #fff; background: rgba(250, 51, 161, .22); }
+.page-perfil .pf-estado[data-s="inscrito"]{ color: #fff; background: rgba(143, 124, 255, .25); }
+.page-perfil .pf-estado[data-s="ausente"]{ color: var(--pf-muted); }
+.page-perfil .pf-estado[data-s="resultado"]{ color: #fff; background: var(--seg-grad); }
+.page-perfil .pf-sala{
+  font-size: 12px; color: #fff; text-decoration: none;
+  padding: 3px 10px; border-radius: 7px; background: rgba(143,124,255,.22); border: 1px solid rgba(143,124,255,.45);
+}
+.page-perfil .pf-sala:hover{ background: rgba(143,124,255,.35); }
+
 /* ---------------- atividade ---------------- */
 .page-perfil .pf-tempo{ list-style: none; margin: 0; padding: 0 0 0 4px; display: grid; gap: 0; }
 .page-perfil .pf-tempo li{

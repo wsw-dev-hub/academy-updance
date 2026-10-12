@@ -3,8 +3,9 @@
    /js/perfil.js  ·  página /membros/perfil/
    ----------------------------------------------------------------
    Lê GET /api/perfil/resumo (uma chamada) e monta o painel:
-   ritmo diário, desafios, habilidades, eventos, experiência,
-   ranking, títulos, reputação e atividade.
+   ritmo diário, desafios, habilidades, eventos da plataforma
+   (presenciais e on-line), experiência, ranking, títulos,
+   reputação e atividade (ações do próprio membro).
    Usa, só para exibir nomes, os módulos já existentes:
      /js/talentTree.data.js  → window.UDX_TALENTOS (títulos da Árvore)
      /js/reputacao.data.js   → window.UDX_REP (bandas e títulos)
@@ -117,11 +118,11 @@
   function unidadeXp(origem) { return origem === 'talentos' ? 'XP' : 'XPE'; }
 
   /* ---------------- preferências (só neste navegador) ---------------- */
-  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral' };
+  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '' };
   try { var salvo = JSON.parse(win.localStorage.getItem(CHAVE_PREFS) || 'null'); if (salvo) for (var k in salvo) prefs[k] = salvo[k]; } catch (e) {}
   function salvarPrefs() { try { win.localStorage.setItem(CHAVE_PREFS, JSON.stringify(prefs)); } catch (e) {} }
 
-  var estado = { dados: null, busca: '', origem: '', mostrar: 8, habTodas: false };
+  var estado = { dados: null, busca: '', origem: '', mostrar: 8, habTodas: false, evTodos: false };
 
   /* ================================================================
      DERIVAÇÕES — tudo calculado a partir da resposta da API
@@ -439,28 +440,89 @@
   }
 
   /* ================================================================
-     EVENTOS — desafios do tipo "evento"
+     EVENTOS — encontros presenciais e on-line promovidos pela plataforma
+     (tabelas eventos + evento_participacoes). Não confundir com a
+     "Atividade recente", que é o registro de ações do próprio membro.
   ================================================================ */
-  function renderEventos(d, v) {
-    var ev = v.lista.filter(function (x) { return x.tipo === 'evento' && x.status !== 'recusado'; });
-    ev.sort(function (a, b) { return ((b.avaliado || b.enviado) || 0) - ((a.avaliado || a.enviado) || 0); });
-    var ok = ev.filter(function (x) { return x.status === 'aprovado'; }).length;
+  /* Eventos são marcados no horário de Brasília: exibimos sempre nele, com a
+     indicação "(Brasília)" para quem estiver com o aparelho em outro fuso. */
+  var TZ_EV = 'America/Sao_Paulo';
+  var fEvDiaNum = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', timeZone: TZ_EV });
+  var fEvMes    = new Intl.DateTimeFormat('pt-BR', { month: 'short', timeZone: TZ_EV });
+  var fEvAno    = new Intl.DateTimeFormat('pt-BR', { year: 'numeric', timeZone: TZ_EV });
+  var fEvHora   = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: TZ_EV });
+  var foraDeBrasilia = (function () { try { return Intl.DateTimeFormat().resolvedOptions().timeZone !== TZ_EV; } catch (e) { return false; } })();
+  function evMes(d) { return fEvMes.format(d).replace('.', ''); }
+  var TIPOS_EVENTO = {
+    workshop: 'Workshop', 'aula-aberta': 'Aula aberta', battle: 'Battle', mostra: 'Mostra',
+    apresentacao: 'Apresentação', live: 'Live', encontro: 'Encontro'
+  };
+  function renderEventos(d) {
+    var modo = prefs.evModo || '';
+    $$('#pfEvModo button').forEach(function (b) { b.setAttribute('aria-pressed', String((b.getAttribute('data-modo') || '') === modo)); });
+    var agora = new Date();
+    var todos = (d.eventos || []).map(function (e) {
+      return { titulo: e.titulo, modalidade: e.modalidade === 'online' ? 'online' : 'presencial', tipo: e.tipo,
+               inicio: data(e.inicio), fim: data(e.fim), local: e.local, link: e.link,
+               situacao: e.situacao, papel: e.papel, resultado: e.resultado };
+    }).filter(function (e) { return e.inicio; });
     var caixa = $('#pfEventos');
-    if (!ev.length) {
-      caixa.innerHTML = '<div class="pf-vazio">Nenhuma participação registrada ainda. Quando um desafio do tipo evento for aprovado, ele entra aqui.</div>';
+    if (!todos.length) {
+      caixa.innerHTML = '<div class="pf-vazio">Você ainda não participou de eventos da Up Dance. Quando se inscrever em um encontro presencial ou on-line, ele aparece aqui.</div>';
       return;
     }
-    caixa.innerHTML =
-      '<p class="pf-rank__dica"><b>' + plural(ok, 'participação confirmada', 'participações confirmadas') + '</b>' +
-        (ev.length - ok ? ', ' + plural(ev.length - ok, 'aguardando validação', 'aguardando validação') : '') + '</p>' +
-      '<ol class="pf-tempo">' + ev.slice(0, 8).map(function (x) {
-        var dt = x.avaliado || x.enviado;
-        return '<li style="--marca:' + (x.status === 'aprovado' ? 'var(--pf-alcancado)' : 'var(--pf-pendente)') + '">' +
-          '<b style="color:#fff;font-weight:600">' + esc(x.nome) + '</b>' +
-          '<small>' + esc(rotuloGrupo(x.origem, x.grupo, d.nomes || {})) + ', ' +
-            (x.status === 'aprovado' ? 'confirmada ' : 'enviada ') + esc(quando(dt)) + ', +' + fmt(x.xp) + ' ' + unidadeXp(x.origem) + '</small>' +
-        '</li>';
-      }).join('') + '</ol>';
+    var lista = todos.filter(function (e) { return !modo || e.modalidade === modo; });
+    var proximos = lista.filter(function (e) { return (e.fim || e.inicio) >= agora && e.situacao === 'inscrito'; })
+                        .sort(function (a, b) { return a.inicio - b.inicio; });
+    var passados = lista.filter(function (e) { return proximos.indexOf(e) === -1; })
+                        .sort(function (a, b) { return b.inicio - a.inicio; });
+
+    var pres = todos.filter(function (e) { return e.situacao === 'presente'; });
+    var presP = pres.filter(function (e) { return e.modalidade === 'presencial'; }).length;
+    var resumo = '<p class="pf-rank__dica"><b>' + plural(pres.length, 'presença', 'presenças') + '</b>' +
+      (pres.length ? ': ' + plural(presP, 'presencial', 'presenciais') + ' e ' + fmt(pres.length - presP) + ' on-line' : '') +
+      (proximos.length ? '. ' + plural(proximos.length, 'inscrição em evento próximo', 'inscrições em eventos próximos') + '.' : '.') + '</p>';
+
+    if (!lista.length) {
+      caixa.innerHTML = resumo + '<div class="pf-vazio">Nenhum evento ' + (modo === 'online' ? 'on-line' : 'presencial') + ' por aqui ainda.</div>';
+      return;
+    }
+    var limite = estado.evTodos ? passados.length : 6;
+    caixa.innerHTML = resumo +
+      (proximos.length ? '<h3 class="pf-ev-grupo">Próximos</h3><ul class="pf-lista">' + proximos.map(function (e) { return cartao(e, true); }).join('') + '</ul>' : '') +
+      (passados.length ? '<h3 class="pf-ev-grupo">Participações</h3><ul class="pf-lista">' + passados.slice(0, limite).map(function (e) { return cartao(e, false); }).join('') + '</ul>' : '') +
+      (passados.length > 6 ? '<button type="button" class="pf-mais" id="pfEvTodos">' + (estado.evTodos ? 'Mostrar só os 6 mais recentes' : 'Mostrar todas as ' + passados.length + ' participações') + '</button>' : '');
+
+    function cartao(e, futuro) {
+      var hora = fEvHora.format(e.inicio) + (e.fim ? '–' + fEvHora.format(e.fim) : '') + (foraDeBrasilia ? ' (Brasília)' : '');
+      var ano = fEvAno.format(e.inicio);
+      var onde = e.modalidade === 'online'
+        ? '<span><span class="mdi mdi-video-outline" aria-hidden="true"></span>On-line</span>'
+        : '<span><span class="mdi mdi-map-marker-outline" aria-hidden="true"></span>' + esc(e.local || 'Presencial') + '</span>';
+      var estadoTxt = futuro ? ['inscrito', 'mdi-ticket-confirmation-outline', 'Inscrito(a)']
+        : e.situacao === 'presente' ? ['presente', 'mdi-check-circle-outline', 'Presente']
+        : e.situacao === 'ausente' ? ['ausente', 'mdi-close-circle-outline', 'Ausente']
+        : ['inscrito', 'mdi-timer-sand', 'Presença a confirmar'];
+      var sala = futuro && e.modalidade === 'online' && /^https:\/\//i.test(e.link || '')
+        ? '<a class="pf-sala" href="' + esc(e.link) + '" target="_blank" rel="noopener noreferrer">Entrar na sala</a>' : '';
+      return '<li class="pf-evento' + (futuro ? ' is-proximo' : '') + '">' +
+        '<div class="pf-data" aria-hidden="true"><b>' + fEvDiaNum.format(e.inicio) + '</b><span>' + esc(evMes(e.inicio)) + '</span></div>' +
+        '<div style="min-width:0">' +
+          '<span class="pf-evento__titulo">' + esc(e.titulo) + '</span>' +
+          '<div class="pf-evento__info">' +
+            '<span><span class="mdi mdi-calendar-outline" aria-hidden="true"></span>' + esc(fEvDiaNum.format(e.inicio) + ' de ' + evMes(e.inicio) + (ano !== fEvAno.format(agora) ? ' de ' + ano : '') + ', ' + hora) + '</span>' +
+            onde +
+            (TIPOS_EVENTO[e.tipo] ? '<span><span class="mdi mdi-tag-outline" aria-hidden="true"></span>' + esc(TIPOS_EVENTO[e.tipo]) + '</span>' : '') +
+          '</div>' +
+          '<div class="pf-evento__selos">' +
+            '<span class="pf-estado" data-s="' + estadoTxt[0] + '"><span class="mdi ' + estadoTxt[1] + '" aria-hidden="true"></span>' + estadoTxt[2] + '</span>' +
+            (e.papel && e.papel !== 'participante' ? '<span class="pf-estado">' + esc(e.papel.charAt(0).toUpperCase() + e.papel.slice(1)) + '</span>' : '') +
+            (e.resultado ? '<span class="pf-estado" data-s="resultado"><span class="mdi mdi-trophy-outline" aria-hidden="true"></span>' + esc(e.resultado) + '</span>' : '') +
+            sala +
+          '</div>' +
+        '</div>' +
+      '</li>';
+    }
   }
 
   /* ================================================================
@@ -644,7 +706,7 @@
   function renderTudo() {
     var d = estado.dados; deriv = derivar(d);
     renderHero(d, deriv); renderHoje(deriv); renderGrafico(deriv);
-    renderDesafios(d, deriv); renderHabilidades(d, deriv); renderEventos(d, deriv);
+    renderDesafios(d, deriv); renderHabilidades(d, deriv); renderEventos(d);
     renderXp(d, deriv); renderRanking(d); renderTitulos(d); renderReputacao(d); renderAtividade(d, deriv);
     var falhas = d.falhas || [];
     var aviso = $('#pfAviso');
@@ -689,6 +751,14 @@
     $('#pfHabilidades').addEventListener('click', function (e) {
       if (!e.target.closest('#pfHabTodas')) return;
       estado.habTodas = !estado.habTodas; renderHabilidades(estado.dados, deriv);
+    });
+    $('#pfEvModo').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-modo]'); if (!b) return;
+      prefs.evModo = b.getAttribute('data-modo') || ''; salvarPrefs(); renderEventos(estado.dados);
+    });
+    $('#pfEventos').addEventListener('click', function (e) {
+      if (!e.target.closest('#pfEvTodos')) return;
+      estado.evTodos = !estado.evTodos; renderEventos(estado.dados);
     });
     $('#pfRankEscopo').addEventListener('change', function (e) { prefs.escopo = e.target.value; salvarPrefs(); renderRanking(estado.dados); });
 
