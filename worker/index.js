@@ -1915,6 +1915,8 @@ async function lerReputacao(env, email) {
    Ranking: nunca devolve e-mail de terceiros — só iniciais e XP.
 ================================================================ */
 const PERFIL_TOP = 5;
+/* Tipo de membro → trilha de nível correspondente (mesmas chaves nivel-* de access_rules). */
+const PERFIL_NIVEL_DO_TIPO = { 'Free': 'fundamentos', 'Iniciante': 'iniciante', 'Intermediário': 'intermediario', 'Técnico': 'tecnico' };
 
 async function perfilResumo(request, env) {
   const m = await getMember(request, env);
@@ -1928,7 +1930,7 @@ async function perfilResumo(request, env) {
   };
   const todos = (sql, ...args) => env.DB.prepare(sql).bind(...args).all().then(r => r.results || []);
 
-  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, eventos] = await Promise.all([
+  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, eventos, estrutura] = await Promise.all([
     secao('membro', () => env.DB.prepare(
       'SELECT name, created_at FROM members WHERE email = ?'
     ).bind(email).first(), null),
@@ -1939,7 +1941,7 @@ async function perfilResumo(request, env) {
     secao('desafios', () => todos(
       "SELECT 'trilha' AS origem, p.desafio_id AS id, p.nivel_id AS grupo, p.xp, p.status, " +
       '       p.parecer, p.created_at AS enviado, p.reviewed_at AS avaliado, ' +
-      '       d.nome, d.tipo, d.habilidade_id AS hab, h.nome AS hab_nome ' +
+      '       d.nome, d.tipo, d.habilidade_id AS hab, h.nome AS hab_nome, h.card_id AS card ' +
       '  FROM trilha_progresso p ' +
       '  JOIN trilha_desafios d ON d.id = p.desafio_id ' +
       '  LEFT JOIN trilha_habilidades h ON h.id = d.habilidade_id ' +
@@ -1947,7 +1949,7 @@ async function perfilResumo(request, env) {
       'UNION ALL ' +
       "SELECT 'talentos', p.desafio_id, p.perfil_id, p.xp, p.status, " +
       '       p.parecer, p.created_at, p.reviewed_at, ' +
-      '       d.nome, d.tipo, d.habilidade_id, h.nome ' +
+      '       d.nome, d.tipo, d.habilidade_id, h.nome, NULL ' +
       '  FROM talent_progresso p ' +
       '  JOIN talent_desafios d ON d.id = p.desafio_id ' +
       '  LEFT JOIN talent_habilidades h ON h.id = d.habilidade_id ' +
@@ -1985,6 +1987,29 @@ async function perfilResumo(request, env) {
       '  FROM evento_participacoes p JOIN eventos e ON e.id = p.evento_id ' +
       " WHERE p.email = ? AND e.ativo = 1 AND p.situacao <> 'cancelado' " +
       ' ORDER BY e.inicio DESC LIMIT 60', email), []),
+
+    /* Estrutura de cada nível do membro (para o painel "Seus níveis"):
+       total de desafios e de XP por card, nas trilhas já iniciadas ou
+       ligadas a um tipo do membro; por perfil, na Árvore de Talentos. */
+    secao('estrutura', () => {
+      const doTipo = types.map(t => PERFIL_NIVEL_DO_TIPO[t]).filter(Boolean);
+      const ph = doTipo.map(() => '?').join(',');
+      return todos(
+        "SELECT 'trilha' AS origem, d.nivel_id AS grupo, h.card_id AS card, c.nome AS card_nome, " +
+        '       COUNT(*) AS total, SUM(d.xp) AS xp_total, MIN(d.rowid) AS ordem ' +
+        '  FROM trilha_desafios d ' +
+        '  JOIN trilha_habilidades h ON h.id = d.habilidade_id ' +
+        '  LEFT JOIN trilha_cards c ON c.id = h.card_id ' +
+        ' WHERE d.ativo = 1 AND (d.nivel_id IN (SELECT nivel_id FROM trilha_progresso WHERE email = ?)' +
+        (doTipo.length ? ' OR d.nivel_id IN (' + ph + ')' : '') + ') ' +
+        ' GROUP BY d.nivel_id, h.card_id ' +
+        'UNION ALL ' +
+        "SELECT 'talentos', d.perfil_id, NULL, NULL, COUNT(*), SUM(d.xp), MIN(d.rowid) " +
+        '  FROM talent_desafios d ' +
+        ' WHERE d.ativo = 1 AND d.perfil_id IN (SELECT perfil_id FROM talent_progresso WHERE email = ?) ' +
+        ' GROUP BY d.perfil_id ' +
+        'ORDER BY 1, 2, 7', email, ...doTipo, email);   /* cards na ordem em que foram cadastrados */
+    }, []),
   ]);
 
   const mapa = (rows) => Object.fromEntries((rows || []).map(r => [r.id, r.nome]));
@@ -2009,6 +2034,7 @@ async function perfilResumo(request, env) {
     reputacao,
     ranking,
     eventos,
+    estrutura,
     falhas,
   });
 }

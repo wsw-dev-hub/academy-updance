@@ -101,11 +101,11 @@
   function unidadeXp(origem) { return origem === 'talentos' ? 'XP' : 'XPE'; }
 
   /* ---------------- preferências (só neste navegador) ---------------- */
-  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '' };
+  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '', nivel: '' };
   try { var salvo = JSON.parse(win.localStorage.getItem(CHAVE_PREFS) || 'null'); if (salvo) for (var k in salvo) prefs[k] = salvo[k]; } catch (e) {}
   function salvarPrefs() { try { win.localStorage.setItem(CHAVE_PREFS, JSON.stringify(prefs)); } catch (e) {} }
 
-  var estado = { dados: null, busca: '', origem: '', mostrar: 8, habTodas: false, evTodos: false };
+  var estado = { dados: null, busca: '', origem: '', mostrar: 8, habTodas: false, evTodos: false, nv: { status: '', parte: '', mostrar: 6 } };
 
   /* ================================================================
      DERIVAÇÕES — tudo calculado a partir da resposta da API
@@ -115,7 +115,7 @@
       return {
         origem: x.origem, id: x.id, grupo: x.grupo, xp: Number(x.xp) || 0, status: x.status,
         parecer: x.parecer || '', nome: x.nome || x.id, tipo: x.tipo || 'tarefa',
-        hab: x.hab || '', habNome: x.hab_nome || '',
+        hab: x.hab || '', habNome: x.hab_nome || '', card: x.card || '',
         enviado: data(x.enviado), avaliado: data(x.avaliado)
       };
     });
@@ -508,43 +508,177 @@
   }
 
   /* ================================================================
-     EXPERIÊNCIA
+     SEUS NÍVEIS — cada trilha de nível e cada perfil da Árvore de
+     Talentos vira um painel que abre: progresso por card (ou por
+     habilidade), situação dos desafios do nível, posição no ranking
+     do nível e atalhos. Clicar num card filtra os desafios dele.
   ================================================================ */
-  function renderXp(d, v) {
-    var cfg = (d.config && d.config.trilhas) || {};
-    var insig = {}; ((d.titulos && d.titulos.insignias) || []).forEach(function (i) { insig[i.id] = true; });
-    var tocadas = {}; v.lista.forEach(function (x) { tocadas[x.origem + '|' + x.grupo] = true; });
-    var linhas = [];
+  var NIVEL_DO_TIPO = { 'Free': 'fundamentos', 'Iniciante': 'iniciante', 'Intermediário': 'intermediario', 'Técnico': 'tecnico' };
+  var STATUS_NV = [
+    { id: '',         txt: 'Todos' },
+    { id: 'aprovado', txt: 'Aprovados' },
+    { id: 'pendente', txt: 'Aguardando' },
+    { id: 'recusado', txt: 'Recusados' }
+  ];
 
+  function niveisDoMembro(d, v) {
+    var est = d.estrutura || [], tipos = (d.membro && d.membro.tipos) || [];
+    var tem = function (origem, grupo) {
+      return v.lista.some(function (x) { return x.origem === origem && x.grupo === grupo; }) ||
+             est.some(function (e) { return e.origem === origem && e.grupo === grupo; });
+    };
+    var lista = [];
     Object.keys(TRILHAS).forEach(function (id) {
-      if (!tocadas['trilha|' + id] && !v.xpTrilha[id]) return;
-      var lim = (cfg[id] && cfg[id].limiar) || 0, xp = v.xpTrilha[id] || 0;
-      var pct = lim ? Math.min(100, (xp / lim) * 100) : 0;
-      var ganhou = cfg[id] && insig[cfg[id].insignia];
-      linhas.push('<div class="pf-linha">' +
-        '<div class="pf-linha__topo"><a href="' + TRILHAS[id].pagina + '">' + esc(TRILHAS[id].rotulo) + '</a>' +
-          '<span class="pf-linha__valor"><strong>' + fmt(xp) + '</strong> de ' + fmt(lim) + ' XPE' +
-          (ganhou ? ' <span class="pf-selo"><span class="mdi mdi-medal" aria-hidden="true"></span>insígnia</span>' : '') + '</span></div>' +
-        '<div class="pf-trilho" role="img" aria-label="' + Math.round(pct) + '% do XPE do nível"><i class="xp" style="width:' + pct.toFixed(1) + '%"></i></div>' +
-        '<div class="pf-linha__nota">' + (pct >= 100 ? 'Nível concluído.' : 'Faltam ' + fmt(Math.max(0, lim - xp)) + ' XPE para concluir o nível.') + '</div>' +
-      '</div>');
+      var doTipo = tipos.some(function (t) { return NIVEL_DO_TIPO[t] === id; });
+      if (tem('trilha', id) || doTipo) lista.push({ origem: 'trilha', grupo: id });
     });
+    var perfis = {};
+    v.lista.forEach(function (x) { if (x.origem === 'talentos') perfis[x.grupo] = true; });
+    est.forEach(function (e) { if (e.origem === 'talentos') perfis[e.grupo] = true; });
+    Object.keys(perfis).forEach(function (p) { lista.push({ origem: 'talentos', grupo: p }); });
+    return lista.map(function (n) { return montarNivel(d, v, n.origem, n.grupo); });
+  }
 
-    var porPonto = (d.config && d.config.xpPorPonto) || 100;
-    Object.keys(v.xpTalento).forEach(function (p) {
-      var xp = v.xpTalento[p], pontos = Math.floor(xp / porPonto);
-      var resto = xp % porPonto;
-      linhas.push('<div class="pf-linha">' +
-        '<div class="pf-linha__topo"><a href="' + PAGINA_TALENTOS + '">' + esc(rotuloGrupo('talentos', p, d.nomes || {})) + '</a>' +
-          '<span class="pf-linha__valor"><strong>' + fmt(xp) + '</strong> XP</span></div>' +
-        '<div class="pf-trilho" role="img" aria-label="' + resto + ' de ' + porPonto + ' XP para o próximo ponto de talento"><i class="xp" style="width:' + ((resto / porPonto) * 100).toFixed(1) + '%"></i></div>' +
-        '<div class="pf-linha__nota">' + plural(pontos, 'ponto de talento', 'pontos de talento') + '. Faltam ' + (porPonto - resto) + ' XP para o próximo.</div>' +
-      '</div>');
-    });
+  function montarNivel(d, v, origem, grupo) {
+    var cfg = (d.config && d.config.trilhas) || {}, porPonto = (d.config && d.config.xpPorPonto) || 100;
+    var desafios = v.lista.filter(function (x) { return x.origem === origem && x.grupo === grupo; });
+    var c = { aprovado: 0, pendente: 0, recusado: 0 };
+    desafios.forEach(function (x) { c[x.status] = (c[x.status] || 0) + 1; });
+    var est = (d.estrutura || []).filter(function (e) { return e.origem === origem && e.grupo === grupo; });
+    var total = est.reduce(function (s, e) { return s + (Number(e.total) || 0); }, 0);
+    var xp = origem === 'talentos' ? (v.xpTalento[grupo] || 0) : (v.xpTrilha[grupo] || 0);
+    var n = { chave: origem + '|' + grupo, origem: origem, grupo: grupo, desafios: desafios, cont: c, total: total, xp: xp };
 
-    $('#pfXp').innerHTML = linhas.length
-      ? '<div class="pf-linhas">' + linhas.join('') + '</div>'
-      : '<div class="pf-vazio">Sua experiência aparece aqui quando o primeiro desafio for aprovado. <a href="/membros/">Escolher uma trilha</a></div>';
+    if (origem === 'trilha') {
+      var lim = (cfg[grupo] && cfg[grupo].limiar) || 0;
+      var insig = ((d.titulos && d.titulos.insignias) || []).some(function (i) { return cfg[grupo] && i.id === cfg[grupo].insignia; });
+      n.nome = rotuloGrupo('trilha', grupo, d.nomes || {});
+      n.icone = insig ? 'mdi-medal' : 'mdi-stairs-up';
+      n.lim = lim; n.pct = lim ? Math.min(100, (xp / lim) * 100) : 0; n.insignia = insig;
+      n.valor = '<strong>' + fmt(xp) + '</strong> de ' + fmt(lim) + ' XPE';
+      n.estado = !desafios.length ? 'Não iniciado'
+        : n.pct >= 100 ? 'Nível concluído'
+        : 'Faltam ' + fmt(Math.max(0, lim - xp)) + ' XPE';
+      n.rank = d.ranking && d.ranking[grupo];
+      n.pagina = TRILHAS[grupo] ? TRILHAS[grupo].pagina : '/membros/';
+      n.central = '/membros/desafios/?arvore=' + encodeURIComponent(grupo);
+      /* partes = cards do nível (estrutura) com aprovados/aguardando de cada um */
+      n.partes = est.map(function (e) {
+        var ok = 0, pd = 0;
+        desafios.forEach(function (x) { if (x.card === e.card) { if (x.status === 'aprovado') ok++; else if (x.status === 'pendente') pd++; } });
+        return { id: e.card || '', nome: e.card_nome || e.card || 'Card', total: Number(e.total) || 0, ok: ok, pend: pd };
+      });
+      n.tituloPartes = 'Cards do nível';
+    } else {
+      var pontos = Math.floor(xp / porPonto), resto = xp % porPonto;
+      n.nome = rotuloGrupo('talentos', grupo, d.nomes || {});
+      n.icone = 'mdi-family-tree';
+      n.pct = (resto / porPonto) * 100;
+      n.valor = '<strong>' + fmt(xp) + '</strong> XP';
+      n.estado = plural(pontos, 'ponto de talento', 'pontos de talento') + '. Faltam ' + (porPonto - resto) + ' XP para o próximo';
+      n.pontos = pontos;
+      n.rank = d.ranking && d.ranking.talentos;
+      n.pagina = PAGINA_TALENTOS;
+      n.central = '/membros/desafios/?arvore=talentos';
+      n.partes = (d.habilidades || []).filter(function (h) { return h.origem === 'talentos' && h.grupo === grupo; }).map(function (h) {
+        var ok = 0, pd = 0;
+        desafios.forEach(function (x) { if (x.hab === h.id) { if (x.status === 'aprovado') ok++; else if (x.status === 'pendente') pd++; } });
+        return { id: h.id, nome: h.nome || h.id, total: Number(h.total) || 0, ok: ok, pend: pd, porHab: true };
+      });
+      n.tituloPartes = 'Habilidades iniciadas';
+    }
+    return n;
+  }
+
+  function renderNiveis(d, v) {
+    var niveis = niveisDoMembro(d, v), caixa = $('#pfNiveis');
+    if (!niveis.length) {
+      caixa.innerHTML = '<div class="pf-vazio">Seus níveis aparecem aqui quando você começar uma trilha. <a href="/membros/">Escolher uma trilha</a></div>';
+      return;
+    }
+    if (prefs.nivel && !niveis.some(function (n) { return n.chave === prefs.nivel; })) prefs.nivel = '';
+    caixa.innerHTML = '<div class="pf-niveis">' + niveis.map(function (n, i) {
+      var aberto = n.chave === prefs.nivel, idp = 'pfNv' + i;
+      return '<div class="pf-nivel' + (aberto ? ' is-aberto' : '') + '" data-chave="' + esc(n.chave) + '">' +
+        '<button type="button" class="pf-nivel__cab" aria-expanded="' + aberto + '" aria-controls="' + idp + '">' +
+          '<span class="pf-nivel__ico" aria-hidden="true"><span class="mdi ' + n.icone + '"></span></span>' +
+          '<span class="pf-nivel__nome">' + esc(n.nome) +
+            (n.insignia ? ' <span class="pf-selo"><span class="mdi mdi-medal" aria-hidden="true"></span>insígnia</span>' : '') +
+            '<small>' + esc(n.estado) + '</small></span>' +
+          '<span class="pf-nivel__valor">' + n.valor + '</span>' +
+          '<span class="mdi mdi-chevron-down pf-nivel__seta" aria-hidden="true"></span>' +
+          '<span class="pf-trilho pf-nivel__trilho" role="img" aria-label="' + Math.round(n.pct) + '%"><i class="xp" style="width:' + n.pct.toFixed(1) + '%"></i></span>' +
+        '</button>' +
+        '<div class="pf-nivel__painel" id="' + idp + '"' + (aberto ? '' : ' hidden') + '>' + (aberto ? painelNivel(d, n) : '') + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  function painelNivel(d, n) {
+    var f = estado.nv;
+    var rk = n.rank;
+    var stats =
+      mini(n.origem === 'trilha' ? Math.round(n.pct) + '%' : fmt(n.pontos), n.origem === 'trilha' ? 'do XPE do nível' : (n.pontos === 1 ? 'ponto de talento' : 'pontos de talento')) +
+      mini(fmt(n.cont.aprovado) + (n.total ? '<small> de ' + fmt(n.total) + '</small>' : ''), 'desafios aprovados') +
+      mini(fmt(n.cont.pendente), 'aguardando validação') +
+      mini(rk && rk.pos ? rk.pos + 'º<small> de ' + fmt(rk.participantes) + '</small>' : '—', n.origem === 'trilha' ? 'no ranking do nível' : 'no ranking da Árvore');
+
+    var partes = n.partes.length
+      ? '<h3 class="pf-ev-grupo">' + esc(n.tituloPartes) + '</h3><div class="pf-partes">' + n.partes.map(function (p) {
+          var okP = p.total ? (p.ok / p.total) * 100 : 0, pdP = p.total ? (p.pend / p.total) * 100 : 0;
+          var ativo = f.parte === p.id;
+          return '<button type="button" class="pf-parte" data-nv-parte="' + esc(p.id) + '" aria-pressed="' + ativo + '">' +
+            '<span class="pf-linha__topo"><strong>' + esc(p.nome) + '</strong><span class="pf-linha__valor">' + p.ok + ' de ' + p.total + '</span></span>' +
+            '<span class="pf-trilho">' + (okP ? '<i class="ok" style="width:' + okP.toFixed(1) + '%"></i>' : '') + (pdP ? '<i class="pend" style="width:' + pdP.toFixed(1) + '%"></i>' : '') + '</span>' +
+          '</button>';
+        }).join('') + '</div>' +
+        '<p class="pf-linha__nota">Toque em um ' + (n.origem === 'trilha' ? 'card' : 'item') + ' para ver só os desafios dele.</p>'
+      : '';
+
+    var itens = n.desafios.filter(function (x) {
+      if (f.status && x.status !== f.status) return false;
+      if (f.parte && (n.origem === 'trilha' ? x.card : x.hab) !== f.parte) return false;
+      return true;
+    }).sort(function (a, b) { return ((b.avaliado || b.enviado) || 0) - ((a.avaliado || a.enviado) || 0); });
+
+    var chips = '<div class="pf-seg" role="group" aria-label="Situação dos desafios do nível">' + STATUS_NV.map(function (s) {
+      var q = s.id ? n.cont[s.id] || 0 : n.desafios.length;
+      return '<button type="button" data-nv-status="' + s.id + '" aria-pressed="' + (f.status === s.id) + '">' + s.txt + '<span class="pf-cont">' + q + '</span></button>';
+    }).join('') + '</div>';
+
+    var lista = itens.length
+      ? '<ul class="pf-lista">' + itens.slice(0, f.mostrar).map(function (x) {
+          var tp = TIPOS[x.tipo] || TIPOS.tarefa;
+          var qd = x.status === 'pendente' ? 'Enviado ' + quando(x.enviado) : (x.status === 'aprovado' ? 'Aprovado ' : 'Recusado ') + quando(x.avaliado || x.enviado);
+          return '<li class="pf-item pf-item--curto" data-status="' + esc(x.status) + '">' +
+            '<span class="pf-item__ico" title="' + esc(tp.label) + '"><span class="mdi ' + tp.icone + '" aria-hidden="true"></span></span>' +
+            '<div style="min-width:0"><span class="pf-item__nome">' + esc(x.nome) + '</span>' +
+              '<span class="pf-item__ctx">' + esc((x.habNome ? x.habNome + '. ' : '') + qd) + '</span>' +
+              (x.parecer ? '<span class="pf-item__parecer">' + esc(x.parecer) + '</span>' : '') + '</div>' +
+            '<div class="pf-item__dir"><span class="pf-xp">+' + fmt(x.xp) + ' ' + unidadeXp(x.origem) + '</span>' +
+              '<a class="pf-abrir" href="' + esc(linkDesafio(x)) + '">Abrir</a></div>' +
+          '</li>';
+        }).join('') + '</ul>' +
+        (itens.length > f.mostrar ? '<button type="button" class="pf-mais" data-nv-mais>Mostrar mais ' + Math.min(6, itens.length - f.mostrar) + ' de ' + (itens.length - f.mostrar) + ' restantes</button>' : '')
+      : '<div class="pf-vazio">' + (n.desafios.length ? 'Nenhum desafio com esse filtro.' : 'Você ainda não enviou desafios neste nível.' + (n.total ? ' São ' + fmt(n.total) + ' desafios ao todo.' : '')) + '</div>';
+
+    return '<div class="pf-nivel__stats">' + stats + '</div>' +
+      '<div class="pf-nivel__corpo">' +
+        (partes ? '<div class="pf-nivel__partes">' + partes + '</div>' : '') +
+        '<div class="pf-nivel__desafios"><h3 class="pf-ev-grupo">Desafios do nível</h3>' + chips + lista + '</div>' +
+      '</div>' +
+      '<div class="pf-nivel__acoes">' +
+        '<a class="pf-topo-btn" href="' + esc(n.pagina) + '"><span class="mdi mdi-map-marker-path" aria-hidden="true"></span>' + (n.desafios.length ? 'Continuar ' : 'Começar ') + (n.origem === 'trilha' ? 'a trilha' : 'na Árvore') + '</a>' +
+        '<a class="pf-topo-btn" href="' + esc(n.central) + '"><span class="mdi mdi-flag-checkered" aria-hidden="true"></span>Ver na central de desafios</a>' +
+      '</div>';
+
+    function mini(valor, rotulo) { return '<div class="pf-num"><b>' + valor + '</b><span>' + esc(rotulo) + '</span></div>'; }
+  }
+
+  function atualizarPainelAberto(d, v) {
+    var el = $('#pfNiveis .pf-nivel.is-aberto'); if (!el) return;
+    var n = niveisDoMembro(d, v).filter(function (x) { return x.chave === el.getAttribute('data-chave'); })[0];
+    if (n) $('.pf-nivel__painel', el).innerHTML = painelNivel(d, n);
   }
 
   /* ================================================================
@@ -675,7 +809,7 @@
     var d = estado.dados; deriv = derivar(d);
     renderHero(d, deriv); renderHoje(deriv); renderGrafico(deriv);
     renderDesafios(d, deriv); renderHabilidades(d, deriv); renderEventos(d);
-    renderXp(d, deriv); renderRanking(d); renderTitulos(d); renderReputacao(d);
+    renderNiveis(d, deriv); renderRanking(d); renderTitulos(d); renderReputacao(d);
     var falhas = d.falhas || [];
     var aviso = $('#pfAviso');
     if (falhas.length) {
@@ -719,6 +853,25 @@
     $('#pfHabilidades').addEventListener('click', function (e) {
       if (!e.target.closest('#pfHabTodas')) return;
       estado.habTodas = !estado.habTodas; renderHabilidades(estado.dados, deriv);
+    });
+    $('#pfNiveis').addEventListener('click', function (e) {
+      var cab = e.target.closest('.pf-nivel__cab');
+      if (cab) {
+        var chave = cab.parentNode.getAttribute('data-chave');
+        prefs.nivel = prefs.nivel === chave ? '' : chave;
+        estado.nv = { status: '', parte: '', mostrar: 6 };
+        salvarPrefs(); renderNiveis(estado.dados, deriv);
+        var novo = $('#pfNiveis .pf-nivel[data-chave="' + chave + '"] .pf-nivel__cab'); if (novo) novo.focus();
+        return;
+      }
+      var st = e.target.closest('[data-nv-status]'), pt = e.target.closest('[data-nv-parte]'), mais = e.target.closest('[data-nv-mais]');
+      if (st) { estado.nv.status = st.getAttribute('data-nv-status'); estado.nv.mostrar = 6; }
+      else if (pt) { var id = pt.getAttribute('data-nv-parte'); estado.nv.parte = estado.nv.parte === id ? '' : id; estado.nv.mostrar = 6; }
+      else if (mais) { estado.nv.mostrar += 6; }
+      else return;
+      var alvo = st ? '[data-nv-status="' + estado.nv.status + '"]' : pt ? '[data-nv-parte="' + pt.getAttribute('data-nv-parte') + '"]' : null;
+      atualizarPainelAberto(estado.dados, deriv);
+      if (alvo) { var b = $('#pfNiveis .is-aberto ' + alvo); if (b) b.focus(); }
     });
     $('#pfEvModo').addEventListener('click', function (e) {
       var b = e.target.closest('button[data-modo]'); if (!b) return;
