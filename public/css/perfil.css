@@ -63,7 +63,7 @@
   border: 1.5px solid rgba(223, 224, 242, 0.40);
   padding: 8px 16px; border-radius: var(--udx-radius-sm, 6px);
   font-family: var(--udx-font); font-size: .88rem; font-weight: 500;
-  text-decoration: none; cursor: pointer;
+  text-decoration: none; cursor: pointer; margin-bottom: 12px;
   transition: background-color 220ms ease, border-color 220ms ease;
 }
 .page-perfil .pf-topo-btn:hover{ background-color: rgba(223, 224, 242, 0.08); border-color: var(--udx-primary-hot); color: #fff; }
@@ -344,7 +344,7 @@
 .page-perfil .pf-parte .pf-trilho{ margin-top: 7px; }
 .page-perfil .pf-item--curto{ padding: 9px 11px; }
 .page-perfil .pf-nivel__acoes{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.page-perfil .pf-nivel__acoes .pf-topo-btn{ font-size: 12.5px; padding: 7px 12px; margin-bottom: 12px; }
+.page-perfil .pf-nivel__acoes .pf-topo-btn{ font-size: 12.5px; padding: 7px 12px; }
 
 /* ---------------- ranking ---------------- */
 .page-perfil .pf-rank__pos{ display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
