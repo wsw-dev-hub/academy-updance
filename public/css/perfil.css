@@ -63,7 +63,7 @@
   border: 1.5px solid rgba(223, 224, 242, 0.40);
   padding: 8px 16px; border-radius: var(--udx-radius-sm, 6px);
   font-family: var(--udx-font); font-size: .88rem; font-weight: 500;
-  text-decoration: none; cursor: pointer; margin-bottom: 12px;
+  text-decoration: none; cursor: pointer;
   transition: background-color 220ms ease, border-color 220ms ease;
 }
 .page-perfil .pf-topo-btn:hover{ background-color: rgba(223, 224, 242, 0.08); border-color: var(--udx-primary-hot); color: #fff; }
@@ -210,7 +210,7 @@
 .page-perfil .pf-seg{ display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--pf-surface-2); border: 1px solid var(--pf-line); flex-wrap: wrap; }
 .page-perfil .pf-seg button{
   border: 0; background: transparent; color: var(--pf-muted);
-  padding: 6px 11px; border-radius: 8px; margin-bottom: 0;
+  padding: 6px 11px; border-radius: 8px;
   font-family: var(--udx-font); font-size: 12.5px; font-weight: 500; cursor: pointer;
 }
 .page-perfil .pf-seg button:hover{ color: #fff; }
@@ -500,3 +500,15 @@
 .page-perfil .pf-plano__aviso{ color: var(--pf-muted); }
 .page-perfil .pf-parte__nivel{ display: block; margin-top: 2px; font-size: 11.5px; color: var(--pf-muted); }
 .page-perfil .pf-parte.is-fechada{ opacity: .62; }
+
+/* ---------------- Profissionalização (Árvores de Talentos) ---------------- */
+.page-perfil .pf-prof{
+  background:
+    radial-gradient(520px 180px at 100% 0%, rgba(242, 116, 5, .10), transparent 70%),
+    var(--pf-surface);
+  border-color: rgba(242, 116, 5, .22);
+}
+.page-perfil .pf-prof .pf-bloco__titulo .mdi{ color: #F27405; }
+.page-perfil .pf-nivel[style*="--nv-grad"] .pf-nivel__ico{ background: var(--nv-grad); }
+.page-perfil .pf-nivel[style*="--nv-grad"] .pf-nivel__trilho .xp{ background: var(--nv-grad); }
+.page-perfil .pf-prof .pf-nivel.is-aberto{ border-color: rgba(242, 116, 5, .40); }

@@ -89,7 +89,7 @@
   }
   function rotuloGrupo(origem, grupo, nomes) {
     if (origem === 'talentos') {
-      return 'Árvore de Talentos, ' + ((nomes.perfisTalento && nomes.perfisTalento[grupo]) || grupo);
+      return 'Profissionalização, ' + ((nomes.perfisTalento && nomes.perfisTalento[grupo]) || grupo);
     }
     return (TRILHAS[grupo] && TRILHAS[grupo].rotulo) || (nomes.niveis && nomes.niveis[grupo]) || grupo;
   }
@@ -101,11 +101,11 @@
   function unidadeXp(origem) { return origem === 'talentos' ? 'XP' : 'XPE'; }
 
   /* ---------------- preferências (só neste navegador) ---------------- */
-  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '', nivel: '' };
+  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '', nivel: '', prof: '' };
   try { var salvo = JSON.parse(win.localStorage.getItem(CHAVE_PREFS) || 'null'); if (salvo) for (var k in salvo) prefs[k] = salvo[k]; } catch (e) {}
   function salvarPrefs() { try { win.localStorage.setItem(CHAVE_PREFS, JSON.stringify(prefs)); } catch (e) {} }
 
-  var estado = { dados: null, busca: '', origem: '', mostrar: 8, habTodas: false, evTodos: false, nv: { status: '', parte: '', mostrar: 6 } };
+  var estado = { dados: null, busca: '', origem: '', mostrar: 8, habTodas: false, evTodos: false, nv: { status: '', parte: '', mostrar: 6 }, pv: { status: '', parte: '', mostrar: 6 } };
 
   /* ================================================================
      DERIVAÇÕES — tudo calculado a partir da resposta da API
@@ -513,6 +513,12 @@
      habilidade), situação dos desafios do nível, posição no ranking
      do nível e atalhos. Clicar num card filtra os desafios dele.
   ================================================================ */
+  /* Cores de cada carreira — as mesmas da página da Árvore de Talentos (talentTree.js). */
+  var COR_PERFIL = {
+    bailarino: 'linear-gradient(135deg, #F20505 0%, #8C0783 100%)',
+    professor: 'linear-gradient(135deg, #5708A6 0%, #430ABF 100%)',
+    performer: 'linear-gradient(135deg, #FA33A1 0%, #F27405 100%)'
+  };
   var NIVEL_DO_TIPO = { 'Free': 'fundamentos', 'Iniciante': 'iniciante', 'Intermediário': 'intermediario', 'Técnico': 'tecnico' };
   var STATUS_NV = [
     { id: '',         txt: 'Todos' },
@@ -586,12 +592,14 @@
       tiers.forEach(function (t) { if (gastos >= t.requisito) faixa = t; else if (!prox) prox = t; });
       var tit = perfil ? perfil.habilidades.filter(function (h) { return h.tipo === 'titulo'; })[0] : null;
       var titOk = tit && ((d.titulos && d.titulos.talentos) || []).some(function (x) { return x.id === tit.id; });
-      n.nome = 'Árvore de Talentos, ' + ((perfil && perfil.nome) || rotuloGrupo('talentos', grupo, d.nomes || {}).replace(/^Árvore de Talentos, /, ''));
+      n.nome = (perfil && perfil.nome) || rotuloGrupo('talentos', grupo, d.nomes || {}).replace(/^Profissionalização, /, '');
+      n.segmento = perfil && perfil.segmento;
+      n.cor = COR_PERFIL[grupo] || '';
       n.icone = titOk ? 'mdi-trophy-variant' : ((perfil && perfil.icone) || 'mdi-family-tree');
       n.pct = (resto / porPonto) * 100;
       n.valor = '<strong>' + fmt(xp) + '</strong> XP';
-      n.estado = titOk ? 'Título conquistado: ' + tit.nome
-        : (faixa ? 'Faixa ' + faixa.n + ', ' + faixa.nome : 'Faixa 1') + '. ' + plural(Math.max(0, pontos - gastos), 'ponto livre', 'pontos livres');
+      n.estado = (n.segmento ? n.segmento + '. ' : '') + (titOk ? 'Título conquistado: ' + tit.nome
+        : (faixa ? 'Faixa ' + faixa.n + ', ' + faixa.nome : 'Faixa 1') + '. ' + plural(Math.max(0, pontos - gastos), 'ponto livre', 'pontos livres'));
       n.insignia = titOk;
       n.pontos = pontos; n.gastos = gastos; n.livres = Math.max(0, pontos - gastos);
       n.dominadas = dominadas; n.totalHabs = habs.length;
@@ -614,32 +622,49 @@
     return n;
   }
 
+  /* Duas seções usam o mesmo painel: "Seus níveis" (trilhas de nível) e
+     "Profissionalização" (Árvores de Talentos do Estágio). Cada uma lembra
+     o seu item aberto e tem filtros próprios. */
+  var SECOES = {
+    pfNiveis: { origem: 'trilha',   pref: 'nivel', est: 'nv', bloco: '#blNiveis',
+                vazio: 'Seus níveis aparecem aqui quando você começar uma trilha. <a href="/membros/">Escolher uma trilha</a>' },
+    pfProf:   { origem: 'talentos', pref: 'prof',  est: 'pv', bloco: '#blProf', vazio: '' }
+  };
+  function itensDaSecao(id, d, v) {
+    return niveisDoMembro(d, v).filter(function (n) { return n.origem === SECOES[id].origem; });
+  }
+
   function renderNiveis(d, v) {
-    var niveis = niveisDoMembro(d, v), caixa = $('#pfNiveis');
-    if (!niveis.length) {
-      caixa.innerHTML = '<div class="pf-vazio">Seus níveis aparecem aqui quando você começar uma trilha. <a href="/membros/">Escolher uma trilha</a></div>';
-      return;
-    }
-    if (prefs.nivel && !niveis.some(function (n) { return n.chave === prefs.nivel; })) prefs.nivel = '';
-    caixa.innerHTML = '<div class="pf-niveis">' + niveis.map(function (n, i) {
-      var aberto = n.chave === prefs.nivel, idp = 'pfNv' + i;
-      return '<div class="pf-nivel' + (aberto ? ' is-aberto' : '') + '" data-chave="' + esc(n.chave) + '">' +
+    var trilhas = itensDaSecao('pfNiveis', d, v), prof = itensDaSecao('pfProf', d, v);
+    /* Sem trilha e com árvores (estagiário que já passou pelos níveis): só a Profissionalização. */
+    $('#blNiveis').hidden = !trilhas.length && !!prof.length;
+    $('#blProf').hidden = !prof.length;
+    renderSecao('pfNiveis', d, trilhas);
+    renderSecao('pfProf', d, prof);
+  }
+
+  function renderSecao(id, d, itens) {
+    var cfg = SECOES[id], caixa = $('#' + id);
+    if (!itens.length) { caixa.innerHTML = cfg.vazio ? '<div class="pf-vazio">' + cfg.vazio + '</div>' : ''; return; }
+    if (prefs[cfg.pref] && !itens.some(function (n) { return n.chave === prefs[cfg.pref]; })) prefs[cfg.pref] = '';
+    caixa.innerHTML = '<div class="pf-niveis">' + itens.map(function (n, i) {
+      var aberto = n.chave === prefs[cfg.pref], idp = id + 'P' + i;
+      return '<div class="pf-nivel' + (aberto ? ' is-aberto' : '') + '" data-chave="' + esc(n.chave) + '"' + (n.cor ? ' style="--nv-grad:' + n.cor + '"' : '') + '>' +
         '<button type="button" class="pf-nivel__cab" aria-expanded="' + aberto + '" aria-controls="' + idp + '">' +
           '<span class="pf-nivel__ico" aria-hidden="true"><span class="mdi ' + n.icone + '"></span></span>' +
           '<span class="pf-nivel__nome">' + esc(n.nome) +
-            (n.insignia ? ' <span class="pf-selo"><span class="mdi mdi-medal" aria-hidden="true"></span>insígnia</span>' : '') +
+            (n.insignia ? ' <span class="pf-selo"><span class="mdi mdi-medal" aria-hidden="true"></span>' + (n.origem === 'trilha' ? 'insígnia' : 'título') + '</span>' : '') +
             '<small>' + esc(n.estado) + '</small></span>' +
           '<span class="pf-nivel__valor">' + n.valor + '</span>' +
           '<span class="mdi mdi-chevron-down pf-nivel__seta" aria-hidden="true"></span>' +
           '<span class="pf-trilho pf-nivel__trilho" role="img" aria-label="' + Math.round(n.pct) + '%"><i class="xp" style="width:' + n.pct.toFixed(1) + '%"></i></span>' +
         '</button>' +
-        '<div class="pf-nivel__painel" id="' + idp + '"' + (aberto ? '' : ' hidden') + '>' + (aberto ? painelNivel(d, n) : '') + '</div>' +
+        '<div class="pf-nivel__painel" id="' + idp + '"' + (aberto ? '' : ' hidden') + '>' + (aberto ? painelNivel(d, n, estado[cfg.est]) : '') + '</div>' +
       '</div>';
     }).join('') + '</div>';
   }
 
-  function painelNivel(d, n) {
-    var f = estado.nv;
+  function painelNivel(d, n, f) {
     var rk = n.rank;
     var stats = n.origem === 'trilha'
       ? mini(Math.round(n.pct) + '%', 'do XPE do nível') +
@@ -649,7 +674,7 @@
       : mini(fmt(n.livres) + '<small> de ' + fmt(n.pontos) + '</small>', 'pontos de talento livres') +
         mini(fmt(n.dominadas) + '<small> de ' + fmt(n.totalHabs) + '</small>', 'habilidades dominadas') +
         mini(fmt(n.cont.aprovado) + (n.total ? '<small> de ' + fmt(n.total) + '</small>' : ''), 'desafios aprovados') +
-        mini(rk && rk.pos ? rk.pos + 'º<small> de ' + fmt(rk.participantes) + '</small>' : '—', 'no ranking da Árvore');
+        mini(rk && rk.pos ? rk.pos + 'º<small> de ' + fmt(rk.participantes) + '</small>' : '—', 'no ranking da Profissionalização');
 
     /* Árvore de Talentos: faixa, título e plano salvo */
     var plano = '';
@@ -711,12 +736,12 @@
           '</li>';
         }).join('') + '</ul>' +
         (itens.length > f.mostrar ? '<button type="button" class="pf-mais" data-nv-mais>Mostrar mais ' + Math.min(6, itens.length - f.mostrar) + ' de ' + (itens.length - f.mostrar) + ' restantes</button>' : '')
-      : '<div class="pf-vazio">' + (n.desafios.length ? 'Nenhum desafio com esse filtro.' : 'Você ainda não enviou desafios neste nível.' + (n.total ? ' São ' + fmt(n.total) + ' desafios ao todo.' : '')) + '</div>';
+      : '<div class="pf-vazio">' + (n.desafios.length ? 'Nenhum desafio com esse filtro.' : (n.origem === 'trilha' ? 'Você ainda não enviou desafios neste nível.' : 'Você ainda não enviou desafios nesta árvore.') + (n.total ? ' São ' + fmt(n.total) + ' desafios ao todo.' : '')) + '</div>';
 
     return '<div class="pf-nivel__stats">' + stats + '</div>' + plano +
       '<div class="pf-nivel__corpo">' +
         (partes ? '<div class="pf-nivel__partes">' + partes + '</div>' : '') +
-        '<div class="pf-nivel__desafios"><h3 class="pf-ev-grupo">Desafios do nível</h3>' + chips + lista + '</div>' +
+        '<div class="pf-nivel__desafios"><h3 class="pf-ev-grupo">' + (n.origem === 'trilha' ? 'Desafios do nível' : 'Desafios da árvore') + '</h3>' + chips + lista + '</div>' +
       '</div>' +
       '<div class="pf-nivel__acoes">' +
         (n.semAcesso ? '' : '<a class="pf-topo-btn" href="' + esc(n.pagina) + '"><span class="mdi mdi-map-marker-path" aria-hidden="true"></span>' + (n.origem === 'trilha' ? (n.desafios.length ? 'Continuar a trilha' : 'Começar a trilha') : 'Abrir a árvore e distribuir pontos') + '</a>') +
@@ -726,18 +751,19 @@
     function mini(valor, rotulo) { return '<div class="pf-num"><b>' + valor + '</b><span>' + esc(rotulo) + '</span></div>'; }
   }
 
-  function atualizarPainelAberto(d, v) {
-    var el = $('#pfNiveis .pf-nivel.is-aberto'); if (!el) return;
-    var n = niveisDoMembro(d, v).filter(function (x) { return x.chave === el.getAttribute('data-chave'); })[0];
-    if (n) $('.pf-nivel__painel', el).innerHTML = painelNivel(d, n);
+  function atualizarPainelAberto(id, d, v) {
+    var el = $('#' + id + ' .pf-nivel.is-aberto'); if (!el) return;
+    var n = itensDaSecao(id, d, v).filter(function (x) { return x.chave === el.getAttribute('data-chave'); })[0];
+    if (n) $('.pf-nivel__painel', el).innerHTML = painelNivel(d, n, estado[SECOES[id].est]);
   }
+
 
   /* ================================================================
      RANKING
   ================================================================ */
   function rotuloEscopo(id, d) {
     if (id === 'geral') return 'Geral';
-    if (id === 'talentos') return 'Árvore de Talentos';
+    if (id === 'talentos') return 'Profissionalização (Árvores de Talentos)';
     return (TRILHAS[id] && TRILHAS[id].rotulo) || (d.nomes && d.nomes.niveis && d.nomes.niveis[id]) || id;
   }
   function renderRanking(d) {
@@ -905,24 +931,28 @@
       if (!e.target.closest('#pfHabTodas')) return;
       estado.habTodas = !estado.habTodas; renderHabilidades(estado.dados, deriv);
     });
-    $('#pfNiveis').addEventListener('click', function (e) {
-      var cab = e.target.closest('.pf-nivel__cab');
-      if (cab) {
-        var chave = cab.parentNode.getAttribute('data-chave');
-        prefs.nivel = prefs.nivel === chave ? '' : chave;
-        estado.nv = { status: '', parte: '', mostrar: 6 };
-        salvarPrefs(); renderNiveis(estado.dados, deriv);
-        var novo = $('#pfNiveis .pf-nivel[data-chave="' + chave + '"] .pf-nivel__cab'); if (novo) novo.focus();
-        return;
-      }
-      var st = e.target.closest('[data-nv-status]'), pt = e.target.closest('[data-nv-parte]'), mais = e.target.closest('[data-nv-mais]');
-      if (st) { estado.nv.status = st.getAttribute('data-nv-status'); estado.nv.mostrar = 6; }
-      else if (pt) { var id = pt.getAttribute('data-nv-parte'); estado.nv.parte = estado.nv.parte === id ? '' : id; estado.nv.mostrar = 6; }
-      else if (mais) { estado.nv.mostrar += 6; }
-      else return;
-      var alvo = st ? '[data-nv-status="' + estado.nv.status + '"]' : pt ? '[data-nv-parte="' + pt.getAttribute('data-nv-parte') + '"]' : null;
-      atualizarPainelAberto(estado.dados, deriv);
-      if (alvo) { var b = $('#pfNiveis .is-aberto ' + alvo); if (b) b.focus(); }
+    Object.keys(SECOES).forEach(function (id) {
+      var cfg = SECOES[id];
+      $('#' + id).addEventListener('click', function (e) {
+        var cab = e.target.closest('.pf-nivel__cab');
+        if (cab) {
+          var chave = cab.parentNode.getAttribute('data-chave');
+          prefs[cfg.pref] = prefs[cfg.pref] === chave ? '' : chave;
+          estado[cfg.est] = { status: '', parte: '', mostrar: 6 };
+          salvarPrefs(); renderSecao(id, estado.dados, itensDaSecao(id, estado.dados, deriv));
+          var novo = $('#' + id + ' .pf-nivel[data-chave="' + chave + '"] .pf-nivel__cab'); if (novo) novo.focus();
+          return;
+        }
+        var f = estado[cfg.est];
+        var st = e.target.closest('[data-nv-status]'), pt = e.target.closest('[data-nv-parte]'), mais = e.target.closest('[data-nv-mais]');
+        if (st) { f.status = st.getAttribute('data-nv-status'); f.mostrar = 6; }
+        else if (pt) { var idp = pt.getAttribute('data-nv-parte'); f.parte = f.parte === idp ? '' : idp; f.mostrar = 6; }
+        else if (mais) { f.mostrar += 6; }
+        else return;
+        var alvo = st ? '[data-nv-status="' + f.status + '"]' : pt ? '[data-nv-parte="' + pt.getAttribute('data-nv-parte') + '"]' : null;
+        atualizarPainelAberto(id, estado.dados, deriv);
+        if (alvo) { var b = $('#' + id + ' .is-aberto ' + alvo); if (b) b.focus(); }
+      });
     });
     $('#pfEvModo').addEventListener('click', function (e) {
       var b = e.target.closest('button[data-modo]'); if (!b) return;
