@@ -1929,13 +1929,14 @@ async function perfilResumo(request, env) {
   const email = m.email;
   const types = Array.isArray(m.types) && m.types.length ? m.types : [m.type || 'Free'];
   const falhas = [];
+  const estagiario = types.includes('Estagiário(a)');   /* árvores de talentos: exclusivas do estágio */
   const secao = async (nome, fn, vazio) => {
     try { return await fn(); }
     catch (e) { console.error('perfilResumo/' + nome + ':', (e && e.message) || e); falhas.push(nome); return vazio; }
   };
   const todos = (sql, ...args) => env.DB.prepare(sql).bind(...args).all().then(r => r.results || []);
 
-  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, eventos, estrutura] = await Promise.all([
+  const [membro, niveis, perfisTal, desafios, habilidades, insignias, titulosTal, reputacao, ranking, eventos, estrutura, plano] = await Promise.all([
     secao('membro', () => env.DB.prepare(
       'SELECT name, created_at FROM members WHERE email = ?'
     ).bind(email).first(), null),
@@ -2011,10 +2012,20 @@ async function perfilResumo(request, env) {
         'UNION ALL ' +
         "SELECT 'talentos', d.perfil_id, NULL, NULL, COUNT(*), SUM(d.xp), MIN(d.rowid) " +
         '  FROM talent_desafios d ' +
-        ' WHERE d.ativo = 1 AND d.perfil_id IN (SELECT perfil_id FROM talent_progresso WHERE email = ?) ' +
+        ' WHERE d.ativo = 1 AND (? = 1 OR d.perfil_id IN (SELECT perfil_id FROM talent_progresso WHERE email = ?)) ' +
         ' GROUP BY d.perfil_id ' +
-        'ORDER BY 1, 2, 7', email, ...doTipo, email);   /* cards na ordem em que foram cadastrados */
+        'ORDER BY 1, 2, 7', email, ...doTipo, estagiario ? 1 : 0, email);   /* cards na ordem em que foram cadastrados */
     }, []),
+
+    /* Plano atual da Árvore de Talentos (página marcada como atual, ou a 1ª):
+       alocação de pontos por habilidade — o catálogo vem de talentTree.data.js. */
+    secao('plano', async () => {
+      const p = await env.DB.prepare(
+        'SELECT page_id, nome, alocacao FROM talent_paginas WHERE email = ? ORDER BY atual DESC, page_id LIMIT 1'
+      ).bind(email).first();
+      const n = await env.DB.prepare('SELECT COUNT(*) AS n FROM talent_paginas WHERE email = ?').bind(email).first();
+      return p ? { pagina: p.page_id, nome: p.nome, alocacao: parseJSON(p.alocacao, {}), paginas: (n && n.n) || 1 } : null;
+    }, null),
   ]);
 
   const mapa = (rows) => Object.fromEntries((rows || []).map(r => [r.id, r.nome]));
@@ -2040,6 +2051,7 @@ async function perfilResumo(request, env) {
     ranking,
     eventos,
     estrutura,
+    plano,
     falhas,
   });
 }
