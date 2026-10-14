@@ -6,7 +6,7 @@
  *  Requisitos:
  *    - /js/talentTree.data.js carregado ANTES deste arquivo
  *      (expõe window.UDX_TALENTOS)
- *    - Marcação-âncora de /membros/estagio/arvore-de-talentos/
+ *    - Marcação-âncora de /membros/nivel-estagiario/arvore-de-talentos/
  *
  *  RESPONSABILIDADES
  *  -----------------
@@ -1016,33 +1016,6 @@
       UI.renderPanel();
       var novo = $('[data-hab="' + hab.id + '"]', UI.refs.board);
       if (novo) { UI.tipFixo = true; UI.mostrarTip(hab, novo); }
-    });
-
-    /* --- tooltip no click/touch / foco --- */
-   UI.refs.board.addEventListener('click', function (ev) {
-      var btn = ev.target.closest('.tt-node');
-      if (!btn) { return; }
-      
-      var hab = DADOS.indice[btn.getAttribute('data-hab')];
-      if (!hab) { return; }
-
-      UI.habSelecionada = hab.id;
-
-      // Preserva ações existentes (Alt/Meta remove, clique normal investe)
-      if (ev.altKey || ev.metaKey) { 
-        Acoes.remover(hab); 
-      } else { 
-        Acoes.investir(hab); 
-      }
-
-      UI.renderPanel();
-      
-      // Reobtem a referência do nó após o re-render e exibe/atualiza o tooltip
-      var novo = $('[data-hab="' + hab.id + '"]', UI.refs.board);
-      if (novo) { 
-        UI.tipFixo = true; 
-        UI.mostrarTip(hab, novo); 
-      }
     });
 
     /* --- Fechar tooltip ao clicar / tocar fora --- */

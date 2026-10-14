@@ -25,7 +25,7 @@
     intermediario: { rotulo: 'Nível Intermediário', pagina: '/membros/nivel-intermediario/arvore-de-habilidades/' },
     tecnico:       { rotulo: 'Nível Técnico',       pagina: '/membros/nivel-tecnico/arvore-de-habilidades/' }
   };
-  var PAGINA_TALENTOS = '/membros/estagio/arvore-de-talentos/';
+  var PAGINA_TALENTOS = '/membros/nivel-estagiario/arvore-de-talentos/';
 
   /* Nomes das insígnias de trilha (dos módulos de dados; ini/int seguem o padrão). */
   var INSIGNIAS = {

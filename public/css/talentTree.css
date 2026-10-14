@@ -22,7 +22,7 @@
    1) TOKENS DA PÁGINA + TOKENS POR PERFIL
    Segue o padrão --seg-* já usado em .page-trails/.page-apps/.page-clube
 ================================================================ */
-.page-membros.page-talentos{
+.page-membros:is(.page-talentos, .page-estagiario){
     --tt-grad:        linear-gradient(135deg, #430ABF 0%, #8C0783 100%);
     --tt-grad-soft:   linear-gradient(135deg, rgba(67,10,191,.18) 0%, rgba(140,7,131,.22) 100%);
     --tt-glow:        rgba(67, 10, 191, 0.32);
@@ -840,7 +840,7 @@
 
 /* --- MOBILE PEQUENO — até 360px --- */
 @media screen and (max-width: 360px){
-    .page-membros.page-talentos{
+    .page-membros:is(.page-talentos, .page-estagiario){
         --tt-node: 46px;
         --tt-gap-col: 9px;
         --tt-gap-row: 28px;
@@ -855,7 +855,7 @@
 
 /* --- MOBILE — até 480px --- */
 @media screen and (max-width: 480px){
-    .page-membros.page-talentos{ --tt-node: 50px; --tt-gap-col: 11px; }
+    .page-membros:is(.page-talentos, .page-estagiario){ --tt-node: 50px; --tt-gap-col: 11px; }
     .tt-actions{ width: 100%; }
     .tt-actions .tt-btn{ flex: 1 1 auto; justify-content: center; }
     .tt-panel{ padding: 18px 14px; }
@@ -867,19 +867,19 @@
 
 /* --- MOBILE MÉDIO — 481px a 575px --- */
 @media (min-width: 481px) and (max-width: 575px){
-    .page-membros.page-talentos{ --tt-node: 54px; }
+    .page-membros:is(.page-talentos, .page-estagiario){ --tt-node: 54px; }
 }
 
 /* --- ≥ 576px --- */
 @media screen and (min-width: 576px){
-    .page-membros.page-talentos{ --tt-node: 58px; --tt-gap-col: 14px; }
+    .page-membros:is(.page-talentos, .page-estagiario){ --tt-node: 58px; --tt-gap-col: 14px; }
     .tt-wallet{ grid-template-columns: repeat(2, 1fr); }
     .tt-titles{ grid-template-columns: repeat(2, 1fr); }
 }
 
 /* --- ≥ 768px --- */
 @media screen and (min-width: 768px){
-    .page-membros.page-talentos{ --tt-node: 62px; --tt-gap-col: 18px; --tt-gap-row: 40px; }
+    .page-membros:is(.page-talentos, .page-estagiario){ --tt-node: 62px; --tt-gap-col: 18px; --tt-gap-row: 40px; }
     .tt-wallet{ grid-template-columns: repeat(3, 1fr); }
     .tt-tree{ padding: 26px 24px 40px; }
     .tt-panel{ padding: 26px 24px; }
@@ -901,7 +901,7 @@
 
 /* --- ≥ 1024px — as três árvores lado a lado (layout do modelo) --- */
 @media screen and (min-width: 1024px){
-    .page-membros.page-talentos{ --tt-node: 56px; --tt-gap-col: 14px; --tt-gap-row: 38px; }
+    .page-membros:is(.page-talentos, .page-estagiario){ --tt-node: 56px; --tt-gap-col: 14px; --tt-gap-row: 38px; }
     .tt-board{ grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .tt-profile-tabs{ display: none; }
     .tt-tree{ padding: 22px 16px 40px; }
@@ -909,14 +909,14 @@
 
 /* --- ≥ 1200px --- */
 @media screen and (min-width: 1200px){
-    .page-membros.page-talentos{ --tt-node: 62px; --tt-gap-col: 18px; --tt-gap-row: 42px; }
+    .page-membros:is(.page-talentos, .page-estagiario){ --tt-node: 62px; --tt-gap-col: 18px; --tt-gap-row: 42px; }
     .tt-board{ gap: 20px; }
     .tt-tree{ padding: 26px 22px 40px; }
 }
 
 /* --- ≥ 1440px --- */
 @media screen and (min-width: 1440px){
-    .page-membros.page-talentos{ --tt-node: 68px; --tt-gap-col: 22px; --tt-gap-row: 46px; }
+    .page-membros:is(.page-talentos, .page-estagiario){ --tt-node: 68px; --tt-gap-col: 22px; --tt-gap-row: 46px; }
     .tt-board{ gap: 24px; }
 }
 

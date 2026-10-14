@@ -123,6 +123,11 @@ export default {
     const url = new URL(request.url);
     const { pathname } = url;
 
+    // ---- endereço antigo da Árvore de Talentos (nível Estagiário) ----
+    if (pathname === '/membros/estagio/arvore-de-talentos' || pathname.startsWith('/membros/estagio/arvore-de-talentos/')) {
+      return Response.redirect(url.origin + '/membros/nivel-estagiario/arvore-de-talentos/' + url.search, 301);
+    }
+
     // ---- fora do academy → blog (mesmo caminho e query) ----
     if (pathname === '/' || BLOG_PREFIXES.some(p => pathname === p.slice(0, -1) || pathname.startsWith(p))) {
       return Response.redirect(BLOG_ORIGIN + pathname + url.search, 302);
