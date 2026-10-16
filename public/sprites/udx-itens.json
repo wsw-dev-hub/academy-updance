@@ -1,0 +1,62 @@
+[
+  {
+    "id": "udx-insignia-free",
+    "nome": "Insígnia do Nível Free",
+    "arquivo": "udx-insignia-free.png",
+    "quadro": {
+      "largura": 128,
+      "altura": 128
+    },
+    "quadros": 16,
+    "fps": 12,
+    "loop": true
+  },
+  {
+    "id": "udx-insignia-iniciante",
+    "nome": "Insígnia do Nível Iniciante",
+    "arquivo": "udx-insignia-iniciante.png",
+    "quadro": {
+      "largura": 128,
+      "altura": 128
+    },
+    "quadros": 16,
+    "fps": 12,
+    "loop": true
+  },
+  {
+    "id": "udx-insignia-intermediario",
+    "nome": "Insígnia do Nível Intermediário",
+    "arquivo": "udx-insignia-intermediario.png",
+    "quadro": {
+      "largura": 128,
+      "altura": 128
+    },
+    "quadros": 16,
+    "fps": 12,
+    "loop": true
+  },
+  {
+    "id": "udx-insignia-tecnico",
+    "nome": "Insígnia do Nível Técnico",
+    "arquivo": "udx-insignia-tecnico.png",
+    "quadro": {
+      "largura": 128,
+      "altura": 128
+    },
+    "quadros": 16,
+    "fps": 12,
+    "loop": true
+  },
+  {
+    "id": "udx-evento-disco",
+    "nome": "Disco de evento",
+    "arquivo": "udx-evento-disco.png",
+    "quadro": {
+      "largura": 128,
+      "altura": 128
+    },
+    "quadros": 16,
+    "fps": 12,
+    "loop": true
+  }
+]

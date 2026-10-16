@@ -1,0 +1,35 @@
+{
+  "id": "udx-tutting-01",
+  "nome": "Tutting · Caixas",
+  "arquivo": "udx-tutting-sheet.png",
+  "arquivoWebp": "udx-tutting-sheet.webp",
+  "quadro": {
+    "largura": 300,
+    "altura": 320
+  },
+  "quadros": 15,
+  "fps": 6,
+  "loop": true,
+  "ordemOriginal": [
+    1,
+    10,
+    2,
+    3,
+    4,
+    8,
+    13,
+    12,
+    5,
+    10,
+    6,
+    7,
+    6,
+    14,
+    16
+  ],
+  "descartados": {
+    "9": "repete o quadro 5",
+    "11": "mão mais longa que o antebraço",
+    "15": "mãos em prece alongadas"
+  }
+}

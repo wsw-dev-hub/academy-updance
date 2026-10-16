@@ -1,0 +1,37 @@
+@charset "utf-8";
+/* ================================================================
+   SPRITES 2D — Up Dance Experience
+   /css/sprites.css  ·  componente .udx-sprite
+   ----------------------------------------------------------------
+   Faixa horizontal de quadros (PNG/WebP) animada só com CSS.
+   Uso:
+     <span class="udx-sprite" role="img" aria-label="Insígnia do Nível Técnico"
+           style="--src:url(/sprites/udx-insignia-tecnico.png); --n:16; --fps:12;
+                  --w:128px; --h:128px"></span>
+   --n    quadros na faixa       --fps  quadros por segundo
+   --w/--h tamanho exibido (a arte é 1:1 com o quadro; use metade
+           do tamanho do quadro para nitidez em telas de alta densidade)
+   Movimento reduzido: fica parado no 1º quadro.
+   Fora da tela: /js/sprites.js pausa (classe .is-pausado).
+================================================================ */
+.udx-sprite{
+  --n: 1; --fps: 12; --w: 128px; --h: 128px;
+  display: inline-block;
+  width: var(--w); height: var(--h);
+  background-image: var(--src);
+  background-repeat: no-repeat;
+  background-size: calc(var(--n) * 100%) 100%;
+  background-position: 0% 0;
+  animation: udx-sprite calc(var(--n) / var(--fps) * 1s) steps(var(--n), jump-none) infinite;
+  image-rendering: auto;
+  flex-shrink: 0;
+}
+.udx-sprite.is-uma-vez{ animation-iteration-count: 1; animation-fill-mode: forwards; }
+.udx-sprite.is-pausado{ animation-play-state: paused; }
+@keyframes udx-sprite{
+  from{ background-position: 0% 0; }
+  to  { background-position: 100% 0; }
+}
+@media (prefers-reduced-motion: reduce){
+  .udx-sprite{ animation: none; background-position: 0% 0; }
+}
