@@ -110,7 +110,7 @@ export default defineConfig(({ command }) => ({
         'membros/iniciante': resolve(__dirname, 'public/membros/nivel-iniciante/index.html'),
         'membros/intermediario': resolve(__dirname, 'public/membros/nivel-intermediario/index.html'),
         'membros/hab-intermediario': resolve(__dirname, 'public/membros/nivel-intermediario/arvore-de-habilidades/index.html'),
-        //'membros/revisao': resolve(__dirname, 'public/revisao/index.html'),
+        'membros/revisao': resolve(__dirname, 'public/revisao/index.html'),
 
       },
       external: ['ton-connect', 'ton-core'],
