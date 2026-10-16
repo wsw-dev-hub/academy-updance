@@ -34,9 +34,9 @@
     versao:      '1.0.0',
     xpPorPonto:  100,
 
-    /* Acesso: tipos de membro autorizados a ver a árvore.
-       'Estagiário(a)' é o piso — os níveis acima herdam o acesso. */
-    tiposComAcesso: ['Estagiário(a)', 'Monitor(a)', 'Assistente', 'Professor(a)', 'Premium'],
+    /* Acesso: árvores do nível Estagiário — exclusivas do tipo 'Estagiário(a)'.
+       A portaria do servidor é a regra 'arvore_talentos' em access_rules. */
+    tiposComAcesso: ['Estagiário(a)'],
 
     /* ============================================================
        LEGENDA DE DESAFIOS

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Meu perfil — Up Dance</title>
+<link rel="icon" type="image/x-icon" href="/images/icons/udx-icon.ico">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital@1&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.9.96/css/materialdesignicons.min.css">
+
+<!-- Design tokens e componentes do projeto -->
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/blog.css">
+<link rel="stylesheet" href="/css/trailsFormat.css">
+<link rel="stylesheet" href="/css/format.css">
+<link rel="stylesheet" href="/css/perfil.css">
+</head>
+
+<body class="page-membros page-perfil">
+
+  <header class="members-topbar">
+    <img src="/images/icons/udx-icon.png" alt="">
+    <span class="marca">Up Dance</span>
+    <span class="type-badge">
+      <span class="mdi mdi-account-star-outline" aria-hidden="true"></span>
+      <span>Meu perfil</span>
+    </span>
+    <span class="spacer"></span>
+    <a class="pf-topo-btn" href="/membros/" aria-label="Voltar para a Área de Membros">
+      <span class="mdi mdi-arrow-left" aria-hidden="true"></span>
+      <span class="pf-topo-txt">Área de Membros</span>
+    </a>
+    <button class="pf-topo-btn" id="sair" type="button">Sair</button>
+  </header>
+
+  <main class="pf-main" id="pfApp" aria-busy="true">
+    <div class="auto-container">
+
+      <!-- Identidade -->
+      <section class="pf-hero" id="pfHero" aria-label="Resumo do seu perfil">
+        <div class="pf-id">
+          <div class="pf-avatar"><span>&nbsp;</span></div>
+          <div style="flex:1">
+            <div class="pf-esqueleto" style="height:30px;width:60%"></div>
+            <div class="pf-esqueleto" style="height:14px;width:40%;margin-top:10px"></div>
+          </div>
+        </div>
+        <div class="pf-numeros">
+          <div class="pf-num pf-esqueleto" style="height:64px"></div>
+          <div class="pf-num pf-esqueleto" style="height:64px"></div>
+          <div class="pf-num pf-esqueleto" style="height:64px"></div>
+          <div class="pf-num pf-esqueleto" style="height:64px"></div>
+        </div>
+      </section>
+
+      <div class="pf-aviso" id="pfAviso" role="status" hidden></div>
+
+      <!-- Desafios diários -->
+      <section class="pf-bloco pf-ritmo" aria-labelledby="tRitmo">
+        <div class="pf-bloco__cab">
+          <h2 class="pf-bloco__titulo" id="tRitmo"><span class="mdi mdi-pulse" aria-hidden="true"></span>Seu ritmo</h2>
+          <div class="pf-seg" role="group" aria-label="Período do gráfico" id="pfPeriodo">
+            <button type="button" data-dias="7">7 dias</button>
+            <button type="button" data-dias="14">14 dias</button>
+            <button type="button" data-dias="30">30 dias</button>
+          </div>
+        </div>
+        <div class="pf-ritmo__corpo">
+          <div class="pf-hoje" id="pfHoje"><div class="pf-esqueleto" style="height:104px;width:104px;border-radius:50%"></div></div>
+          <div class="pf-grafico">
+            <div class="pf-grafico__barra">
+              <div class="pf-legenda" aria-hidden="true">
+                <span><i style="background:var(--pf-enviado)"></i>Enviados</span>
+                <span><i style="background:var(--pf-alcancado)"></i>Aprovados</span>
+              </div>
+            </div>
+            <div id="pfGrafico"><div class="pf-esqueleto" style="height:190px"></div></div>
+            <p class="pf-grafico__resumo" id="pfGraficoResumo"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seus níveis (interativo) -->
+      <section class="pf-bloco pf-niveis-bloco" id="blNiveis" aria-labelledby="tNiveis">
+        <div class="pf-bloco__cab">
+          <h2 class="pf-bloco__titulo" id="tNiveis"><span class="mdi mdi-stairs-up" aria-hidden="true"></span>Seus níveis</h2>
+        </div>
+        <p class="pf-sub">Trilhas de nível (Free, Iniciante, Intermediário e Técnico). Abra um nível para ver o progresso por card, a situação de cada desafio e sua posição no ranking do nível.</p>
+        <div id="pfNiveis"><div class="pf-esqueleto" style="height:120px"></div></div>
+      </section>
+
+      <!-- Profissionalização: Árvores de Talentos do Estágio (separadas dos níveis) -->
+      <section class="pf-bloco pf-niveis-bloco pf-prof" id="blProf" aria-labelledby="tProf" hidden>
+        <div class="pf-bloco__cab">
+          <h2 class="pf-bloco__titulo" id="tProf"><span class="mdi mdi-briefcase-variant-outline" aria-hidden="true"></span>Profissionalização</h2>
+          <a class="pf-bloco__link" href="/membros/nivel-estagiario/">Área do Estágio</a>
+        </div>
+        <p class="pf-sub">Seu plano de carreira no Estágio: três Árvores de Talentos (Bailarino(a), Professor(a) e Performer). Os pontos vêm do XP de cada carreira e você distribui na árvore.</p>
+        <div id="pfProf"></div>
+      </section>
+
+      <div class="pf-grade">
+        <div class="pf-col">
+
+          <!-- Desafios: alcançados e pendentes -->
+          <section class="pf-bloco" aria-labelledby="tDesafios">
+            <div class="pf-bloco__cab">
+              <h2 class="pf-bloco__titulo" id="tDesafios"><span class="mdi mdi-flag-checkered" aria-hidden="true"></span>Desafios</h2>
+              <a class="pf-bloco__link" href="/membros/desafios/">Central de desafios</a>
+            </div>
+            <div class="pf-ferramentas">
+              <div class="pf-seg" role="tablist" aria-label="Situação dos desafios" id="pfAbas">
+                <button type="button" role="tab" data-status="pendente">Aguardando<span class="pf-cont" data-cont="pendente"></span></button>
+                <button type="button" role="tab" data-status="aprovado">Aprovados<span class="pf-cont" data-cont="aprovado"></span></button>
+                <button type="button" role="tab" data-status="recusado">Recusados<span class="pf-cont" data-cont="recusado"></span></button>
+              </div>
+            </div>
+            <div class="pf-ferramentas">
+              <label class="pf-oculto" for="pfBusca">Buscar desafio</label>
+              <input class="pf-busca" id="pfBusca" type="search" placeholder="Buscar desafio ou habilidade" autocomplete="off">
+              <label class="pf-oculto" for="pfOrigem">Origem</label>
+              <select class="pf-select" id="pfOrigem">
+                <option value="">Níveis e profissionalização</option>
+                <option value="trilha">Só níveis</option>
+                <option value="talentos">Só Profissionalização</option>
+              </select>
+            </div>
+            <div id="pfDesafios" role="tabpanel" aria-live="polite"><div class="pf-esqueleto" style="height:120px"></div></div>
+          </section>
+
+          <!-- Habilidades -->
+          <section class="pf-bloco" aria-labelledby="tHab">
+            <div class="pf-bloco__cab">
+              <h2 class="pf-bloco__titulo" id="tHab"><span class="mdi mdi-star-four-points-outline" aria-hidden="true"></span>Habilidades</h2>
+              <label class="pf-oculto" for="pfHabOrdem">Ordenar habilidades</label>
+              <select class="pf-select" id="pfHabOrdem">
+                <option value="progresso">Mais avançadas</option>
+                <option value="xp">Mais XP</option>
+                <option value="nome">Nome</option>
+              </select>
+            </div>
+            <p class="pf-sub">Desafios aprovados e aguardando em cada habilidade que você já começou.</p>
+            <div id="pfHabilidades"><div class="pf-esqueleto" style="height:120px"></div></div>
+          </section>
+
+        </div>
+        <div class="pf-col">
+
+          <!-- Ranking -->
+          <section class="pf-bloco" aria-labelledby="tRank">
+            <div class="pf-bloco__cab">
+              <h2 class="pf-bloco__titulo" id="tRank"><span class="mdi mdi-podium" aria-hidden="true"></span>Ranking</h2>
+              <label class="pf-oculto" for="pfRankEscopo">Ranking de</label>
+              <select class="pf-select" id="pfRankEscopo"></select>
+            </div>
+            <div id="pfRanking"><div class="pf-esqueleto" style="height:140px"></div></div>
+          </section>
+
+          <!-- Títulos -->
+          <section class="pf-bloco" aria-labelledby="tTit">
+            <div class="pf-bloco__cab">
+              <h2 class="pf-bloco__titulo" id="tTit"><span class="mdi mdi-trophy-outline" aria-hidden="true"></span>Títulos e insígnias</h2>
+            </div>
+            <div id="pfTitulos"><div class="pf-esqueleto" style="height:90px"></div></div>
+          </section>
+
+          <!-- Reputação -->
+          <section class="pf-bloco" aria-labelledby="tRep">
+            <div class="pf-bloco__cab">
+              <h2 class="pf-bloco__titulo" id="tRep"><span class="mdi mdi-shield-star-outline" aria-hidden="true"></span>Reputação</h2>
+              <a class="pf-bloco__link" href="/membros/reputacao/">Ver detalhes</a>
+            </div>
+            <div id="pfReputacao"><div class="pf-esqueleto" style="height:90px"></div></div>
+          </section>
+
+          <!-- Eventos promovidos pela plataforma -->
+          <section class="pf-bloco" aria-labelledby="tEventos">
+            <div class="pf-bloco__cab">
+              <h2 class="pf-bloco__titulo" id="tEventos"><span class="mdi mdi-calendar-star" aria-hidden="true"></span>Eventos</h2>
+              <div class="pf-seg" role="group" aria-label="Modalidade dos eventos" id="pfEvModo">
+                <button type="button" data-modo="">Todos</button>
+                <button type="button" data-modo="presencial">Presenciais</button>
+                <button type="button" data-modo="online">On-line</button>
+              </div>
+            </div>
+            <p class="pf-sub">Encontros presenciais e on-line promovidos pela Up Dance em que você se inscreveu.</p>
+            <div id="pfEventos"><div class="pf-esqueleto" style="height:80px"></div></div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="pf-tip" id="pfTip" role="tooltip" aria-hidden="true"></div>
+
+  <footer class="members-footer">
+    © Up Dance — Meu perfil. Seus dados são visíveis apenas para você; no ranking, outros membros aparecem só pelas iniciais.
+  </footer>
+
+<script src="/js/talentTree.data.js" defer></script>
+<script src="/js/reputacao.data.js" defer></script>
+<script src="/js/perfil.js" defer></script>
+</body>
+</html>

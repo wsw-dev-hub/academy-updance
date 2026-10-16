@@ -106,7 +106,7 @@ export default defineConfig(({ command }) => ({
         //'membros/temporada-free': resolve(__dirname, 'public/membros/temporada-free/index.html'),
 
         //'membros/capacitacao': resolve(__dirname, 'public/membros/capacitacao/estagiario.html'),
-        'membros/revisao': resolve(__dirname, 'public/membros/revisao/index.html'),
+        'membros/revisao': resolve(__dirname, 'public/revisao/index.html'),
         'membros/free': resolve(__dirname, 'public/membros/nivel-free/index.html'),
         'membros/iniciante': resolve(__dirname, 'public/membros/nivel-iniciante/index.html'),
         'membros/intermediario': resolve(__dirname, 'public/membros/nivel-intermediario/index.html'),

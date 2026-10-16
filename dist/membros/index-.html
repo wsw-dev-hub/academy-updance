@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Área de Membros — Up Dance</title>
+<link rel="icon" type="image/x-icon" href="/images/icons/udx-icon.ico">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital@1&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.9.96/css/materialdesignicons.min.css">
+
+<!-- Design tokens e componentes do projeto -->
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/blog.css">
+<link rel="stylesheet" href="/css/trailsFormat.css">
+<!--<link rel="stylesheet" href="/css/mediaQuery.css">-->
+<link rel="stylesheet" href="/css/format.css">
+
+<style>
+  .page-membros{
+    --m-grad:        linear-gradient(135deg, #F434A1 0%, #ff8442 100%);
+    --m-grad-soft:   linear-gradient(135deg, rgba(244,52,161,.18) 0%, rgba(255,132,66,.22) 100%);
+    --m-grad-text:   linear-gradient(135deg, #ff8442 0%, #F434A1 100%);
+    --m-pink:        #F434A1;
+    --m-orange:      #ff8442;
+    --m-glow:        rgba(244, 52, 161, 0.32);
+
+    --seg-grad:      var(--m-grad);
+    --seg-grad-soft: var(--m-grad-soft);
+    --seg-grad-text: var(--m-grad-text);
+    --seg-accent:    var(--m-pink);
+    --seg-accent-2:  var(--m-orange);
+    --seg-glow:      var(--m-glow);
+
+    --seg-hero-rgba-a: rgba(244, 52, 161, 0.22);
+    --seg-hero-rgba-b: rgba(255, 132, 66, 0.28);
+    --seg-cta-rgba-a:  rgba(244, 52, 161, 0.18);
+    --seg-cta-rgba-b:  rgba(255, 132, 66, 0.22);
+    --seg-how-rgba-a:  rgba(244, 52, 161, 0.06);
+    --seg-how-rgba-b:  rgba(255, 132, 66, 0.08);
+    --seg-step-bg:     rgba(17, 2, 115, 0.18);
+  }
+
+  .members-topbar{
+    position: sticky; top: 0; z-index: 300;
+    display: flex; align-items: center; gap: .8rem;
+    padding: 12px 22px;
+    background: rgba(2, 2, 26, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--udx-border);
+    box-shadow: 0 2px 24px rgba(0, 0, 0, 0.50);
+    flex-wrap: wrap;
+  }
+  .members-topbar img{ width: 34px; height: 34px; }
+  .members-topbar .marca{
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1.25rem;
+    background: linear-gradient(to top, #fb8460, #f13aa1);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .members-topbar .type-badge{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 50px;
+    font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--seg-grad); color: #fff;
+    box-shadow: 0 6px 18px var(--seg-glow);
+    max-width: 60vw;
+    white-space: normal;
+    line-height: 1.15;
+    font-size: 10.5px;
+  }
+  .members-topbar .type-badge .mdi{ font-size: 14px; }
+  .members-topbar .spacer{ flex: 1; }
+  .members-topbar .btn-sair{
+    background: transparent;
+    color: var(--udx-text);
+    border: 1.5px solid rgba(223, 224, 242, 0.40);
+    padding: 8px 16px; border-radius: var(--udx-radius-sm);
+    font-family: var(--udx-font); font-size: .88rem; font-weight: 500;
+    cursor: pointer;
+    transition: background-color 280ms ease, border-color 280ms ease, color 280ms ease;
+  }
+  .members-topbar .btn-sair:hover{
+    background-color: rgba(223, 224, 242, 0.08);
+    border-color: var(--udx-primary-hot);
+    color: #fff;
+  }
+
+  .members-main{ padding-bottom: 40px; }
+
+  .members-hero .type-chip{
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 10px; padding: 6px 14px; border-radius: 50px;
+    background: rgba(2, 2, 26, 0.55);
+    border: 1px solid var(--udx-border);
+    color: var(--udx-text);
+    font-size: 12px; font-weight: 600;
+  }
+  .members-hero .type-chip .mdi{ font-size: 15px; color: var(--seg-accent); }
+  .members-hero .type-chip b{ font-weight: 700; }
+
+  .members-list{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  @media (min-width: 780px){
+    .members-list{ grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* Card bloqueado */
+  .trail-x.is-locked{
+    opacity: .55;
+    filter: grayscale(.25);
+  }
+  .trail-x.is-locked .trail-x__cta{
+    background: rgba(2, 2, 26, 0.65);
+    color: var(--udx-text-muted);
+    box-shadow: none;
+    border: 1px solid var(--udx-border);
+  }
+  .trail-x .lock-note{
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11.5px; font-weight: 600;
+    color: var(--udx-text-muted);
+    margin-top: 4px;
+  }
+  .trail-x .lock-note .mdi{ font-size: 14px; }
+
+  /* Paleta por nível (Opção 2) — sobrescreve o contrato --seg-* no card.
+     Só tokens oficiais. Card sem data-lvl (ou nível sem paleta) mantém a
+     paleta padrão de .page-membros. */
+  .trail-x[data-lvl="free"]{
+    --seg-grad:      linear-gradient(135deg, #030BA6 0%, #BF0449 100%);
+    --seg-grad-soft: linear-gradient(135deg, rgba(3,11,166,.18) 0%, rgba(191,4,73,.22) 100%);
+    --seg-grad-text: linear-gradient(135deg, #BF0449 0%, #030BA6 100%);
+    --seg-accent:    #030BA6; --seg-accent-2: #BF0449;
+    --seg-glow:      rgba(3, 11, 166, 0.32);
+  }
+  .trail-x[data-lvl="iniciante"]{
+    --seg-grad:      linear-gradient(135deg, #110273 0%, #030BA6 100%);
+    --seg-grad-soft: linear-gradient(135deg, rgba(17,2,115,.18) 0%, rgba(3,11,166,.22) 100%);
+    --seg-grad-text: linear-gradient(135deg, #030BA6 0%, #110273 100%);
+    --seg-accent:    #030BA6; --seg-accent-2: #110273;
+    --seg-glow:      rgba(3, 11, 166, 0.32);
+  }
+  .trail-x[data-lvl="intermediario"]{
+    --seg-grad:      linear-gradient(135deg, #8C0783 0%, #FA33A1 100%);
+    --seg-grad-soft: linear-gradient(135deg, rgba(140,7,131,.18) 0%, rgba(250,51,161,.22) 100%);
+    --seg-grad-text: linear-gradient(135deg, #FA33A1 0%, #8C0783 100%);
+    --seg-accent:    #8C0783; --seg-accent-2: #FA33A1;
+    --seg-glow:      rgba(140, 7, 131, 0.32);
+  }
+  /* professor — TENTATIVO (herdado de talentTree.css data-perfil="professor"); CONFIRMAR */
+  .trail-x[data-lvl="professor"]{
+    --seg-grad:      linear-gradient(135deg, #5708A6 0%, #430ABF 100%);
+    --seg-grad-soft: linear-gradient(135deg, rgba(87,8,166,.18) 0%, rgba(67,10,191,.22) 100%);
+    --seg-grad-text: linear-gradient(135deg, #430ABF 0%, #5708A6 100%);
+    --seg-accent:    #430ABF; --seg-accent-2: #5708A6;
+    --seg-glow:      rgba(67, 10, 191, 0.32);
+  }
+  /* AGUARDANDO HEX OFICIAL — enquanto não vierem, estes níveis caem no fallback:
+  .trail-x[data-lvl="basico"]{ }
+  .trail-x[data-lvl="estagiario"]{ }
+  .trail-x[data-lvl="monitor"]{ }
+  .trail-x[data-lvl="assistente"]{ }
+  .trail-x[data-lvl="premium"]{ }
+  */
+
+  /* Lista de produtos dentro do card (turno 13) */
+  .products-list{
+    margin: 12px 0 0;
+    padding: 12px 0 0;
+    border-top: 1px dashed var(--udx-border);
+    list-style: none;
+    display: grid; gap: 8px;
+  }
+  .products-list li{ margin: 0; padding: 0; }
+  .products-list a{
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--udx-radius-sm);
+    color: var(--udx-text); text-decoration: none;
+    font-size: 13px; line-height: 1.4;
+    background: rgba(2, 2, 26, 0.35);
+    border: 1px solid var(--udx-border);
+    transition: border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
+  }
+  .products-list a:hover{
+    border-color: var(--seg-accent);
+    background: rgba(244, 52, 161, 0.06);
+    transform: translateX(3px);
+  }
+  .products-list a > .mdi:first-child{
+    font-size: 18px; color: var(--seg-accent); flex-shrink: 0;
+  }
+  .products-list__label{
+    display: flex; flex-direction: column;
+    flex: 1; min-width: 0;
+  }
+  .products-list__desc{
+    font-size: 11.5px; color: var(--udx-text-muted); margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .products-list__ext{
+    font-size: 14px; color: var(--udx-text-muted); flex-shrink: 0;
+  }
+
+  /* Ebooks fixos (bloco "Sempre disponível") */
+  .ebooks-list{
+    margin: 6px 0 0;
+    padding: 14px 0 0;
+    border-top: 1px dashed var(--udx-border);
+    list-style: none;
+    display: grid; gap: 8px;
+  }
+  .ebooks-list li{ margin: 0; padding: 0; }
+  .ebooks-list a{
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: var(--udx-radius-sm);
+    color: var(--udx-text); text-decoration: none;
+    font-size: 13px; line-height: 1.4;
+    background: rgba(2, 2, 26, 0.35);
+    border: 1px solid var(--udx-border);
+    transition: border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
+  }
+  .ebooks-list a:hover{
+    border-color: var(--seg-accent);
+    background: rgba(244, 52, 161, 0.06);
+    transform: translateX(3px);
+  }
+  .ebooks-list a .mdi{
+    font-size: 16px; color: var(--seg-accent); flex-shrink: 0;
+  }
+
+  .members-state{
+    text-align: center; /*padding: 40px 20px;*/
+    color: var(--udx-text-muted); font-size: .95rem;
+  }
+  .members-footer{
+    padding: 20px 22px; text-align: center;
+    color: var(--udx-text-muted); font-size: .8rem;
+    border-top: 1px solid var(--udx-border);
+  }
+
+  /* -------------------------------------------------------------
+     Vitrine — itens vinculados apresentados sem navegação.
+     Só se aplica às listas geradas no hub /membros/ com o
+     modificador .products-list--display; a página de estágio
+     usa .products-list padrão (com links reais) e não é afetada.
+  ------------------------------------------------------------- */
+  .products-list--display .products-list__row{
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--udx-radius-sm);
+    color: var(--udx-text);
+    font-size: 13px; line-height: 1.4;
+    background: rgba(2, 2, 26, 0.35);
+    border: 1px solid var(--udx-border);
+    cursor: default;
+    user-select: none;
+  }
+  .products-list--display .products-list__row:hover{
+    background: rgba(2, 2, 26, 0.35);
+    border-color: var(--udx-border);
+    transform: none;
+  }
+  .products-list--display .products-list__row > .mdi:first-child{
+    font-size: 18px; color: var(--udx-primary-hot); flex-shrink: 0;
+  }
+
+  /* -------------------------------------------------------------
+     Seção de itens dentro de cada card (SEMPRE presente).
+     Três estados possíveis para o conteúdo interno:
+       - <ul class="products-list--display">  → vitrine dos itens
+       - <div class="products-list__empty">   → pacote sem itens vinculados
+       - <div class="products-list__empty products-list__empty--locked">
+                                              → pacote bloqueado no plano
+  ------------------------------------------------------------- */
+  .products-list__wrap{
+    display: block;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--udx-border);
+  }
+  .products-list__title{
+    display: flex; align-items: center; gap: 8px;
+    margin: 0 0 8px;
+    font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--udx-text-muted);
+  }
+  .products-list__title .mdi{
+    font-size: 14px; color: var(--udx-primary-hot);
+  }
+
+  .products-list__empty{
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--udx-radius-sm);
+    color: var(--udx-text-muted);
+    font-size: 12.5px; line-height: 1.4;
+    background: rgba(2, 2, 26, 0.30);
+    border: 1px dashed var(--udx-border);
+  }
+  .products-list__empty .mdi{
+    font-size: 16px; flex-shrink: 0;
+    color: var(--udx-primary-hot);
+  }
+  .products-list__empty--locked{
+    /* No card bloqueado o estado ficam coerente com .is-locked: a mesma
+       borda tracejada, com o ícone de cadeado em tom neutro. */
+    background: rgba(2, 2, 26, 0.20);
+    color: var(--udx-text-muted);
+  }
+  .products-list__empty--locked .mdi{
+    color: var(--udx-text-muted);
+  }
+
+  /* Dentro da seção wrap, remove a borda superior duplicada da própria
+     .products-list padrão (a wrap já traz o divisor). */
+  .products-list__wrap .products-list{
+    margin: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  
+  /* -------------------------------------------------------------
+     Variantes de CTA no card do hub:
+     .trail-x__cta--go   → acesso à área real do recurso (liberado)
+     .trail-x__cta--info → landing descritiva do plano (bloqueado)
+     Ambas herdam o layout de .trail-x__cta; só o tratamento
+     cromático é modulado para leitura imediata do estado.
+  ------------------------------------------------------------- */
+  .trail-x.is-locked .trail-x__cta--info{
+    background: rgba(2, 2, 26, 0.55);
+    color: var(--udx-text);
+    border: 1px solid var(--udx-border);
+    box-shadow: none;
+  }
+  .trail-x.is-locked .trail-x__cta--info:hover,
+  .trail-x.is-locked .trail-x__cta--info:focus-visible{
+    background: rgba(223, 224, 242, 0.06);
+    border-color: var(--udx-primary-hot);
+    color: #fff;
+  }
+  .trail-x.is-locked .trail-x__cta--info .mdi{ font-size: 15px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .trail-x, .ebooks-list a, .products-list a, .members-topbar .btn-sair{ transition: none; }
+  }
+</style>
+</head>
+
+<body class="page-membros">
+
+  <header class="members-topbar">
+    <img src="/images/icons/udx-icon.png" alt="">
+    <span class="marca">Up Dance</span>
+    <span class="type-badge" id="typeBadge" hidden>
+      <span class="mdi mdi-shield-star" aria-hidden="true"></span>
+      <span id="typeBadgeLabel">—</span>
+    </span>
+    <span class="spacer"></span>
+    <button class="btn-sair" id="sair">Sair</button>
+  </header>
+
+  <main class="members-main">
+
+    <section class="trails-hero">
+      <div class="auto-container">
+        <div class="trails-hero__inner members-hero">
+          <div class="eyebrow">
+            <b>01</b>
+            <span>Área de Membros</span>
+          </div>
+          <h1>Bem-vindo(a) à sua <em>área exclusiva</em></h1>
+          <p class="lead">
+            Conteúdo, ferramentas e materiais liberados conforme o seu plano.
+            Aproveite tudo o que está disponível para você — e fique de olho,
+            porque a lista cresce toda semana.
+          </p>
+
+          <div class="type-chip" id="userChip" hidden>
+            <span class="mdi mdi-account-check-outline" aria-hidden="true"></span>
+            <span>Conectado como <b id="userEmail">—</b></span>
+          </div>
+
+          <div class="trails-stats" id="memberStats" style="margin-top:26px">
+            <div class="trails-stats__item">
+              <b id="statResources">0</b>
+              <span>Recursos liberados</span>
+            </div>
+            <div class="trails-stats__item">
+              <b id="statType">—</b>
+              <span>Seu plano atual</span>
+            </div>
+          </div>
+          <div class="members-hero__actions" style="margin-top:22px">
+            <a class="home-cta home-cta--solid" href="/membros/reputacao/">
+              <span class="mdi mdi-medal-outline" aria-hidden="true"></span>
+              Minha reputação
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DINÂMICA — populada por JS a partir de /api/me/access -->
+    <!--<section class="trails-section">
+      <div class="auto-container">
+        <div class="trails-section__head ts__h">
+          <div class="eyebrow">
+            <span class="mdi mdi-star-four-points-outline" aria-hidden="true"></span>
+            <span>Seu conteúdo por plano</span>
+          </div>
+          <h2>O que está <em>disponível para você</em></h2>
+          <p class="lead">
+            Os recursos abaixo refletem seu plano atual. Itens em destaque
+            estão liberados; os esmaecidos podem ser desbloqueados com um
+            plano superior.
+          </p>
+        </div>
+
+        <div class="members-state" id="membersLoading"><p>Carregando seus acessos…</p></div>
+        <div class="members-state" id="membersEmpty" hidden>
+          <p>Nenhum recurso cadastrado ainda. Volte em breve.</p>
+        </div>
+        <div class="trails-list members-list" id="membersList" hidden></div>
+      </div>
+    </section>-->
+
+    <!-- SEÇÃO DINÂMICA 1 — NOVIDADES (recém-adicionados; exibida por JS só se houver) -->
+    <section class="trails-section" id="novidadesSection" hidden>
+      <div class="auto-container">
+        <div class="trails-section__head ts__h">
+          <div class="eyebrow">
+            <span class="mdi mdi-new-box" aria-hidden="true"></span>
+            <span>Novidades</span>
+          </div>
+          <h2>Adicionado <em>recentemente</em></h2>
+          <p class="lead">
+            O que entrou por último na sua área — fique de olho, a lista
+            cresce toda semana.
+          </p>
+        </div>
+
+        <div class="trails-list members-list" id="novidadesList"></div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DINÂMICA 2 — PLANOS E RECURSOS (todos os demais) -->
+    <section class="trails-section" id="recursosSection">
+      <div class="auto-container">
+        <div class="trails-section__head ts__h">
+          <div class="eyebrow">
+            <span class="mdi mdi-star-four-points-outline" aria-hidden="true"></span>
+            <span>Seu conteúdo por plano</span>
+          </div>
+          <h2>O que está <em>disponível para você</em></h2>
+          <p class="lead">
+            Os recursos abaixo refletem seu plano atual. Itens em destaque
+            estão liberados; os esmaecidos podem ser desbloqueados com um
+            plano superior.
+          </p>
+        </div>
+
+        <div class="members-state" id="membersLoading"><!--<p>Carregando seus acessos…</p>--></div>
+        <div class="members-state" id="membersEmpty" hidden>
+          <!--<p>Nenhum recurso cadastrado ainda. Volte em breve.</p>-->
+        </div>
+        <div class="trails-list members-list" id="membersList" hidden></div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO FIXA — recursos sempre disponíveis -->
+    <section class="trails-section" style="padding-top:0">
+      <div class="auto-container">
+        <div class="trails-section__head ts__h">
+          <div class="eyebrow">
+            <span class="mdi mdi-book-open-variant" aria-hidden="true"></span>
+            <span>Conteúdo disponível</span>
+          </div>
+          <h2>Ebooks e <em>Mini-ebooks</em></h2>
+          <!--<p class="lead">
+            Materiais em PDF prontos para download — disponíveis para todos os membros.
+          </p>-->
+        </div>
+
+        <div class="trails-list members-list">
+          <article class="trail-x">
+            <div class="trail-x__top">
+              <span class="trail-x__icon"><span class="mdi mdi-book-open-variant"></span></span>
+              <div>
+                <span class="trail-x__num">Biblioteca</span>
+                <h3>Guias práticos</h3>
+              </div>
+            </div>
+            <p class="trail-x__desc">
+              Estamos preparando novos materiais gratuitos para todos os membros.
+              Em breve, esta biblioteca terá conteúdos abertos ao público da Up Dance.
+            </p>
+            <p class="lock-note" style="margin-top:10px">
+              <span class="mdi mdi-clock-outline"></span>
+              Em breve
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="trails-cta">
+      <div class="auto-container">
+        <div class="trails-cta__box">
+          <h2>Quer acessar <em>mais recursos?</em></h2>
+          <p>Fale com a gente para conhecer os planos superiores e liberar apps, aulas avançadas e trilhas completas.</p>
+          <div class="trails-cta__ctas">
+            <a class="home-cta home-cta--solid" href="/contato/">
+              <span class="mdi mdi-message-text-outline"></span>
+              Falar com a Up Dance
+            </a>
+            <a class="home-cta home-cta--ghost" href="/planos/">
+              <span class="mdi mdi-tag-multiple-outline"></span>
+              Ver planos
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="members-footer">
+    © Up Dance — acesso restrito. Este conteúdo é pessoal e intransferível.
+  </footer>
+
+<script>
+  (function(){
+    'use strict';
+
+    function esc(s){
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+      });
+    }
+
+    // Sanitiza nome de ícone MDI (a-z, 0-9, hífen). Dupla defesa com o backend.
+    function safeIcon(name){
+      if (!name) return 'star-four-points-outline';
+      return /^[a-z0-9\-]{2,60}$/.test(name) ? name : 'star-four-points-outline';
+    }
+
+    var typeBadge      = document.getElementById('typeBadge');
+    var typeBadgeLabel = document.getElementById('typeBadgeLabel');
+    var userChip       = document.getElementById('userChip');
+    var userEmail      = document.getElementById('userEmail');
+    var statType       = document.getElementById('statType');
+    var statResources  = document.getElementById('statResources');
+    var loading        = document.getElementById('membersLoading');
+    var emptyState     = document.getElementById('membersEmpty');
+    var list           = document.getElementById('membersList');
+    var novidadesSection = document.getElementById('novidadesSection');
+    var novidadesList    = document.getElementById('novidadesList');
+    var recursosSection  = document.getElementById('recursosSection');
+
+    fetch('/api/me', { credentials: 'same-origin' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(u){
+        if(!u || !u.email){ location.href = '/entrar/'; return null; }
+        userEmail.textContent = u.email;
+        userChip.hidden = false;
+
+        // multi-tipo (turno 8) — badge e stat com todos os planos
+        var types = Array.isArray(u.types) && u.types.length ? u.types : [u.type || 'Free'];
+        typeBadgeLabel.textContent = types.join(' · ');
+        typeBadge.hidden = false;
+        statType.textContent = types.length > 1 ? (types.length + ' planos') : types[0];
+
+        return fetch('/api/me/access', { credentials: 'same-origin' })
+          .then(function(r){ return r.ok ? r.json() : null; });
+      })
+      .then(function(access){
+        loading.hidden = true;
+        if(!access){ emptyState.hidden = false; return; }
+
+        var recursos = Array.isArray(access.resources) ? access.resources : [];
+        if(!recursos.length){ emptyState.hidden = false; statResources.textContent = 0; return; }
+
+        var liberados = 0;
+        recursos.forEach(function(r){ if(r.allowed) liberados++; });
+        statResources.textContent = liberados;
+
+        // Novidade = recurso criado nos últimos NOVIDADE_DIAS dias (created_at vem do backend)
+        var NOVIDADE_DIAS = 14;
+        var limiteNovidade = Date.now() - NOVIDADE_DIAS * 864e5;
+        var novidades = [], demais = [];
+        recursos.forEach(function(r, i){
+          r.__i = i; // índice global preserva o rótulo "Recurso NN" nas duas listas
+          var t = r.created_at ? Date.parse(r.created_at) : NaN;
+          if (!isNaN(t) && t >= limiteNovidade) novidades.push(r);
+          else demais.push(r);
+        });
+
+        function cardHtml(r, i){
+          var num  = 'Recurso ' + String(i + 1).padStart(2, '0');
+          var icon = safeIcon(r.icon);
+          var desc = r.description || 'Recurso da área de membros.';
+          var lvlAttr = r.level ? ' data-lvl="'+esc(r.level)+'"' : '';
+
+          // Estado do card:
+          //  - Liberado com destino:   CTA "Acessar" -> área real do recurso.
+          //  - Liberado sem destino:   chip "Em breve" (recurso ainda em preparo).
+          //  - Bloqueado com nível:    CTA "Conhecer plano" -> landing do plano do recurso.
+          //  - Bloqueado sem nível:    lockNote apenas (defesa; access_rules incompleto).
+          //
+          // A landing descritiva é sempre a página do PLANO referente
+          // (ex.: /planos/estagiario/), derivada de r.level — que o backend
+          // resolve como o tier de entrada em access_rules (nivelDoRecurso).
+          var lockedCls = '';
+          var lockNote  = '';
+          var ctaHref   = '';
+          var ctaText   = '';
+          var ctaIcon   = '';
+          var ctaCls    = '';
+
+          if (r.allowed && r.path_prefix){
+            ctaHref = r.path_prefix;
+            ctaText = 'Acessar';
+            ctaIcon = 'arrow-right';
+            ctaCls  = ' trail-x__cta--go';
+          } else if (r.allowed && !r.path_prefix){
+            lockNote = '<span class="lock-note"><span class="mdi mdi-clock-outline"></span> Em breve</span>';
+          } else if (!r.allowed && r.level){
+            lockedCls = ' is-locked';
+            ctaHref = '/planos/' + encodeURIComponent(r.level) + '/';
+            ctaText = 'Conhecer plano';
+            ctaIcon = 'information-outline';
+            ctaCls  = ' trail-x__cta--info';
+          } else {
+            lockedCls = ' is-locked';
+            lockNote  = '<span class="lock-note"><span class="mdi mdi-lock-outline"></span> Não disponível no seu plano</span>';
+          }
+
+          // A seção de itens é SEMPRE renderizada — mesmo quando o pacote não
+          // tem produtos associados (ou não estão visíveis pelo bloqueio). O
+          // estado é distinguido por r.allowed cruzado com r.products.length:
+          //
+          //   allowed + com itens  -> lista os itens (vitrine)
+          //   allowed + sem itens  -> "Nenhum item vinculado ainda."
+          //   bloqueado            -> "Itens visíveis quando o plano liberar."
+          //
+          // O caso bloqueado NÃO revela contagem — coerente com a regra de
+          // herança de meusAcessos (backend nunca expõe conteúdo de card
+          // bloqueado). Se o backend passar a enviar products_count, a
+          // mensagem pode ser enriquecida sem quebrar este contrato.
+          var temItens = Array.isArray(r.products) && r.products.length > 0;
+          var listaItens = temItens
+            ? '<ul class="products-list products-list--display">' + r.products.map(function(p){
+                var pIcon = safeIcon(p.icon || 'chevron-right');
+                return '<li>'+
+                  '<span class="products-list__row" aria-disabled="true">'+
+                    '<span class="mdi mdi-'+esc(pIcon)+'"></span>'+
+                    '<span class="products-list__label">'+esc(p.label)+
+                      (p.description ? '<span class="products-list__desc">'+esc(p.description)+'</span>' : '')+
+                    '</span>'+
+                  '</span>'+
+                '</li>';
+              }).join('') + '</ul>'
+            : (r.allowed
+                ? '<div class="products-list__empty" role="note">'+
+                    '<span class="mdi mdi-package-variant-closed" aria-hidden="true"></span>'+
+                    '<span>Nenhum item vinculado a este pacote ainda.</span>'+
+                  '</div>'
+                : '<div class="products-list__empty products-list__empty--locked" role="note">'+
+                    '<span class="mdi mdi-lock-outline" aria-hidden="true"></span>'+
+                    '<span>Os itens deste pacote ficam visíveis quando o plano estiver liberado.</span>'+
+                  '</div>');
+
+          var produtosHtml =
+            '<section class="products-list__wrap" aria-label="Itens deste pacote">'+
+              '<h4 class="products-list__title">'+
+                '<span class="mdi mdi-cube-outline" aria-hidden="true"></span>'+
+                '<span>Itens deste pacote</span>'+
+              '</h4>'+
+              listaItens +
+            '</section>';
+
+          var ctaHtml = ctaHref
+              ? '<a class="trail-x__cta'+ctaCls+'" href="'+esc(ctaHref)+'">'+
+                  esc(ctaText)+' <span class="mdi mdi-'+esc(ctaIcon)+'"></span>'+
+                '</a>'
+              : '';
+
+            return ''+
+            '<article class="trail-x'+lockedCls+'"'+lvlAttr+' data-resource="'+esc(r.key)+'">'+
+              '<div class="trail-x__top">'+
+                '<span class="trail-x__icon"><span class="mdi mdi-'+esc(icon)+'"></span></span>'+
+                '<div>'+
+                  '<span class="trail-x__num">'+esc(num)+'</span>'+
+                  '<h3>'+esc(r.label || r.key)+'</h3>'+
+                '</div>'+
+              '</div>'+
+              '<p class="trail-x__desc">'+esc(desc)+'</p>'+
+              produtosHtml +
+              ctaHtml +
+              lockNote +
+            '</article>';
+          }
+
+        novidadesList.innerHTML = novidades.map(function(r){ return cardHtml(r, r.__i); }).join('');
+        list.innerHTML          = demais.map(function(r){ return cardHtml(r, r.__i); }).join('');
+
+        // esconde a seção que ficar vazia (nunca as duas: recursos.length > 0 aqui)
+        novidadesSection.hidden = (novidades.length === 0);
+        recursosSection.hidden  = (demais.length === 0);
+        list.hidden = false;
+      })
+      .catch(function(){
+        loading.hidden = true;
+        emptyState.textContent = 'Não foi possível carregar seus acessos. Tente atualizar a página.';
+        emptyState.hidden = false;
+      });
+
+    document.getElementById('sair').addEventListener('click', function(){
+      fetch('/api/member/logout', { method:'POST', credentials:'same-origin' })
+        .catch(function(){})
+        .finally(function(){ location.href = '/'; });
+    });
+  })();
+</script>
+
+</body>
+</html>
