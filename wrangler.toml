@@ -17,7 +17,7 @@ not_found_handling = "404-page"
 # a raiz "/" e os caminhos que não pertencem ao academy (lista BLOG_PREFIXES
 # em worker/index.js). Com not_found_handling = "404-page", um caminho sem
 # arquivo NÃO chega ao Worker a menos que esteja coberto aqui.
-run_worker_first   = ["/api/*", "/admin", "/admin/*", "/ouvir/*"]
+run_worker_first   = ["/api/*", "/admin", "/admin/*", "/ouvir/*", "/sprites/*"]
 
 [[kv_namespaces]]
 binding = "KV"
