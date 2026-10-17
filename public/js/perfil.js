@@ -922,7 +922,7 @@
             s.progresso = fmt(Math.min(melhor.gastos, melhor.req)) + ' de ' + fmt(melhor.req) + ' pontos na árvore mais avançada (' + melhor.nome + ')';
           }
           s.dica = 'Com os pontos da faixa do título, falta ser aprovado(a) no desafio do título da árvore.';
-          s.link = PAGINA_TALENTOS; s.linkTxt = 'Abrir a Árvore de Talentos';
+          s.link = PAGINA_TALENTOS; s.linkTxt = 'Abrir Talentos';
         } else {
           s.dica = 'Disponível a partir de Estagiário(a), depois das trilhas de nível.';
         }
