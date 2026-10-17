@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="/css/blog.css">
 <link rel="stylesheet" href="/css/trailsFormat.css">
 <link rel="stylesheet" href="/css/format.css">
+<link rel="stylesheet" href="/css/sprites.css">
 <link rel="stylesheet" href="/css/perfil.css">
 </head>
 
@@ -56,6 +57,20 @@
       </section>
 
       <div class="pf-aviso" id="pfAviso" role="status" hidden></div>
+
+      <!-- Insígnias: catálogo completo, conquistadas e a conquistar -->
+      <section class="pf-bloco pf-ins-bloco" aria-labelledby="tIns">
+        <div class="pf-bloco__cab">
+          <h2 class="pf-bloco__titulo" id="tIns"><span class="mdi mdi-shield-crown-outline" aria-hidden="true"></span>Insígnias<span class="pf-ins-cont" id="pfInsCont"></span></h2>
+          <div class="pf-seg" role="group" aria-label="Filtrar insígnias" id="pfInsFiltro">
+            <button type="button" data-ins="">Todas</button>
+            <button type="button" data-ins="conquistada">Conquistadas</button>
+            <button type="button" data-ins="disponivel">A conquistar</button>
+          </div>
+        </div>
+        <p class="pf-sub">Abra uma insígnia para ver como conquistá-la e quanto falta.</p>
+        <div id="pfInsignias"><div class="pf-esqueleto" style="height:170px"></div></div>
+      </section>
 
       <!-- Desafios diários -->
       <section class="pf-bloco pf-ritmo" aria-labelledby="tRitmo">
@@ -196,12 +211,19 @@
 
   <div class="pf-tip" id="pfTip" role="tooltip" aria-hidden="true"></div>
 
+  <!-- Detalhe da insígnia (preenchido por perfil.js) -->
+  <dialog class="pf-ins-dlg" id="pfInsDlg" aria-labelledby="pfInsDlgTitulo">
+    <div class="pf-ins-dlg__corpo" id="pfInsDlgCorpo"></div>
+  </dialog>
+
   <footer class="members-footer">
     © Up Dance — Meu perfil. Seus dados são visíveis apenas para você; no ranking, outros membros aparecem só pelas iniciais.
   </footer>
 
 <script src="/js/talentTree.data.js" defer></script>
 <script src="/js/reputacao.data.js" defer></script>
+<script src="/js/insignias.data.js" defer></script>
+<script src="/js/sprites.js" defer></script>
 <script src="/js/perfil.js" defer></script>
 </body>
 </html>

@@ -101,7 +101,7 @@
   function unidadeXp(origem) { return origem === 'talentos' ? 'XP' : 'XPE'; }
 
   /* ---------------- preferências (só neste navegador) ---------------- */
-  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '', nivel: '', prof: '' };
+  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '', nivel: '', prof: '', ins: '' };
   try { var salvo = JSON.parse(win.localStorage.getItem(CHAVE_PREFS) || 'null'); if (salvo) for (var k in salvo) prefs[k] = salvo[k]; } catch (e) {}
   function salvarPrefs() { try { win.localStorage.setItem(CHAVE_PREFS, JSON.stringify(prefs)); } catch (e) {} }
 
@@ -817,10 +817,18 @@
   function renderTitulos(d) {
     var cards = [];
     var t = d.titulos || {};
+    var INS = win.UDX_INSIGNIAS;
     (t.insignias || []).forEach(function (i) {
       var meta = INSIGNIAS[i.id] || { nome: i.id, icone: 'mdi-medal-outline' };
+      var arte = INS && INS.porInsigniaTrilha[i.id];
       var em = data(i.em);
-      cards.push(card(meta.icone, meta.nome, ((TRILHAS[i.grupo] && TRILHAS[i.grupo].rotulo) || i.grupo) + (em ? ', ' + diaCurto(em) + ' de ' + em.getFullYear() : ''), null));
+      cards.push(card(meta.icone, arte ? arte.titulo : meta.nome, ((TRILHAS[i.grupo] && TRILHAS[i.grupo].rotulo) || i.grupo) + (em ? ', ' + diaCurto(em) + ' de ' + em.getFullYear() : ''), null, arte && arte.img));
+    });
+    /* Insígnias que não vêm de trilha (Profissional, Participação). */
+    insEstados.forEach(function (s) {
+      if (!s.ok || s.b.regra.tipo === 'trilha') return;
+      cards.push(card('mdi-shield-crown-outline', s.b.titulo,
+        s.b.regra.tipo === 'evento' ? 'Eventos' + (s.em ? ', ' + diaCurto(s.em) + ' de ' + s.em.getFullYear() : '') : 'Profissionalização', null, s.b.img));
     });
     var T = win.UDX_TALENTOS, idx = (T && T.indice) || {};
     (t.talentos || []).forEach(function (x) {
@@ -837,11 +845,198 @@
       ? '<div class="pf-titulos">' + cards.join('') + '</div>'
       : '<div class="pf-vazio">Nenhum título ainda. Insígnias chegam ao concluir um nível; títulos, pela Árvore de Talentos e pelas avaliações de desempenho.</div>';
 
-    function card(ic, nome, origem, cor) {
+    function card(ic, nome, origem, cor, img) {
       return '<div class="pf-titulo"' + (cor ? ' style="--tit-cor:' + esc(cor) + '"' : '') + '>' +
-        '<span class="pf-titulo__ico"><span class="mdi ' + esc(ic) + '" aria-hidden="true"></span></span>' +
+        (img ? '<span class="pf-titulo__ico is-arte"><img src="' + esc(img) + '" alt="" width="44" height="44" loading="lazy" decoding="async"></span>'
+             : '<span class="pf-titulo__ico"><span class="mdi ' + esc(ic) + '" aria-hidden="true"></span></span>') +
         '<b>' + esc(nome) + '</b><span>' + esc(origem) + '</span></div>';
     }
+  }
+
+  /* ================================================================
+     INSÍGNIAS — catálogo (/js/insignias.data.js) × o que o membro já tem.
+     Nada novo na API: usa titulos.insignias, titulos.talentos, eventos,
+     plano e config.trilhas, que /api/perfil/resumo já devolve.
+  ================================================================ */
+  var CHAVE_VISTAS = 'udx:insignias:vistas';
+  var vistas = {};
+  try { vistas = JSON.parse(win.localStorage.getItem(CHAVE_VISTAS) || '{}') || {}; } catch (e) { vistas = {}; }
+  function marcarVista(id) {
+    if (vistas[id]) return false;
+    vistas[id] = 1;
+    try { win.localStorage.setItem(CHAVE_VISTAS, JSON.stringify(vistas)); } catch (e) {}
+    return true;
+  }
+
+  function estadoInsignias(d, v) {
+    var INS = win.UDX_INSIGNIAS;
+    if (!INS || !d) return [];
+    var cfg = (d.config && d.config.trilhas) || {};
+    var tit = d.titulos || {};
+    var tipos = (d.membro && d.membro.tipos) || [];
+    var TAL = win.UDX_TALENTOS;
+    var agora = new Date();
+
+    return INS.lista.map(function (b) {
+      var r = b.regra;
+      var s = { b: b, ok: false, em: null, pct: 0, progresso: '', dica: '', link: null, linkTxt: '' };
+
+      if (r.tipo === 'trilha') {
+        var ins = (tit.insignias || []).filter(function (i) { return i.id === r.insignia; })[0];
+        var lim = (cfg[r.trilha] && cfg[r.trilha].limiar) || 0;
+        var xp = (v && v.xpTrilha[r.trilha]) || 0;
+        s.ok = !!ins; s.em = ins ? data(ins.em) : null;
+        s.pct = s.ok ? 100 : (lim ? Math.min(100, (xp / lim) * 100) : 0);
+        s.progresso = lim ? fmt(Math.min(xp, lim)) + ' de ' + fmt(lim) + ' XPE' : fmt(xp) + ' XPE';
+        if (!s.ok) {
+          s.dica = lim && xp >= lim ? 'Limiar atingido. A insígnia aparece aqui assim que o registro do nível for concluído.'
+                 : xp ? 'Faltam ' + fmt(Math.max(0, lim - xp)) + ' XPE.' : 'Você ainda não enviou desafios nesta trilha.';
+        }
+        s.link = TRILHAS[r.trilha] ? TRILHAS[r.trilha].pagina : null; s.linkTxt = 'Abrir a trilha';
+
+      } else if (r.tipo === 'talentos') {
+        var perfis = (TAL && TAL.perfis) || [];
+        var idsTitulo = [], nomeTitulo = {};
+        perfis.forEach(function (p) {
+          p.habilidades.forEach(function (h) { if (h.tipo === 'titulo') { idsTitulo.push(h.id); nomeTitulo[h.id] = h.nome; } });
+        });
+        var meus = (tit.talentos || []).filter(function (x) { return !idsTitulo.length || idsTitulo.indexOf(x.id) !== -1; });
+        s.ok = meus.length > 0;
+        var estag = tipos.indexOf('Estagiário(a)') !== -1;
+        if (s.ok) {
+          s.pct = 100;
+          s.progresso = meus.map(function (x) { return nomeTitulo[x.id] || x.id; }).join(', ');
+        } else if (estag && perfis.length) {
+          var aloc = (d.plano && d.plano.alocacao) || {}, melhor = null;
+          perfis.forEach(function (p) {
+            var habs = p.habilidades.filter(function (h) { return h.tipo !== 'titulo'; });
+            var titH = p.habilidades.filter(function (h) { return h.tipo === 'titulo'; })[0];
+            var faixa = titH ? p.tiers.filter(function (t) { return t.n === titH.tier; })[0] : null;
+            var req = (faixa && faixa.requisito) || 0;
+            var gastos = habs.reduce(function (s2, h) { return s2 + Math.min(Number(aloc[h.id]) || 0, h.ranksMax); }, 0);
+            var pct = req ? Math.min(100, (gastos / req) * 100) : 0;
+            if (!melhor || pct > melhor.pct) melhor = { nome: p.nome, gastos: gastos, req: req, pct: pct };
+          });
+          if (melhor) {
+            s.pct = melhor.pct;
+            s.progresso = fmt(Math.min(melhor.gastos, melhor.req)) + ' de ' + fmt(melhor.req) + ' pontos na árvore mais avançada (' + melhor.nome + ')';
+          }
+          s.dica = 'Com os pontos da faixa do título, falta ser aprovado(a) no desafio do título da árvore.';
+          s.link = PAGINA_TALENTOS; s.linkTxt = 'Abrir a Árvore de Talentos';
+        } else {
+          s.dica = 'Disponível a partir de Estagiário(a), depois das trilhas de nível.';
+        }
+
+      } else if (r.tipo === 'evento') {
+        var evs = (d.eventos || []).map(function (e) { return { situacao: e.situacao, inicio: data(e.inicio), fim: data(e.fim) }; });
+        var pres = evs.filter(function (e) { return e.situacao === 'presente' && e.inicio; })
+                      .sort(function (a, b) { return a.inicio - b.inicio; });
+        var insc = evs.filter(function (e) { return e.situacao === 'inscrito' && e.inicio && (e.fim || e.inicio) >= agora; }).length;
+        s.ok = pres.length > 0; s.em = s.ok ? pres[0].inicio : null;
+        s.pct = s.ok ? 100 : 0;
+        s.progresso = s.ok ? plural(pres.length, 'presença confirmada', 'presenças confirmadas') : '0 de 1 presença confirmada';
+        if (!s.ok) s.dica = insc ? 'Você tem ' + plural(insc, 'inscrição', 'inscrições') + ' em eventos próximos. A presença confirmada libera a insígnia.'
+                                 : 'Inscreva-se em um encontro presencial ou on-line da Up Dance.';
+        s.link = '#tEventos'; s.linkTxt = 'Ver seus eventos';
+      }
+
+      s.nova = s.ok && !vistas[b.id];
+      return s;
+    });
+  }
+
+  function htmlInsignia(s, tam, grande) {
+    var b = s.b, src = grande ? b.imgGrande : b.img;
+    return '<span class="udx-insignia' + (s.ok ? '' : ' is-bloqueada') + (s.nova ? ' is-nova' : '') + '"' +
+      ' style="--src:url(\'' + esc(src) + '\');--cor:' + esc(b.cor) + ';--tam:' + tam + ';--atraso:' + (grande ? 0 : (win.UDX_INSIGNIAS.lista.indexOf(b) * .6)).toFixed(1) + 's">' +
+      '<img src="' + esc(src) + '" alt="" width="256" height="256"' + (grande ? '' : ' loading="lazy"') + ' decoding="async"></span>';
+  }
+
+  var insEstados = [];
+  function renderInsignias(d, v) {
+    insEstados = estadoInsignias(d, v);
+    var caixa = $('#pfInsignias');
+    var filtro = prefs.ins || '';
+    $$('#pfInsFiltro button').forEach(function (bt) { bt.setAttribute('aria-pressed', String((bt.getAttribute('data-ins') || '') === filtro)); });
+    if (!insEstados.length) {
+      caixa.innerHTML = '<div class="pf-vazio">Não foi possível carregar o catálogo de insígnias agora.</div>';
+      $('#pfInsCont').textContent = '';
+      return;
+    }
+    var ganhas = insEstados.filter(function (s) { return s.ok; }).length;
+    $('#pfInsCont').textContent = fmt(ganhas) + ' de ' + fmt(insEstados.length);
+    var lista = insEstados.filter(function (s) {
+      return !filtro || (filtro === 'conquistada' ? s.ok : !s.ok);
+    });
+    if (!lista.length) {
+      caixa.innerHTML = '<div class="pf-vazio">' + (filtro === 'conquistada'
+        ? 'Nenhuma insígnia conquistada ainda. Concluir o Nível Free é o primeiro passo.'
+        : 'Você conquistou todas as insígnias disponíveis.') + '</div>';
+      return;
+    }
+    caixa.innerHTML = '<ul class="pf-ins-grade">' + lista.map(function (s) {
+      var b = s.b;
+      var estado = s.ok
+        ? '<span class="pf-ins__estado is-ok"><span class="mdi mdi-check-decagram" aria-hidden="true"></span>' +
+            (s.em ? 'Conquistada em ' + diaCurto(s.em) + ' de ' + s.em.getFullYear() : 'Conquistada') + '</span>'
+        : '<span class="pf-ins__estado"><span class="mdi mdi-lock-outline" aria-hidden="true"></span>' +
+            (s.pct > 0 ? Math.floor(s.pct) + '% do caminho' : 'A conquistar') + '</span>';
+      return '<li><button type="button" class="pf-ins' + (s.ok ? ' is-ok' : '') + '" data-ins-id="' + esc(b.id) + '" style="--cor:' + esc(b.cor) + '"' +
+        ' aria-label="' + esc(b.titulo + ', ' + (s.ok ? 'conquistada' : 'a conquistar') + (s.nova ? ', nova' : '')) + '">' +
+        (s.nova ? '<span class="pf-ins__nova">Nova</span>' : '') +
+        htmlInsignia(s, 'var(--ins-tam)', false) +
+        '<b class="pf-ins__nome">' + esc(b.nome) + '</b>' + estado +
+        (!s.ok && s.pct > 0 ? '<span class="pf-trilho pf-ins__trilho" aria-hidden="true"><i class="xp" style="width:' + s.pct.toFixed(1) + '%"></i></span>' : '') +
+        '</button></li>';
+    }).join('') + '</ul>';
+    if (win.UDX_SPRITE) win.UDX_SPRITE.observar(caixa);
+  }
+
+  /* ---------- diálogo de detalhe ---------- */
+  var insAberta = null;
+  function abrirInsignia(id) {
+    var dlg = $('#pfInsDlg');
+    var i = -1;
+    insEstados.forEach(function (s, k) { if (s.b.id === id) i = k; });
+    if (i < 0 || !dlg) return;
+    var s = insEstados[i], b = s.b;
+    insAberta = id;
+    var novaVista = s.ok && marcarVista(id);
+    if (novaVista) s.nova = false;
+    var ant = insEstados[(i + insEstados.length - 1) % insEstados.length], prox = insEstados[(i + 1) % insEstados.length];
+    $('#pfInsDlgCorpo').innerHTML =
+      '<button type="button" class="pf-ins-dlg__fechar" data-ins-fechar aria-label="Fechar"><span class="mdi mdi-close" aria-hidden="true"></span></button>' +
+      '<div class="pf-ins-dlg__arte" style="--cor:' + esc(b.cor) + '">' + htmlInsignia(s, 'min(300px, 70vw)', true) + '</div>' +
+      '<div class="pf-ins-dlg__info">' +
+        '<span class="pf-ins-dlg__chip' + (s.ok ? ' is-ok' : '') + '"><span class="mdi ' + (s.ok ? 'mdi-check-decagram' : 'mdi-lock-outline') + '" aria-hidden="true"></span>' +
+          (s.ok ? 'Conquistada' + (s.em ? ' em ' + diaCurto(s.em) + ' de ' + s.em.getFullYear() : '') : 'A conquistar') + '</span>' +
+        '<h3 id="pfInsDlgTitulo">' + esc(b.titulo) + '</h3>' +
+        '<p class="pf-ins-dlg__como"><b>Como conquistar.</b> ' + esc(b.como) + '</p>' +
+        (s.progresso ? '<div class="pf-ins-dlg__prog"><div class="pf-linha__topo"><strong>' + (s.ok && b.regra.tipo === 'talentos' ? 'Título' : 'Progresso') + '</strong>' +
+          '<span class="pf-linha__valor">' + esc(s.progresso) + '</span></div>' +
+          '<div class="pf-trilho" role="img" aria-label="' + Math.floor(s.pct) + '% concluído"><i class="xp" style="width:' + s.pct.toFixed(1) + '%"></i></div></div>' : '') +
+        (s.dica ? '<p class="pf-ins-dlg__dica">' + esc(s.dica) + '</p>' : '') +
+        '<div class="pf-ins-dlg__acoes">' +
+          (s.link ? '<a class="pf-ins-dlg__link" href="' + esc(s.link) + '"' + (s.link.charAt(0) === '#' ? ' data-ins-fechar' : '') + '>' + esc(s.linkTxt) + '<span class="mdi mdi-arrow-right" aria-hidden="true"></span></a>' : '') +
+          '<span class="pf-ins-dlg__nav">' +
+            '<button type="button" data-ins-ir="' + esc(ant.b.id) + '" aria-label="Insígnia anterior: ' + esc(ant.b.nome) + '"><span class="mdi mdi-chevron-left" aria-hidden="true"></span></button>' +
+            '<span>' + (i + 1) + ' / ' + insEstados.length + '</span>' +
+            '<button type="button" data-ins-ir="' + esc(prox.b.id) + '" aria-label="Próxima insígnia: ' + esc(prox.b.nome) + '"><span class="mdi mdi-chevron-right" aria-hidden="true"></span></button>' +
+          '</span>' +
+        '</div>' +
+      '</div>';
+    if (!dlg.open) {
+      if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    }
+    var foco = $('.pf-ins-dlg__fechar', dlg); if (foco) foco.focus();
+    if (novaVista) renderInsignias(estado.dados, deriv);
+  }
+  function fecharInsignia() {
+    var dlg = $('#pfInsDlg'), id = insAberta;
+    insAberta = null;
+    if (!dlg) return;
+    if (typeof dlg.close === 'function' && dlg.open) dlg.close(); else dlg.removeAttribute('open');
+    var b = id && $('#pfInsignias [data-ins-id="' + id + '"]'); if (b) b.focus();
   }
 
   /* ================================================================
@@ -886,6 +1081,7 @@
     var d = estado.dados; deriv = derivar(d);
     renderHero(d, deriv); renderHoje(deriv); renderGrafico(deriv);
     renderDesafios(d, deriv); renderHabilidades(d, deriv); renderEventos(d);
+    renderInsignias(d, deriv);
     renderNiveis(d, deriv); renderRanking(d); renderTitulos(d); renderReputacao(d);
     var falhas = d.falhas || [];
     var aviso = $('#pfAviso');
@@ -961,6 +1157,27 @@
     $('#pfEventos').addEventListener('click', function (e) {
       if (!e.target.closest('#pfEvTodos')) return;
       estado.evTodos = !estado.evTodos; renderEventos(estado.dados);
+    });
+    $('#pfInsFiltro').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-ins]'); if (!b) return;
+      prefs.ins = b.getAttribute('data-ins') || ''; salvarPrefs(); renderInsignias(estado.dados, deriv);
+    });
+    $('#pfInsignias').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-ins-id]'); if (b) abrirInsignia(b.getAttribute('data-ins-id'));
+    });
+    var dlg = $('#pfInsDlg');
+    dlg.addEventListener('click', function (e) {
+      if (e.target === dlg) { fecharInsignia(); return; }            /* clique no fundo escurecido */
+      var ir = e.target.closest('[data-ins-ir]');
+      if (ir) { abrirInsignia(ir.getAttribute('data-ins-ir')); return; }
+      if (e.target.closest('[data-ins-fechar]')) fecharInsignia();
+    });
+    dlg.addEventListener('cancel', function (e) { e.preventDefault(); fecharInsignia(); });
+    dlg.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      if (e.target.closest && e.target.closest('a')) return;
+      var btns = $$('[data-ins-ir]', dlg), b = btns[e.key === 'ArrowLeft' ? 0 : btns.length - 1];
+      if (b) { e.preventDefault(); abrirInsignia(b.getAttribute('data-ins-ir')); }
     });
     $('#pfRankEscopo').addEventListener('change', function (e) { prefs.escopo = e.target.value; salvarPrefs(); renderRanking(estado.dados); });
 

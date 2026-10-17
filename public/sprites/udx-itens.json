@@ -2,61 +2,83 @@
   {
     "id": "udx-insignia-free",
     "nome": "Insígnia do Nível Free",
-    "arquivo": "udx-insignia-free.png",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-free-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-free-768.webp",
     "quadro": {
-      "largura": 128,
-      "altura": 128
+      "largura": 256,
+      "altura": 256
     },
-    "quadros": 16,
-    "fps": 12,
-    "loop": true
+    "quadros": 1,
+    "origem": "trilha",
+    "insigniaTrilha": "fund-insignia"
   },
   {
     "id": "udx-insignia-iniciante",
     "nome": "Insígnia do Nível Iniciante",
-    "arquivo": "udx-insignia-iniciante.png",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-iniciante-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-iniciante-768.webp",
     "quadro": {
-      "largura": 128,
-      "altura": 128
+      "largura": 256,
+      "altura": 256
     },
-    "quadros": 16,
-    "fps": 12,
-    "loop": true
+    "quadros": 1,
+    "origem": "trilha",
+    "insigniaTrilha": "ini-insignia"
   },
   {
     "id": "udx-insignia-intermediario",
     "nome": "Insígnia do Nível Intermediário",
-    "arquivo": "udx-insignia-intermediario.png",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-intermediario-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-intermediario-768.webp",
     "quadro": {
-      "largura": 128,
-      "altura": 128
+      "largura": 256,
+      "altura": 256
     },
-    "quadros": 16,
-    "fps": 12,
-    "loop": true
+    "quadros": 1,
+    "origem": "trilha",
+    "insigniaTrilha": "int-insignia"
   },
   {
     "id": "udx-insignia-tecnico",
     "nome": "Insígnia do Nível Técnico",
-    "arquivo": "udx-insignia-tecnico.png",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-tecnico-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-tecnico-768.webp",
     "quadro": {
-      "largura": 128,
-      "altura": 128
+      "largura": 256,
+      "altura": 256
     },
-    "quadros": 16,
-    "fps": 12,
-    "loop": true
+    "quadros": 1,
+    "origem": "trilha",
+    "insigniaTrilha": "tec-insignia"
   },
   {
-    "id": "udx-evento-disco",
-    "nome": "Disco de evento",
-    "arquivo": "udx-evento-disco.png",
+    "id": "udx-insignia-profissional",
+    "nome": "Insígnia Profissional",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-profissional-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-profissional-768.webp",
     "quadro": {
-      "largura": 128,
-      "altura": 128
+      "largura": 256,
+      "altura": 256
     },
-    "quadros": 16,
-    "fps": 12,
-    "loop": true
+    "quadros": 1,
+    "origem": "talentos"
+  },
+  {
+    "id": "udx-insignia-participacao",
+    "nome": "Insígnia de Participação",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-participacao-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-participacao-768.webp",
+    "quadro": {
+      "largura": 256,
+      "altura": 256
+    },
+    "quadros": 1,
+    "origem": "evento"
   }
 ]

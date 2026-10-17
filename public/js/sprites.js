@@ -1,6 +1,7 @@
 /* ================================================================
    SPRITES 2D — Up Dance Experience · /js/sprites.js
-   Pausa a animação dos .udx-sprite fora da tela (economiza bateria)
+   Pausa a animação dos .udx-sprite e o brilho das .udx-insignia fora
+   da tela (economiza bateria)
    e expõe UDX_SPRITE.criar(meta, { largura }) para montar um sprite
    a partir do JSON de /sprites/*.json.
 ================================================================ */
@@ -12,7 +13,7 @@
 
   function observar(raiz) {
     if (!io) return;
-    Array.prototype.forEach.call((raiz || doc).querySelectorAll('.udx-sprite:not([data-obs])'), function (el) {
+    Array.prototype.forEach.call((raiz || doc).querySelectorAll('.udx-sprite:not([data-obs]), .udx-insignia:not([data-obs])'), function (el) {
       el.setAttribute('data-obs', ''); io.observe(el);
     });
   }

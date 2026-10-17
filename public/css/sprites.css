@@ -5,9 +5,9 @@
    ----------------------------------------------------------------
    Faixa horizontal de quadros (PNG/WebP) animada só com CSS.
    Uso:
-     <span class="udx-sprite" role="img" aria-label="Insígnia do Nível Técnico"
-           style="--src:url(/sprites/udx-insignia-tecnico.png); --n:16; --fps:12;
-                  --w:128px; --h:128px"></span>
+     <span class="udx-sprite" role="img" aria-label="Dançarino — tutting"
+           style="--src:url(/sprites/udx-tutting-sheet.webp); --n:15; --fps:6;
+                  --w:150px; --h:160px"></span>
    --n    quadros na faixa       --fps  quadros por segundo
    --w/--h tamanho exibido (a arte é 1:1 com o quadro; use metade
            do tamanho do quadro para nitidez em telas de alta densidade)
@@ -34,4 +34,59 @@
 }
 @media (prefers-reduced-motion: reduce){
   .udx-sprite{ animation: none; background-position: 0% 0; }
+}
+
+/* ================================================================
+   INSÍGNIAS — componente .udx-insignia (arte estática + brilho em CSS)
+   ----------------------------------------------------------------
+   <span class="udx-insignia" style="--src:url(/sprites/insignias/udx-insignia-free-256.webp); --tam:96px">
+     <img src="/sprites/insignias/udx-insignia-free-256.webp" alt="Insígnia do Nível Free">
+   </span>
+   .is-bloqueada  → cinza, sem brilho (ainda não conquistada)
+   .is-nova       → halo pulsando (conquistada e ainda não vista)
+   O brilho usa a própria arte como máscara: só passa sobre o metal,
+   nunca no fundo transparente.
+================================================================ */
+.udx-insignia{
+  --tam: 96px; --cor: #FA33A1;
+  position: relative; display: inline-block; flex-shrink: 0;
+  width: var(--tam); height: var(--tam);
+  transition: transform .25s ease, filter .25s ease;
+}
+.udx-insignia img{
+  display: block; width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.5));
+  transition: filter .25s ease;
+}
+.udx-insignia::after{
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  -webkit-mask: var(--src) center / contain no-repeat;
+          mask: var(--src) center / contain no-repeat;
+  background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,.62) 50%, transparent 62%);
+  background-size: 300% 100%;
+  background-position: 120% 0;
+  mix-blend-mode: screen;
+  animation: udx-insignia-brilho 5.5s ease-in-out infinite;
+  animation-delay: var(--atraso, 0s);
+}
+@keyframes udx-insignia-brilho{
+  0%, 62%  { background-position: 120% 0; }
+  86%, 100%{ background-position: -20% 0; }
+}
+.udx-insignia.is-bloqueada img{ filter: grayscale(1) brightness(.42) contrast(.95) drop-shadow(0 4px 10px rgba(0,0,0,.5)); }
+.udx-insignia.is-bloqueada::after{ display: none; }
+.udx-insignia.is-nova::before{
+  content: ""; position: absolute; inset: 6%; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 0 var(--cor);
+  animation: udx-insignia-halo 2.2s ease-out infinite;
+}
+@keyframes udx-insignia-halo{
+  0%  { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cor) 70%, transparent); }
+  100%{ box-shadow: 0 0 0 calc(var(--tam) * .18) transparent; }
+}
+.udx-insignia.is-pausado::after, .udx-insignia.is-pausado::before{ animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce){
+  .udx-insignia, .udx-insignia img{ transition: none; }
+  .udx-insignia::after{ animation: none; display: none; }
+  .udx-insignia.is-nova::before{ animation: none; box-shadow: 0 0 0 3px var(--cor); }
 }
