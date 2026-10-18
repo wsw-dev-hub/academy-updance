@@ -581,7 +581,12 @@
   display: grid; place-items: center; padding: 6px 0 2px;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--cor) 26%, transparent), transparent);
 }
-.page-perfil .pf-ins-dlg__info{ display: grid; gap: 10px; align-content: start; min-width: 0; }
+.page-perfil .pf-ins-dlg__arte .udx-insignia{ width: min(var(--tam), 100%); height: auto; aspect-ratio: 1 / 1; }
+.page-perfil .pf-ins-dlg__info{ display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-content: start; min-width: 0; }
+/* No diálogo o valor do progresso pode ser longo (Profissional: "X de 30 pontos na árvore…" ou a lista de títulos):
+   aqui ele quebra linha em vez de herdar o nowrap das linhas compactas da página. */
+.page-perfil .pf-ins-dlg .pf-linha__topo{ flex-wrap: wrap; column-gap: 10px; row-gap: 2px; }
+.page-perfil .pf-ins-dlg .pf-linha__valor{ white-space: normal; min-width: 0; overflow-wrap: anywhere; }
 .page-perfil .pf-ins-dlg__info h3{ margin: 0; font-size: 1.25rem; font-weight: 700; color: #fff; line-height: 1.25; }
 .page-perfil .pf-ins-dlg__chip{
   justify-self: start; display: inline-flex; align-items: center; gap: 5px;
