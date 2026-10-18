@@ -375,7 +375,7 @@
             nome: 'Bailarino(a) de Companhia', icone: 'mdi-trophy-variant',
             resumo: 'Título concedido a quem domina corpo, repertório, coletivo e cena. ' +
                     'Habilita audição interna para o elenco fixo da Up Dance.',
-            requer: ['bal-cena', 'bal-solo'],
+            requer: ['bal-cena', 'bal-multi', 'bal-solo'],
             niveis: ['Título conquistado — audição para elenco fixo liberada.'],
             desafios: [
               { id: 'bal-tit-d1', tipo: 'evento', xp: 0,
@@ -687,7 +687,7 @@
             nome: 'Professor(a) Certificado(a)', icone: 'mdi-certificate-outline',
             resumo: 'Título concedido a quem planeja, conduz, adapta e avalia com autonomia. ' +
                     'Habilita a solicitação do tipo de membro Professor(a).',
-            requer: ['prof-turma-propria', 'prof-workshop'],
+            requer: ['prof-turma-propria', 'prof-multi', 'prof-workshop'],
             niveis: ['Título conquistado — solicitação de credencial liberada.'],
             desafios: [
               { id: 'prof-tit-d1', tipo: 'evento', xp: 0,
@@ -986,7 +986,7 @@
             nome: 'Performer Profissional', icone: 'mdi-crown-outline',
             resumo: 'Título concedido a quem domina palco, câmera, mercado e direção. ' +
                     'Habilita entrada no casting de shows e eventos da Up Dance.',
-            requer: ['perf-direcao', 'perf-headliner'],
+            requer: ['perf-direcao', 'perf-multi', 'perf-headliner'],
             niveis: ['Título conquistado — casting de shows e eventos liberado.'],
             desafios: [
               { id: 'perf-tit-d1', tipo: 'evento', xp: 0,
