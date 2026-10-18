@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Revisão de títulos — Up Dance</title>
+<link rel="icon" type="image/x-icon" href="/images/icons/udx-icon.ico">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --fundo:#02021a; --sup:rgba(9,7,38,.82); --sup2:rgba(2,2,26,.62); --linha:rgba(223,224,242,.12);
+    --texto:#dfe0f2; --mudo:#b0b3cc; --rosa:#FA33A1; --azul:#8F7CFF; --ok:#3ccf8e; --aviso:#F2B807;
+    --grad:linear-gradient(135deg,#430ABF 0%,#FA33A1 100%);
+    --m1:#430ABF; --m2:#FA33A1;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--fundo);color:var(--texto);font:15px/1.55 Poppins,system-ui,sans-serif}
+  main{max-width:1180px;margin:0 auto;padding:28px 16px 64px;display:grid;gap:22px}
+  h1{margin:0;font-size:1.6rem;font-weight:700;color:#fff;line-height:1.25}
+  h2{margin:0;font-size:1.12rem;font-weight:600;color:#fff}
+  h3{margin:0;font-size:.98rem;font-weight:600;color:#fff}
+  p{margin:0}
+  .sub{color:var(--mudo);font-size:13.5px}
+  .bloco{background:var(--sup);border:1px solid var(--linha);border-radius:16px;padding:20px;display:grid;gap:16px;min-width:0}
+  .cab{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+  .numeros{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .num{padding:10px 14px;border-radius:12px;background:var(--sup2);border:1px solid var(--linha);min-width:120px}
+  .num b{display:block;font-size:1.35rem;color:#fff;line-height:1.2}
+  .num span{font-size:12px;color:var(--mudo)}
+  button{font:inherit;font-size:13px;color:#fff;background:var(--sup2);border:1px solid var(--linha);border-radius:10px;padding:7px 12px;cursor:pointer;min-height:36px}
+  button:hover{border-color:rgba(250,51,161,.55)}
+  button:focus-visible,input:focus-visible,.celula:focus-visible{outline:2px solid var(--rosa);outline-offset:2px}
+  .seg{display:inline-flex;flex-wrap:wrap;gap:2px;padding:3px;border-radius:10px;background:var(--sup2);border:1px solid var(--linha)}
+  .seg button{border:0;background:transparent;min-height:32px}
+  .seg button[aria-pressed="true"],.seg button[aria-selected="true"]{background:rgba(223,224,242,.14)}
+  .busca{flex:1;min-width:200px;max-width:360px;font:inherit;font-size:14px;color:#fff;background:var(--sup2);border:1px solid var(--linha);border-radius:10px;padding:8px 12px}
+  .busca::placeholder{color:var(--mudo)}
+  .etq{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:50px;font-size:11px;font-weight:600;line-height:1.6;white-space:nowrap}
+  .etq.sug{color:#fff;background:var(--grad)}
+  .etq.ok{color:#0b2a1c;background:var(--ok)}
+  .etq.parcial{color:#2a2100;background:var(--aviso)}
+  .etq.pendente{color:#fff;background:rgba(223,224,242,.16)}
+
+  /* classificação */
+  .colunas{display:grid;gap:14px;grid-template-columns:1fr}
+  @media (min-width:860px){.colunas{grid-template-columns:1fr 1.25fr 1fr}}
+  .grupo{background:var(--sup2);border:1px solid var(--linha);border-radius:14px;padding:14px;display:grid;gap:10px;align-content:start}
+  .grupo h3 span{color:var(--mudo);font-weight:500}
+  .grupo p.sub{font-size:12.5px}
+  .grupo ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+  .grupo li{display:grid;gap:1px;padding:7px 10px;border-radius:9px;background:rgba(223,224,242,.04)}
+  .grupo li b{font-size:13.5px;font-weight:600;color:#fff}
+  .grupo li small{font-size:11.5px;color:var(--mudo)}
+
+  /* tiers */
+  .tiers{display:grid;gap:10px;grid-template-columns:1fr}
+  @media (min-width:720px){.tiers{grid-template-columns:repeat(3,1fr)}}
+  .tier{padding:12px 14px;border-radius:12px;background:var(--sup2);border:1px solid var(--linha)}
+  .tier b{color:#fff}
+  .tier .rom{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:8px;border-radius:8px;font-weight:700;color:#fff;background:var(--grad)}
+  .tier p{font-size:12.5px;color:var(--mudo);margin-top:6px}
+
+  /* matriz */
+  .abas{display:flex;flex-wrap:wrap;gap:8px}
+  .aba{display:inline-flex;align-items:center;gap:8px}
+  .aba i{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2))}
+  .aba[aria-selected="true"]{border-color:transparent;background:linear-gradient(135deg,color-mix(in srgb,var(--c1) 55%,transparent),color-mix(in srgb,var(--c2) 45%,transparent))}
+  .cobertura{font-size:12.5px;color:var(--mudo);padding:10px 12px;border-radius:10px;background:var(--sup2);border:1px solid var(--linha)}
+  .cobertura b{color:#fff;font-weight:600}
+  .rolagem{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;border:1px solid var(--linha)}
+  table{border-collapse:collapse;width:100%;min-width:760px}
+  th,td{padding:0;border-bottom:1px solid var(--linha);text-align:left;vertical-align:top}
+  thead th{padding:10px 12px;font-size:12px;font-weight:600;color:var(--mudo);background:var(--sup2);white-space:nowrap}
+  thead th small{display:block;font-weight:500;font-size:11px}
+  thead th.sem{opacity:.55}
+  tbody th{padding:12px;width:190px;background:var(--sup2)}
+  tbody th b{display:block;font-size:13.5px;color:#fff;font-weight:600}
+  tbody th span{display:block;font-size:11.5px;color:var(--mudo);font-weight:400;line-height:1.4;margin-top:2px}
+  .celula{display:grid;gap:4px;width:100%;height:100%;padding:12px;text-align:left;border:0;border-radius:0;background:transparent;min-height:72px;align-content:start}
+  .celula:hover{background:rgba(223,224,242,.05)}
+  .celula b{font-size:13.5px;font-weight:600;color:#fff;line-height:1.3}
+  .celula small{font-size:11px;color:var(--mudo)}
+  td.sem .celula b{color:#c8c9de}
+  td.sem{background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(223,224,242,.025) 8px 16px)}
+  .celula.is-ativa{background:color-mix(in srgb,var(--c1) 22%,transparent);box-shadow:inset 3px 0 0 var(--c2)}
+  .celula mark,.res mark{background:rgba(250,51,161,.35);color:#fff;border-radius:3px;padding:0 1px}
+  .detalhe{padding:16px;border-radius:14px;background:var(--sup2);border:1px solid var(--linha);display:grid;gap:12px}
+  .detalhe .linha-t{display:grid;gap:8px;grid-template-columns:1fr}
+  @media (min-width:720px){.detalhe .linha-t{grid-template-columns:repeat(3,1fr)}}
+  .detalhe .t{padding:10px 12px;border-radius:10px;background:rgba(223,224,242,.04);border:1px solid var(--linha)}
+  .detalhe .t b{display:block;color:#fff;font-size:14px}
+  .detalhe .t span{font-size:12px;color:var(--mudo)}
+  .legenda{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--mudo);align-items:center}
+  .legenda .amostra{display:inline-block;width:22px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px;border:1px solid var(--linha);background:repeating-linear-gradient(135deg,transparent 0 4px,rgba(223,224,242,.18) 4px 8px)}
+
+  .resultados{display:grid;gap:6px}
+  .res{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:8px 12px;border-radius:10px;background:var(--sup2);border:1px solid var(--linha);font-size:13px}
+  .res b{color:#fff;font-weight:600}
+  .res span{color:var(--mudo);font-size:12px}
+  .res button{min-height:30px;padding:4px 10px;font-size:12px;margin-left:auto}
+
+  /* reputação e transversais */
+  .cartoes{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
+  .cartao{padding:16px;border-radius:14px;background:var(--sup2);border:1px solid var(--linha);display:grid;gap:10px;align-content:start;border-top:3px solid var(--cor,#FA33A1)}
+  .cartao .topo{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+  .cartao h3{flex:1 1 100%}
+  .cartao p{font-size:13px}
+  .cartao ol{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+  .cartao li{display:flex;gap:8px;font-size:12.5px;align-items:flex-start}
+  .cartao li .rom{flex:0 0 auto;display:inline-grid;place-items:center;min-width:28px;height:22px;border-radius:6px;font-size:11px;font-weight:700;color:#fff;background:rgba(223,224,242,.12)}
+  .cartao .fonte{font-size:11.5px;color:var(--mudo)}
+  .oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Revisão de títulos</h1>
+    <p class="sub">Habilidade por modalidade, habilidade transversal e reputação. Catálogo em <code>/js/titulos.data.js</code>; esta página é só para conferência.</p>
+    <div class="numeros" id="numeros"></div>
+  </header>
+
+  <section class="bloco" aria-labelledby="tClass">
+    <div>
+      <h2 id="tClass">Classificação das 32 sugestões</h2>
+      <p class="sub">Regra usada: se o nome aponta uma técnica que pode ser avaliada num desafio, é <b>habilidade</b>. Se depende de reconhecimento da comunidade, de tempo ou de ensinar outras pessoas, é <b>reputação</b>.</p>
+    </div>
+    <div class="colunas" id="classificacao"></div>
+  </section>
+
+  <section class="bloco" aria-labelledby="tTiers">
+    <div>
+      <h2 id="tTiers">Tiers dos títulos de habilidade</h2>
+      <p class="sub">Cada título de categoria e nível sobe de I a III. O nome exibido ganha o numeral: <i>Engenheiro da Isolação II</i>.</p>
+    </div>
+    <div class="tiers" id="tiers"></div>
+  </section>
+
+  <section class="bloco" aria-labelledby="tMatriz">
+    <div class="cab">
+      <div>
+        <h2 id="tMatriz">Títulos de habilidade por modalidade</h2>
+        <p class="sub">6 categorias × 4 níveis em cada modalidade. Clique num título para ver os três tiers.</p>
+      </div>
+      <span class="seg" role="group" aria-label="Forma do nome">
+        <button type="button" data-genero="m" aria-pressed="true">Masculino</button>
+        <button type="button" data-genero="f" aria-pressed="false">Feminino</button>
+      </span>
+    </div>
+    <div class="cab">
+      <div class="abas" role="tablist" aria-label="Modalidade" id="abas"></div>
+      <label class="oculto" for="busca">Buscar título</label>
+      <input class="busca" id="busca" type="search" placeholder="Buscar em todas as modalidades" autocomplete="off">
+    </div>
+    <div class="resultados" id="resultados" hidden></div>
+    <p class="cobertura" id="cobertura"></p>
+    <div class="rolagem" id="matrizCaixa" role="tabpanel" aria-labelledby="tMatriz"></div>
+    <div class="legenda">
+      <span><span class="etq sug">sugestão</span> nome vindo da lista enviada</span>
+      <span><span class="amostra"></span>nível sem desafios desta modalidade nas trilhas hoje</span>
+    </div>
+    <div class="detalhe" id="detalhe" aria-live="polite"></div>
+  </section>
+
+  <section class="bloco" aria-labelledby="tRep">
+    <div>
+      <h2 id="tRep">Títulos de reputação</h2>
+      <p class="sub">Cada um com 3 tiers. A etiqueta mostra se o D1 já guarda o dado necessário para conceder o título.</p>
+    </div>
+    <div class="cartoes" id="reputacao"></div>
+  </section>
+
+  <section class="bloco" aria-labelledby="tTrans">
+    <div>
+      <h2 id="tTrans">Títulos de habilidade transversais</h2>
+      <p class="sub">Cruzam estilos e ficam ligados aos perfis da Profissionalização. O tier III é o critério que o título já tem hoje.</p>
+    </div>
+    <div class="cartoes" id="transversais"></div>
+  </section>
+</main>
+
+<script src="../../js/titulos.data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var T = window.UDX_TITULOS;
+  if (!T) { document.querySelector('main').insertAdjacentHTML('beforeend', '<p class="bloco">Não foi possível carregar /js/titulos.data.js.</p>'); return; }
+  function $(s) { return document.querySelector(s); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function norm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function marca(txt, q) {
+    if (!q) return esc(txt);
+    var n = norm(txt), i = n.indexOf(q);
+    if (i < 0) return esc(txt);
+    return esc(txt.slice(0, i)) + '<mark>' + esc(txt.slice(i, i + q.length)) + '</mark>' + esc(txt.slice(i + q.length));
+  }
+
+  var estado = { genero: 'm', mod: 'pop', sel: null, q: '' };
+  try { var s = JSON.parse(localStorage.getItem('udx:revisao-titulos') || 'null'); if (s) { estado.genero = s.genero || 'm'; if (T.modalidades[s.mod]) estado.mod = s.mod; } } catch (e) {}
+  function salvar() { try { localStorage.setItem('udx:revisao-titulos', JSON.stringify({ genero: estado.genero, mod: estado.mod })); } catch (e) {} }
+  function nome(t) { return estado.genero === 'f' ? (t.nomeF || t.nome) : t.nome; }
+  var NIVEL = {}; T.niveis.forEach(function (n) { NIVEL[n.id] = n; });
+
+  /* números */
+  var nHab = 0; Object.keys(T.modalidades).forEach(function (m) { T.modalidades[m].categorias.forEach(function (c) { nHab += Object.keys(c.titulos).length; }); });
+  $('#numeros').innerHTML = [
+    [nHab, 'títulos de habilidade'], [T.transversais.length, 'transversais'], [T.reputacao.length, 'de reputação'], [3, 'tiers por título']
+  ].map(function (x) { return '<div class="num"><b>' + x[0] + '</b> <span>' + x[1] + '</span></div>'; }).join('');
+
+  /* classificação */
+  var grupos = [
+    { tipo: 'reputacao', titulo: 'Reputação', txt: 'Constância, presença na roda, condução, cultura e ensino.' },
+    { tipo: 'habilidade', titulo: 'Habilidade por modalidade', txt: 'Técnica de um estilo. Entram na matriz no nível e categoria indicados.' },
+    { tipo: 'transversal', titulo: 'Habilidade transversal', txt: 'Técnica que cruza estilos, ligada aos perfis da Profissionalização.' }
+  ];
+  $('#classificacao').innerHTML = grupos.map(function (g) {
+    var itens = T.classificacao.filter(function (c) { return c.tipo === g.tipo; });
+    return '<div class="grupo"><h3>' + g.titulo + ' <span>(' + itens.length + ')</span></h3><p class="sub">' + g.txt + '</p><ul>' +
+      itens.map(function (c) { return '<li><b>' + esc(c.nome) + '</b><small>' + esc(c.destino) + '</small></li>'; }).join('') + '</ul></div>';
+  }).join('');
+
+  /* tiers */
+  $('#tiers').innerHTML = T.tiers.map(function (t) {
+    return '<div class="tier"><span class="rom">' + t.rotulo + '</span><b>' + esc(t.nome) + '</b><p>' + esc(t.regra) + '</p></div>';
+  }).join('');
+
+  /* abas */
+  var ids = Object.keys(T.modalidades);
+  $('#abas').innerHTML = ids.map(function (id) {
+    var m = T.modalidades[id];
+    return '<button type="button" role="tab" class="aba" data-mod="' + id + '" style="--c1:' + m.cor + ';--c2:' + m.corAlt + '"><i aria-hidden="true"></i>' + esc(m.nome) + '</button>';
+  }).join('');
+
+  function renderMatriz() {
+    var m = T.modalidades[estado.mod];
+    document.documentElement.style.setProperty('--c1', m.cor);
+    document.documentElement.style.setProperty('--c2', m.corAlt);
+    Array.prototype.forEach.call(document.querySelectorAll('#abas .aba'), function (b) {
+      b.setAttribute('aria-selected', String(b.getAttribute('data-mod') === estado.mod));
+      b.tabIndex = b.getAttribute('data-mod') === estado.mod ? 0 : -1;
+    });
+    $('#cobertura').innerHTML = '<b>Conteúdo nas trilhas hoje:</b> ' + esc(m.coberturaNota) +
+      ' Nos níveis sem desafios do estilo, os títulos ficam definidos e passam a valer quando os desafios forem criados.';
+    var html = '<table><caption class="oculto">Títulos de ' + esc(m.nome) + ' por categoria e nível</caption><thead><tr><th scope="col">Categoria</th>' +
+      T.niveis.map(function (n) {
+        var sem = !m.cobertura[n.id];
+        return '<th scope="col"' + (sem ? ' class="sem"' : '') + '>' + esc(n.nome) + '<small>' + (sem ? 'sem desafios hoje' : 'com desafios') + '</small></th>';
+      }).join('') + '</tr></thead><tbody>';
+    m.categorias.forEach(function (c) {
+      html += '<tr><th scope="row"><b>' + esc(c.nome) + '</b><span>' + esc(c.desc) + '</span></th>';
+      T.niveis.forEach(function (n) {
+        var t = c.titulos[n.id], sem = !m.cobertura[n.id];
+        html += '<td' + (sem ? ' class="sem"' : '') + '><button type="button" class="celula' + (estado.sel === t.id ? ' is-ativa' : '') + '" data-id="' + t.id + '">' +
+          '<b>' + esc(nome(t)) + '</b>' + (t.sugestao ? '<span><span class="etq sug">sugestão</span></span>' : '') +
+          '<small>' + esc(t.id) + '</small></button></td>';
+      });
+      html += '</tr>';
+    });
+    $('#matrizCaixa').innerHTML = html + '</tbody></table>';
+    renderDetalhe();
+  }
+
+  function renderDetalhe() {
+    var x = estado.sel && T.indice[estado.sel];
+    if (!x || x.familia !== 'habilidade' || x.modalidade !== estado.mod) {
+      $('#detalhe').innerHTML = '<p class="sub">Selecione um título na tabela para ver os três tiers.</p>';
+      return;
+    }
+    var m = T.modalidades[x.modalidade], cat = m.categorias.filter(function (c) { return c.id === x.categoria; })[0];
+    var t = x.titulo;
+    $('#detalhe').innerHTML =
+      '<div class="cab"><div><h3>' + esc(nome(t)) + (t.sugestao ? ' <span class="etq sug">sugestão</span>' : '') + '</h3>' +
+      '<p class="sub">' + esc(m.nome) + ' · ' + esc(cat.nome) + ' · Nível ' + esc(NIVEL[x.nivel].nome) + '. ' + esc(NIVEL[x.nivel].foco) + '</p></div>' +
+      '<p class="sub">Forma ' + (estado.genero === 'f' ? 'masculina' : 'feminina') + ': <b style="color:#fff">' + esc(estado.genero === 'f' ? t.nome : (t.nomeF || t.nome)) + '</b></p></div>' +
+      '<div class="linha-t">' + T.tiers.map(function (tt) {
+        return '<div class="t"><b>' + esc(nome(t)) + ' ' + tt.rotulo + '</b><span>' + esc(tt.nome) + ': ' + esc(tt.regra) + '</span></div>';
+      }).join('') + '</div>';
+  }
+
+  /* busca em todas as modalidades */
+  function renderBusca() {
+    var q = norm(estado.q.trim()), caixa = $('#resultados');
+    if (q.length < 2) { caixa.hidden = true; caixa.innerHTML = ''; return; }
+    var achados = [];
+    ids.forEach(function (mid) {
+      var m = T.modalidades[mid];
+      m.categorias.forEach(function (c) {
+        T.niveis.forEach(function (n) {
+          var t = c.titulos[n.id];
+          if (norm(t.nome).indexOf(q) >= 0 || norm(t.nomeF).indexOf(q) >= 0 || norm(c.nome).indexOf(q) >= 0)
+            achados.push({ t: t, m: m, mid: mid, c: c, n: n });
+        });
+      });
+    });
+    T.reputacao.concat(T.transversais).forEach(function (r) {
+      if (norm(r.nome).indexOf(q) >= 0 || norm(r.nomeF).indexOf(q) >= 0) achados.push({ t: r, rep: true });
+    });
+    caixa.hidden = false;
+    caixa.innerHTML = achados.length ? achados.slice(0, 30).map(function (a) {
+      if (a.rep) {
+        var fam = T.indice[a.t.id].familia === 'reputacao' ? 'Reputação' : 'Transversal';
+        return '<div class="res"><b>' + marca(nome(a.t), q) + '</b><span>' + fam + '</span></div>';
+      }
+      return '<div class="res"><b>' + marca(nome(a.t), q) + '</b><span>' + esc(a.m.nome) + ' · ' + esc(a.c.nome) + ' · ' + esc(a.n.nome) + '</span>' +
+        '<button type="button" data-ir-mod="' + a.mid + '" data-ir-id="' + a.t.id + '">Ver na tabela</button></div>';
+    }).join('') + (achados.length > 30 ? '<p class="sub">Mais ' + (achados.length - 30) + ' resultados; refine a busca.</p>' : '')
+      : '<p class="sub">Nenhum título com "' + esc(estado.q.trim()) + '".</p>';
+  }
+
+  /* reputação e transversais */
+  var DADOS = { disponivel: ['ok', 'dado já existe no D1'], parcial: ['parcial', 'dado em parte no D1'], pendente: ['pendente', 'precisa de registro novo'] };
+  function cartao(r, fam) {
+    var d = DADOS[r.dados];
+    return '<article class="cartao" style="--cor:' + r.cor + '"><div class="topo"><h3>' + esc(nome(r)) + '</h3>' +
+      (r.sugestao ? '<span class="etq sug">sugestão</span>' : '') +
+      (d ? '<span class="etq ' + d[0] + '">' + d[1] + '</span>' : '') +
+      (r.porEstilo ? '<span class="etq pendente">um por estilo</span>' : '') +
+      (r.escopo ? '<span class="etq pendente">' + esc(r.escopo) + '</span>' : '') + '</div>' +
+      '<p>' + esc(r.desc) + '</p><ol>' + r.tiers.map(function (t) {
+        return '<li><span class="rom">' + t.rotulo + '</span><span>' + esc(t.regra) + '</span></li>';
+      }).join('') + '</ol>' +
+      (r.fonte ? '<p class="fonte">Fonte: ' + esc(r.fonte) + '</p>' : '') +
+      '<p class="fonte">id: ' + esc(r.id) + (r.idLegado ? ' · continua aceitando ' + esc(r.idLegado) : '') + '</p></article>';
+  }
+  function renderCartoes() {
+    $('#reputacao').innerHTML = T.reputacao.map(function (r) { return cartao(r); }).join('');
+    $('#transversais').innerHTML = T.transversais.map(function (r) { return cartao(r); }).join('');
+  }
+
+  function renderTudo() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-genero]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-genero') === estado.genero)); });
+    renderMatriz(); renderBusca(); renderCartoes();
+  }
+
+  /* eventos */
+  $('#abas').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-mod]'); if (!b) return;
+    estado.mod = b.getAttribute('data-mod'); estado.sel = null; salvar(); renderMatriz();
+  });
+  $('#abas').addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    var i = ids.indexOf(estado.mod) + (e.key === 'ArrowRight' ? 1 : -1);
+    estado.mod = ids[(i + ids.length) % ids.length]; estado.sel = null; salvar(); renderMatriz();
+    $('#abas [data-mod="' + estado.mod + '"]').focus();
+  });
+  $('#matrizCaixa').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-id]'); if (!b) return;
+    estado.sel = estado.sel === b.getAttribute('data-id') ? null : b.getAttribute('data-id');
+    renderMatriz();
+    var de = $('#matrizCaixa [data-id="' + b.getAttribute('data-id') + '"]'); if (de) de.focus();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-genero]'), function (b) {
+    b.addEventListener('click', function () { estado.genero = b.getAttribute('data-genero'); salvar(); renderTudo(); });
+  });
+  var t = null;
+  $('#busca').addEventListener('input', function (e) {
+    clearTimeout(t); var v = e.target.value;
+    t = setTimeout(function () { estado.q = v; renderBusca(); }, 140);
+  });
+  $('#resultados').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ir-id]'); if (!b) return;
+    estado.mod = b.getAttribute('data-ir-mod'); estado.sel = b.getAttribute('data-ir-id'); salvar(); renderMatriz();
+    var c = $('#matrizCaixa [data-id="' + estado.sel + '"]');
+    if (c) { c.scrollIntoView({ block: 'center', behavior: 'smooth' }); c.focus({ preventScroll: true }); }
+  });
+
+  renderTudo();
+})();
+</script>
+</body>
+</html>
