@@ -18,6 +18,7 @@
  *  habilidade.tipo ........ 'habilidade' (padrão) | 'titulo'
  *  desafio.tipo ........... 'tarefa' | 'atividade' | 'evento'
  *  desafio.xp ............. experiência ESPECÍFICA do perfil
+ *  desafio.multi .......... grupo multiestilo (ver T.multiestilo)
  *
  *  ECONOMIA
  *  ------------
@@ -31,7 +32,7 @@
 
   var T = {
 
-    versao:      '1.0.0',
+    versao:      '1.1.0',
     xpPorPonto:  100,
 
     /* Acesso: árvores do nível Estagiário — exclusivas do tipo 'Estagiário(a)'.
@@ -46,6 +47,36 @@
       atividade: { label: 'Atividade', icone: 'mdi-account-clock-outline' },
       desafio:   { label: 'Desafio',   icone: 'mdi-hand-coin-outline' },
       evento:    { label: 'Evento',    icone: 'mdi-calendar-star' }
+    },
+
+    /* ============================================================
+       MULTIESTILO — desafios de nível profissional nas 5 linguagens.
+       desafio.multi = id do grupo. O membro escolhe a(s) linguagem(ns)
+       no envio e a coordenação confirma ou corrige na aprovação.
+       Espelhado no worker (MULTI_*). Grupos com max 1 não repetem
+       linguagem entre as vagas.
+    ============================================================ */
+    multiestilo: {
+      estilos: [
+        { id: 'hhd', nome: 'Hip Hop Dance' },
+        { id: 'pop', nome: 'Popping' },
+        { id: 'lock', nome: 'Locking' },
+        { id: 'break', nome: 'Breaking' },
+        { id: 'house', nome: 'House Dance' }
+      ],
+      tiers: [
+        { n: 1, estilos: 2, notaAcima: 80 },
+        { n: 2, estilos: 3, notaAcima: 85 },
+        { n: 3, estilos: 5, notaAcima: 90 }
+      ],
+      grupos: {
+        cad: { perfil: 'bailarino', titulo: 'trans-cadencias', nome: 'Mestre das Cadências', nomeF: 'Mestra das Cadências', min: 1, max: 1 },
+        ling: { perfil: 'bailarino', titulo: 'trans-linguagens', nome: 'Oráculo das Linguagens', nomeF: 'Oráculo das Linguagens', min: 2, max: 3 },
+        nom: { perfil: 'performer', titulo: 'trans-nomade', nome: 'Nômade do Groove', nomeF: 'Nômade do Groove', min: 1, max: 1 },
+        reg: { perfil: 'performer', titulo: 'trans-regente', nome: 'Regente do Movimento', nomeF: 'Regente do Movimento', min: 2, max: 5 },
+        dia: { perfil: 'professor', titulo: 'trans-dialetos', nome: 'Guardião dos Dialetos Urbanos', nomeF: 'Guardiã dos Dialetos Urbanos', min: 1, max: 1 },
+        cro: { perfil: 'professor', titulo: 'trans-cronista', nome: 'Cronista das Cinco Escolas', nomeF: 'Cronista das Cinco Escolas', min: 1, max: 1 }
+      }
     },
 
     perfis: [
@@ -296,6 +327,44 @@
               { id: 'bal-solo-d2', tipo: 'atividade', xp: 180,
                 nome: 'Material próprio',
                 desc: 'Levar 32 tempos de material autoral para aprovação da direção.' }
+            ]
+          },
+
+          /* ---------- FAIXA 4 · MULTIESTILO (5 linguagens) ---------- */
+          {
+            id: 'bal-multi', tier: 4, col: 2, ranksMax: 3,
+            nome: 'Repertório Multiestilo', icone: 'mdi-earth',
+            resumo: 'Dançar com propriedade nas cinco linguagens da Up Dance: Hip Hop Dance, Popping, Locking, Breaking e House.',
+            niveis: [
+              'Sustenta solo técnico em 2 linguagens com a musicalidade de cada uma.',
+              'Sustenta solo técnico em 3 linguagens e funde duas delas numa coreografia.',
+              'Transita pelas 5 linguagens e cria fusões que preservam a assinatura de cada estilo.'
+            ],
+            desafios: [
+              { id: 'mx-cad-1', tipo: 'tarefa', xp: 150, multi: 'cad',
+                nome: 'Solo técnico · 1ª linguagem',
+                desc: 'Solo de 32 tempos numa linguagem escolhida por você, com passos de nível [ INTERMEDIÁRIO ] e a musicalidade própria do estilo. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cad-2', tipo: 'tarefa', xp: 150, multi: 'cad',
+                nome: 'Solo técnico · 2ª linguagem',
+                desc: 'Solo de 32 tempos numa linguagem escolhida por você, com passos de nível [ INTERMEDIÁRIO ] e a musicalidade própria do estilo. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cad-3', tipo: 'tarefa', xp: 150, multi: 'cad',
+                nome: 'Solo técnico · 3ª linguagem',
+                desc: 'Solo de 32 tempos numa linguagem escolhida por você, com passos de nível [ INTERMEDIÁRIO ] e a musicalidade própria do estilo. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cad-4', tipo: 'tarefa', xp: 150, multi: 'cad',
+                nome: 'Solo técnico · 4ª linguagem',
+                desc: 'Solo de 32 tempos numa linguagem escolhida por você, com passos de nível [ INTERMEDIÁRIO ] e a musicalidade própria do estilo. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cad-5', tipo: 'tarefa', xp: 150, multi: 'cad',
+                nome: 'Solo técnico · 5ª linguagem',
+                desc: 'Solo de 32 tempos numa linguagem escolhida por você, com passos de nível [ INTERMEDIÁRIO ] e a musicalidade própria do estilo. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-ling-1', tipo: 'atividade', xp: 220, multi: 'ling',
+                nome: 'Coreografia de fusão · 1',
+                desc: 'Coreografia de 64 tempos que funde 2 ou 3 linguagens sem perder a assinatura de cada uma. Marque as linguagens usadas.' },
+              { id: 'mx-ling-2', tipo: 'atividade', xp: 220, multi: 'ling',
+                nome: 'Coreografia de fusão · 2',
+                desc: 'Coreografia de 64 tempos que funde 2 ou 3 linguagens sem perder a assinatura de cada uma. Marque as linguagens usadas.' },
+              { id: 'mx-ling-3', tipo: 'atividade', xp: 220, multi: 'ling',
+                nome: 'Coreografia de fusão · 3',
+                desc: 'Coreografia de 64 tempos que funde 2 ou 3 linguagens sem perder a assinatura de cada uma. Marque as linguagens usadas.' }
             ]
           },
 
@@ -566,6 +635,50 @@
             ]
           },
 
+          /* ---------- FAIXA 4 · MULTIESTILO (5 linguagens) ---------- */
+          {
+            id: 'prof-multi', tier: 4, col: 2, ranksMax: 3,
+            nome: 'Didática Multiestilo', icone: 'mdi-translate',
+            resumo: 'Ensinar e contar a história de cada linguagem com a mesma segurança.',
+            niveis: [
+              'Conduz aula e apresenta as raízes de 2 linguagens.',
+              'Conduz aula e apresenta as raízes de 3 linguagens.',
+              'Conduz aula e apresenta as raízes das 5 linguagens.'
+            ],
+            desafios: [
+              { id: 'mx-dia-1', tipo: 'atividade', xp: 150, multi: 'dia',
+                nome: 'Aula · 1ª linguagem',
+                desc: 'Conduzir uma aula de 40 minutos numa linguagem escolhida, com plano escrito e devolutiva da turma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-dia-2', tipo: 'atividade', xp: 150, multi: 'dia',
+                nome: 'Aula · 2ª linguagem',
+                desc: 'Conduzir uma aula de 40 minutos numa linguagem escolhida, com plano escrito e devolutiva da turma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-dia-3', tipo: 'atividade', xp: 150, multi: 'dia',
+                nome: 'Aula · 3ª linguagem',
+                desc: 'Conduzir uma aula de 40 minutos numa linguagem escolhida, com plano escrito e devolutiva da turma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-dia-4', tipo: 'atividade', xp: 150, multi: 'dia',
+                nome: 'Aula · 4ª linguagem',
+                desc: 'Conduzir uma aula de 40 minutos numa linguagem escolhida, com plano escrito e devolutiva da turma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-dia-5', tipo: 'atividade', xp: 150, multi: 'dia',
+                nome: 'Aula · 5ª linguagem',
+                desc: 'Conduzir uma aula de 40 minutos numa linguagem escolhida, com plano escrito e devolutiva da turma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cro-1', tipo: 'tarefa', xp: 120, multi: 'cro',
+                nome: 'Seminário de raízes · 1ª linguagem',
+                desc: 'Apresentar 15 minutos sobre origem, pioneiros, fundamentos e vocabulário de uma linguagem, com as fontes usadas. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cro-2', tipo: 'tarefa', xp: 120, multi: 'cro',
+                nome: 'Seminário de raízes · 2ª linguagem',
+                desc: 'Apresentar 15 minutos sobre origem, pioneiros, fundamentos e vocabulário de uma linguagem, com as fontes usadas. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cro-3', tipo: 'tarefa', xp: 120, multi: 'cro',
+                nome: 'Seminário de raízes · 3ª linguagem',
+                desc: 'Apresentar 15 minutos sobre origem, pioneiros, fundamentos e vocabulário de uma linguagem, com as fontes usadas. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cro-4', tipo: 'tarefa', xp: 120, multi: 'cro',
+                nome: 'Seminário de raízes · 4ª linguagem',
+                desc: 'Apresentar 15 minutos sobre origem, pioneiros, fundamentos e vocabulário de uma linguagem, com as fontes usadas. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-cro-5', tipo: 'tarefa', xp: 120, multi: 'cro',
+                nome: 'Seminário de raízes · 5ª linguagem',
+                desc: 'Apresentar 15 minutos sobre origem, pioneiros, fundamentos e vocabulário de uma linguagem, com as fontes usadas. Cada envio precisa ser numa linguagem diferente.' }
+            ]
+          },
+
           /* ---------------- TÍTULO ---------------- */
           {
             id: 'prof-titulo', tier: 5, col: 2, tipo: 'titulo', ranksMax: 1,
@@ -823,6 +936,44 @@
               { id: 'perf-head-d2', tipo: 'atividade', xp: 190,
                 nome: 'Release de divulgação',
                 desc: 'Entregar release, foto e ficha técnica usados na peça de divulgação.' }
+            ]
+          },
+
+          /* ---------- FAIXA 4 · MULTIESTILO (5 linguagens) ---------- */
+          {
+            id: 'perf-multi', tier: 4, col: 2, ranksMax: 3,
+            nome: 'Palco Multiestilo', icone: 'mdi-account-music',
+            resumo: 'Responder a qualquer música no palco e dirigir números que passam por vários estilos.',
+            niveis: [
+              'Improvisa em 2 linguagens em cypher ou battle.',
+              'Improvisa em 3 linguagens e dirige um número com trechos de estilos diferentes.',
+              'Improvisa nas 5 linguagens e dirige números que atravessam todas elas.'
+            ],
+            desafios: [
+              { id: 'mx-nom-1', tipo: 'evento', xp: 150, multi: 'nom',
+                nome: 'Round de freestyle · 1ª linguagem',
+                desc: 'Round de 1 minuto de freestyle numa linguagem escolhida, em cypher ou battle da plataforma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-nom-2', tipo: 'evento', xp: 150, multi: 'nom',
+                nome: 'Round de freestyle · 2ª linguagem',
+                desc: 'Round de 1 minuto de freestyle numa linguagem escolhida, em cypher ou battle da plataforma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-nom-3', tipo: 'evento', xp: 150, multi: 'nom',
+                nome: 'Round de freestyle · 3ª linguagem',
+                desc: 'Round de 1 minuto de freestyle numa linguagem escolhida, em cypher ou battle da plataforma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-nom-4', tipo: 'evento', xp: 150, multi: 'nom',
+                nome: 'Round de freestyle · 4ª linguagem',
+                desc: 'Round de 1 minuto de freestyle numa linguagem escolhida, em cypher ou battle da plataforma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-nom-5', tipo: 'evento', xp: 150, multi: 'nom',
+                nome: 'Round de freestyle · 5ª linguagem',
+                desc: 'Round de 1 minuto de freestyle numa linguagem escolhida, em cypher ou battle da plataforma. Cada envio precisa ser numa linguagem diferente.' },
+              { id: 'mx-reg-1', tipo: 'evento', xp: 240, multi: 'reg',
+                nome: 'Número multiestilo · 1',
+                desc: 'Conceber e dirigir um número de até 3 minutos em que cada trecho é de uma linguagem diferente (de 2 a 5). Marque as linguagens do número.' },
+              { id: 'mx-reg-2', tipo: 'evento', xp: 240, multi: 'reg',
+                nome: 'Número multiestilo · 2',
+                desc: 'Conceber e dirigir um número de até 3 minutos em que cada trecho é de uma linguagem diferente (de 2 a 5). Marque as linguagens do número.' },
+              { id: 'mx-reg-3', tipo: 'evento', xp: 240, multi: 'reg',
+                nome: 'Número multiestilo · 3',
+                desc: 'Conceber e dirigir um número de até 3 minutos em que cada trecho é de uma linguagem diferente (de 2 a 5). Marque as linguagens do número.' }
             ]
           },
 

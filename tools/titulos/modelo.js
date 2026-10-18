@@ -14,6 +14,8 @@
  *     Títulos que cruzam estilos e valem para a Profissionalização
  *     (Bailarino(a), Performer, Improviso, Popping + Coreografia).
  *     Mantêm os ids trans-* já gravados no D1.
+ *     multiestilo: true → desafios mx-* da Árvore de Talentos nas 5
+ *     linguagens; gravados em talent_rep_titulos como <id>-<tier>.
  *
  *  3. REPUTAÇÃO                  (reputacao)
  *     Reconhecimento pela comunidade e constância: rodas, condução,
@@ -54,9 +56,19 @@
     return 'hab-' + modalidade + '-' + (SIGLA[nivel] || nivel) + '-' + categoria;
   };
 
+  /* Títulos multiestilo gravados com o tier no id: 'trans-cadencias-2' → base + tier 2. */
+  T.separarTier = function (id) {
+    var m = /^(.*)-([123])$/.exec(String(id || ''));
+    if (m && indice[m[1]] && !indice[id]) return { base: m[1], tier: Number(m[2]) };
+    return { base: id, tier: 0 };
+  };
+
   /* Nome para exibir: genero 'f' usa a forma feminina; tier (1..3) acrescenta o numeral. */
   T.nomeTitulo = function (id, opc) {
     opc = opc || {};
+    var sep = T.separarTier(id);
+    if (sep.tier && !opc.tier) { opc = { genero: opc.genero, tier: sep.tier }; }
+    id = sep.base;
     var x = indice[id];
     if (!x) return id;
     var nome = opc.genero === 'f' ? (x.titulo.nomeF || x.titulo.nome) : x.titulo.nome;

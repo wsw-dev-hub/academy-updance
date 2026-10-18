@@ -259,6 +259,18 @@ TRANSVERSAIS = [
    'desc': 'Traduz em movimento o que a palavra não alcança.', 'habilidade': 'avaliações de improviso'},
   {'id': 'trans-arquiteto',  'nome': 'Arquiteto do Flow',      'nomeF': 'Arquiteta do Flow',       'escopo': 'Popping + Coreografia', 'icone': 'mdi-vector-polyline', 'cor': '#430ABF',
    'desc': 'Projeta rotas invisíveis por onde o movimento corre sem esbarrar em si mesmo.', 'habilidade': 'avaliações de popping e de coreografia'},
+  {'id': 'trans-cadencias', 'nome': 'Mestre das Cadências', 'nomeF': 'Mestra das Cadências', 'escopo': 'Bailarino(a) · 5 linguagens', 'icone': 'mdi-metronome', 'cor': '#F20505', 'multiestilo': True, 'perfil': 'bailarino', 'habilidadeArvore': 'bal-multi',
+   'desc': 'Domínio técnico de verdade em linguagens diferentes: cada estilo com a sua cadência.', 'tiersTexto': ['2 linguagens diferentes com nota acima de 80 em "Solo técnico"', '3 linguagens diferentes com nota acima de 85 em "Solo técnico"', '5 linguagens diferentes com nota acima de 90 em "Solo técnico"']},
+  {'id': 'trans-linguagens', 'nome': 'Oráculo das Linguagens', 'nomeF': 'Oráculo das Linguagens', 'escopo': 'Bailarino(a) · 5 linguagens', 'icone': 'mdi-eye-circle-outline', 'cor': '#F20505', 'multiestilo': True, 'perfil': 'bailarino', 'habilidadeArvore': 'bal-multi',
+   'desc': 'Funde linguagens numa mesma coreografia sem apagar a assinatura de nenhuma delas.', 'tiersTexto': ['2 linguagens diferentes com nota acima de 80 em "Coreografia de fusão"', '3 linguagens diferentes com nota acima de 85 em "Coreografia de fusão"', '5 linguagens diferentes com nota acima de 90 em "Coreografia de fusão"']},
+  {'id': 'trans-nomade', 'nome': 'Nômade do Groove', 'nomeF': 'Nômade do Groove', 'escopo': 'Performer · 5 linguagens', 'icone': 'mdi-compass-rose', 'cor': '#FA33A1', 'multiestilo': True, 'perfil': 'performer', 'habilidadeArvore': 'perf-multi',
+   'desc': 'Atravessa estilos no freestyle: a música muda e o corpo responde na língua certa.', 'tiersTexto': ['2 linguagens diferentes com nota acima de 80 em "Round de freestyle"', '3 linguagens diferentes com nota acima de 85 em "Round de freestyle"', '5 linguagens diferentes com nota acima de 90 em "Round de freestyle"']},
+  {'id': 'trans-regente', 'nome': 'Regente do Movimento', 'nomeF': 'Regente do Movimento', 'escopo': 'Performer · 5 linguagens', 'icone': 'mdi-movie-open-star-outline', 'cor': '#FA33A1', 'multiestilo': True, 'perfil': 'performer', 'habilidadeArvore': 'perf-multi',
+   'desc': 'Concebe e dirige números em que cada trecho fala uma linguagem diferente.', 'tiersTexto': ['2 linguagens diferentes com nota acima de 80 em "Número multiestilo"', '3 linguagens diferentes com nota acima de 85 em "Número multiestilo"', '5 linguagens diferentes com nota acima de 90 em "Número multiestilo"']},
+  {'id': 'trans-dialetos', 'nome': 'Guardião dos Dialetos Urbanos', 'nomeF': 'Guardiã dos Dialetos Urbanos', 'escopo': 'Professor(a) · 5 linguagens', 'icone': 'mdi-translate', 'cor': '#5708A6', 'multiestilo': True, 'perfil': 'professor', 'habilidadeArvore': 'prof-multi',
+   'desc': 'Ensina cada linguagem com a mesma segurança, do vocabulário à musicalidade.', 'tiersTexto': ['2 linguagens diferentes com nota acima de 80 em "Aula"', '3 linguagens diferentes com nota acima de 85 em "Aula"', '5 linguagens diferentes com nota acima de 90 em "Aula"']},
+  {'id': 'trans-cronista', 'nome': 'Cronista das Cinco Escolas', 'nomeF': 'Cronista das Cinco Escolas', 'escopo': 'Professor(a) · 5 linguagens', 'icone': 'mdi-book-open-page-variant-outline', 'cor': '#5708A6', 'multiestilo': True, 'perfil': 'professor', 'habilidadeArvore': 'prof-multi',
+   'desc': 'Conhece e conta a origem, os pioneiros e os fundamentos das cinco escolas.', 'tiersTexto': ['2 linguagens diferentes com nota acima de 80 em "Seminário de raízes"', '3 linguagens diferentes com nota acima de 85 em "Seminário de raízes"', '5 linguagens diferentes com nota acima de 90 em "Seminário de raízes"']},
 ]
 TIERS_TRANS = ['3 avaliações seguidas com nota acima de 80', '3 avaliações seguidas acima de 85', '3 avaliações seguidas acima de 90 (critério atual do título)']
 
@@ -290,7 +302,10 @@ for r in REPUTACAO:
     if norm(r['nome']) in sug_norm: r['sugestao'] = True; destino[norm(r['nome'])] = ('reputacao', 'Reputação')
     todos_nomes.append((r['nome'], r['id']))
 for t in TRANSVERSAIS:
-    t['tiers'] = [{'n': i + 1, 'rotulo': ['I', 'II', 'III'][i], 'regra': x + ' em ' + t['habilidade'] + '.'} for i, x in enumerate(TIERS_TRANS)]
+    if t.get('tiersTexto'):
+        t['tiers'] = [{'n': i + 1, 'rotulo': ['I', 'II', 'III'][i], 'regra': x + '.'} for i, x in enumerate(t.pop('tiersTexto'))]
+    else:
+        t['tiers'] = [{'n': i + 1, 'rotulo': ['I', 'II', 'III'][i], 'regra': x + ' em ' + t['habilidade'] + '.'} for i, x in enumerate(TIERS_TRANS)]
     if norm(t['nome']) in sug_norm: t['sugestao'] = True; destino[norm(t['nome'])] = ('transversal', 'Habilidade transversal · ' + t['escopo'])
     todos_nomes.append((t['nome'], t['id']))
 

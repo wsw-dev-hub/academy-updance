@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fila da Árvore de Talentos — Up Dance</title>
+<link rel="icon" type="image/x-icon" href="/images/icons/udx-icon.ico">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<style>
+  :root{
+    --fundo:#02021a; --sup:rgba(9,7,38,.86); --sup2:rgba(2,2,26,.66); --linha:rgba(223,224,242,.12);
+    --texto:#dfe0f2; --mudo:#b0b3cc; --rosa:#FA33A1; --ok:#3ccf8e; --erro:#ff6b8b;
+    --grad:linear-gradient(135deg,#430ABF 0%,#FA33A1 100%);
+    --bailarino:linear-gradient(135deg,#F20505 0%,#8C0783 100%);
+    --professor:linear-gradient(135deg,#5708A6 0%,#430ABF 100%);
+    --performer:linear-gradient(135deg,#FA33A1 0%,#F27405 100%);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fundo);color:var(--texto);font:15px/1.55 Poppins,system-ui,sans-serif}
+  .topo{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;
+        background:rgba(2,2,26,.96);border-bottom:1px solid var(--linha);backdrop-filter:blur(12px)}
+  .topo img{width:32px;height:32px}
+  .selo{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;
+        letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--grad)}
+  .topo .vao{flex:1}
+  a.voltar,button{font:inherit;font-size:13px;color:#fff;background:var(--sup2);border:1px solid var(--linha);border-radius:10px;
+        padding:7px 12px;cursor:pointer;min-height:36px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  button:hover,a.voltar:hover{border-color:rgba(250,51,161,.55)}
+  button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--rosa);outline-offset:2px}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  main{max-width:1100px;margin:0 auto;padding:24px 16px 64px;display:grid;gap:18px}
+  h1{margin:0;font-size:1.45rem;color:#fff}
+  .sub{margin:4px 0 0;color:var(--mudo);font-size:13.5px}
+  .barra{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .seg{display:inline-flex;flex-wrap:wrap;gap:2px;padding:3px;border-radius:10px;background:var(--sup2);border:1px solid var(--linha)}
+  .seg button{border:0;background:transparent;min-height:32px}
+  .seg button[aria-pressed="true"]{background:rgba(223,224,242,.14)}
+  input[type=search],input[type=number],textarea,select{font:inherit;font-size:14px;color:#fff;background:var(--sup2);
+        border:1px solid var(--linha);border-radius:10px;padding:8px 11px}
+  input[type=search]{flex:1;min-width:200px;max-width:340px}
+  .cont{font-size:12.5px;color:var(--mudo)}
+  .lista{display:grid;gap:12px}
+  .item{background:var(--sup);border:1px solid var(--linha);border-radius:14px;padding:16px;display:grid;gap:12px;
+        border-left:4px solid transparent;border-image:none}
+  .item[data-perfil="bailarino"]{border-left-color:#F20505}
+  .item[data-perfil="professor"]{border-left-color:#5708A6}
+  .item[data-perfil="performer"]{border-left-color:#FA33A1}
+  .item__topo{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:flex-start;justify-content:space-between}
+  .item h2{margin:0;font-size:1rem;color:#fff;line-height:1.35}
+  .item h2 small{display:block;font-size:12px;color:var(--mudo);font-weight:500;margin-top:2px}
+  .etqs{display:flex;flex-wrap:wrap;gap:6px}
+  .etq{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:50px;font-size:11px;font-weight:600;
+       background:rgba(223,224,242,.08);border:1px solid var(--linha);white-space:nowrap}
+  .etq.mx{background:var(--grad);border-color:transparent;color:#fff}
+  .dados{display:grid;gap:4px;font-size:13px}
+  .dados b{color:#fff;font-weight:600}
+  .prova{padding:10px 12px;border-radius:10px;background:var(--sup2);border:1px solid var(--linha);font-size:13px;word-break:break-word;white-space:pre-wrap}
+  .prova a{color:#fff}
+  .estilos{display:grid;gap:6px}
+  .estilos__rot{font-size:12.5px;color:var(--mudo)}
+  .estilos__rot b{color:#fff}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips button{border-radius:50px;padding:5px 12px;min-height:32px;font-size:12px;font-weight:600}
+  .chips button[aria-pressed="true"]{background:var(--grad);border-color:transparent}
+  .chips button.declarado{box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)}
+  .form{display:grid;gap:10px;grid-template-columns:1fr}
+  @media (min-width:720px){.form{grid-template-columns:150px 1fr auto;align-items:end}}
+  .campo{display:grid;gap:4px;font-size:12.5px;color:var(--mudo)}
+  .campo input,.campo textarea{width:100%}
+  textarea{min-height:42px;resize:vertical}
+  .acoes{display:flex;gap:8px;flex-wrap:wrap}
+  .aprovar{background:var(--grad);border-color:transparent;font-weight:600}
+  .recusar{border-color:rgba(255,107,139,.45)}
+  .msg{font-size:12.5px;margin:0}
+  .msg.erro{color:var(--erro)}
+  .vazio{padding:28px 16px;text-align:center;color:var(--mudo);background:var(--sup);border:1px dashed var(--linha);border-radius:14px}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+         padding:10px 16px;border-radius:12px;background:#0b0a2e;border:1px solid var(--linha);color:#fff;font-size:13.5px;
+         transition:opacity .2s ease,transform .2s ease;max-width:calc(100vw - 32px)}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  .oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  @media (prefers-reduced-motion: reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <img src="/images/icons/udx-icon.png" alt="">
+  <span class="selo"><span class="mdi mdi-family-tree" aria-hidden="true"></span>Árvore de Talentos</span>
+  <span class="vao"></span>
+  <a class="voltar" href="/admin/"><span class="mdi mdi-arrow-left" aria-hidden="true"></span>Voltar ao painel</a>
+</header>
+
+<main>
+  <div>
+    <h1>Fila de validação</h1>
+    <p class="sub">Desafios da Árvore de Talentos aguardando a coordenação. Nos desafios multiestilo, confirme ou corrija a linguagem escolhida pelo membro e informe a nota (0 a 100); a nota é o que conta para os títulos multiestilo.</p>
+  </div>
+
+  <div class="barra">
+    <span class="seg" role="group" aria-label="Perfil" id="filtroPerfil">
+      <button type="button" data-perfil="" aria-pressed="true">Todos</button>
+      <button type="button" data-perfil="bailarino" aria-pressed="false">Bailarino(a)</button>
+      <button type="button" data-perfil="professor" aria-pressed="false">Professor(a)</button>
+      <button type="button" data-perfil="performer" aria-pressed="false">Performer</button>
+    </span>
+    <span class="seg" role="group" aria-label="Tipo de desafio" id="filtroTipo">
+      <button type="button" data-mx="" aria-pressed="true">Todos os desafios</button>
+      <button type="button" data-mx="1" aria-pressed="false">Só multiestilo</button>
+    </span>
+    <label class="oculto" for="busca">Buscar por membro ou desafio</label>
+    <input id="busca" type="search" placeholder="Buscar por e-mail ou desafio" autocomplete="off">
+    <span class="cont" id="cont" aria-live="polite"></span>
+    <button type="button" id="recarregar"><span class="mdi mdi-refresh" aria-hidden="true"></span>Atualizar</button>
+  </div>
+
+  <div class="lista" id="lista" aria-live="polite"><div class="vazio">Carregando a fila…</div></div>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/js/talentTree.data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var T = window.UDX_TALENTOS || {};
+  var MX = T.multiestilo || { estilos: [], grupos: {} };
+  var NOME = {}; MX.estilos.forEach(function (e) { NOME[e.id] = e.nome; });
+  var fila = [], escolhas = {}, filtro = { perfil: '', mx: '', q: '' };
+
+  function $(s, r) { return (r || document).querySelector(s); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function grupoDe(id) { var m = /^mx-([a-z]+)-\d+$/.exec(id || ''); return m && MX.grupos[m[1]] ? m[1] : null; }
+  function lista(s) { return String(s || '').split(',').filter(function (x) { return NOME[x]; }); }
+  function quando(s) {
+    var d = new Date(String(s || '').replace(' ', 'T') + 'Z');
+    return isNaN(d) ? (s || '') : d.toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+  function prova(txt) {
+    var t = esc(txt || '');
+    if (!t) return '<em>Sem texto de comprovação.</em>';
+    return t.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+  }
+  var tt; function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('on'); }, 3200); }
+
+  function carregar() {
+    $('#lista').innerHTML = '<div class="vazio">Carregando a fila…</div>';
+    fetch('/api/admin/talentos/fila', { credentials: 'same-origin' })
+      .then(function (r) {
+        if (r.status === 401 || r.status === 403) { location.href = '/admin-login/'; return null; }
+        return r.ok ? r.json() : null;
+      })
+      .then(function (j) {
+        if (!j) { $('#lista').innerHTML = '<div class="vazio">Não foi possível carregar a fila agora.</div>'; return; }
+        fila = (j.fila || []).map(function (f) {
+          var g = grupoDe(f.desafio_id);
+          if (g && !escolhas[f.progresso_id]) escolhas[f.progresso_id] = lista(f.estilo || f.estilo_declarado);
+          return Object.assign({ grupo: g }, f);
+        });
+        render();
+      })
+      .catch(function () { $('#lista').innerHTML = '<div class="vazio">Não foi possível carregar a fila agora.</div>'; });
+  }
+
+  function visiveis() {
+    var q = filtro.q.trim().toLowerCase();
+    return fila.filter(function (f) {
+      if (filtro.perfil && f.perfil_id !== filtro.perfil) return false;
+      if (filtro.mx && !f.grupo) return false;
+      if (q && (String(f.email) + ' ' + String(f.desafio) + ' ' + String(f.habilidade)).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+
+  function render() {
+    var vs = visiveis();
+    $('#cont').textContent = vs.length + ' de ' + fila.length + ' na fila';
+    if (!vs.length) {
+      $('#lista').innerHTML = '<div class="vazio">' + (fila.length ? 'Nenhum item com estes filtros.' : 'Fila vazia. Nada aguardando validação.') + '</div>';
+      return;
+    }
+    $('#lista').innerHTML = vs.map(function (f) {
+      var g = f.grupo ? MX.grupos[f.grupo] : null;
+      var decl = lista(f.estilo_declarado), esc_ = escolhas[f.progresso_id] || [];
+      var bloco = '';
+      if (g) {
+        bloco = '<div class="estilos"><span class="estilos__rot">Linguagem declarada pelo membro: <b>' +
+          esc(decl.map(function (x) { return NOME[x]; }).join(' + ') || 'não informada') + '</b>. ' +
+          (g.max === 1 ? 'Confirme ou troque:' : 'Confirme ou ajuste (' + g.min + ' a ' + g.max + '):') + '</span>' +
+          '<div class="chips" role="group" aria-label="Linguagens confirmadas">' + MX.estilos.map(function (e) {
+            return '<button type="button" data-chip="' + f.progresso_id + '" data-estilo="' + e.id + '" aria-pressed="' + (esc_.indexOf(e.id) !== -1) + '"' +
+              (decl.indexOf(e.id) !== -1 ? ' class="declarado" title="Escolhida pelo membro"' : '') + '>' + esc(e.nome) + '</button>';
+          }).join('') + '</div></div>';
+      }
+      return '<article class="item" data-id="' + f.progresso_id + '" data-perfil="' + esc(f.perfil_id) + '">' +
+        '<div class="item__topo"><h2>' + esc(f.desafio) + '<small>' + esc(f.habilidade) + ' · ' + esc(f.perfil) + '</small></h2>' +
+          '<div class="etqs">' + (g ? '<span class="etq mx"><span class="mdi mdi-earth" aria-hidden="true"></span>Multiestilo · ' + esc(g.nome) + '</span>' : '') +
+          '<span class="etq">' + esc(f.tipo) + '</span><span class="etq">+' + esc(f.xp) + ' XP</span></div></div>' +
+        '<div class="dados"><span>Membro: <b>' + esc(f.email) + '</b></span><span>Enviado: ' + esc(quando(f.created_at)) + '</span></div>' +
+        '<div class="prova">' + prova(f.comprovacao) + '</div>' + bloco +
+        '<div class="form">' +
+          '<label class="campo">Nota (0 a 100)' + (g ? ' · obrigatória' : ' · opcional') +
+            '<input type="number" min="0" max="100" step="1" inputmode="numeric" data-nota="' + f.progresso_id + '"></label>' +
+          '<label class="campo">Parecer<textarea data-parecer="' + f.progresso_id + '" maxlength="500" placeholder="Devolutiva para o membro"></textarea></label>' +
+          '<div class="acoes"><button type="button" class="aprovar" data-acao="aprovado" data-id="' + f.progresso_id + '">Aprovar</button>' +
+          '<button type="button" class="recusar" data-acao="recusado" data-id="' + f.progresso_id + '">Recusar</button></div>' +
+        '</div><p class="msg" data-msg="' + f.progresso_id + '"></p></article>';
+    }).join('');
+  }
+
+  function avaliar(id, decisao) {
+    var f = fila.filter(function (x) { return String(x.progresso_id) === String(id); })[0];
+    if (!f) return;
+    var g = f.grupo ? MX.grupos[f.grupo] : null;
+    var notaTxt = $('[data-nota="' + id + '"]').value.trim();
+    var parecer = $('[data-parecer="' + id + '"]').value.trim();
+    var msg = $('[data-msg="' + id + '"]');
+    var corpo = { id: Number(id), decisao: decisao, parecer: parecer };
+    if (notaTxt !== '') {
+      var n = Number(notaTxt);
+      if (!isFinite(n) || n < 0 || n > 100) { msg.className = 'msg erro'; msg.textContent = 'A nota vai de 0 a 100.'; return; }
+      corpo.nota = Math.round(n);
+    }
+    if (decisao === 'aprovado' && g) {
+      if (corpo.nota == null) { msg.className = 'msg erro'; msg.textContent = 'Informe a nota para aprovar um desafio multiestilo.'; return; }
+      var e = escolhas[id] || [];
+      if (e.length < g.min || e.length > g.max) {
+        msg.className = 'msg erro';
+        msg.textContent = g.max === 1 ? 'Confirme uma linguagem.' : 'Confirme de ' + g.min + ' a ' + g.max + ' linguagens.';
+        return;
+      }
+      corpo.estilos = e;
+    }
+    var botoes = document.querySelectorAll('[data-id="' + id + '"][data-acao]');
+    Array.prototype.forEach.call(botoes, function (b) { b.disabled = true; });
+    msg.className = 'msg'; msg.textContent = 'Enviando…';
+    fetch('/api/admin/talentos/avaliar', {
+      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo)
+    })
+      .then(function (r) { return r.json().catch(function () { return null; }).then(function (j) { return { r: r, j: j }; }); })
+      .then(function (x) {
+        if (x.r.status === 401 || x.r.status === 403) { location.href = '/admin-login/'; return; }
+        if (!x.j || !x.j.ok) {
+          msg.className = 'msg erro'; msg.textContent = (x.j && x.j.erro) || 'Não foi possível registrar agora.';
+          Array.prototype.forEach.call(botoes, function (b) { b.disabled = false; });
+          if (x.r.status === 409 && x.j && x.j.erro === 'Já avaliado.') { fila = fila.filter(function (y) { return y !== f; }); render(); }
+          return;
+        }
+        fila = fila.filter(function (y) { return y !== f; });
+        delete escolhas[id];
+        render();
+        toast(decisao === 'aprovado' ? 'Aprovado: ' + f.desafio : 'Recusado: ' + f.desafio);
+      })
+      .catch(function () {
+        msg.className = 'msg erro'; msg.textContent = 'Sem conexão. Tente de novo.';
+        Array.prototype.forEach.call(botoes, function (b) { b.disabled = false; });
+      });
+  }
+
+  $('#lista').addEventListener('click', function (ev) {
+    var c = ev.target.closest('[data-chip]');
+    if (c) {
+      var id = c.getAttribute('data-chip'), est = c.getAttribute('data-estilo');
+      var f = fila.filter(function (x) { return String(x.progresso_id) === id; })[0];
+      var g = f && f.grupo ? MX.grupos[f.grupo] : { max: 1 };
+      var atual = (escolhas[id] || []).slice(), i = atual.indexOf(est);
+      if (i !== -1) atual.splice(i, 1);
+      else if (g.max === 1) atual = [est];
+      else if (atual.length < g.max) atual.push(est);
+      escolhas[id] = atual;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-chip="' + id + '"]'), function (b) {
+        b.setAttribute('aria-pressed', String(atual.indexOf(b.getAttribute('data-estilo')) !== -1));
+      });
+      return;
+    }
+    var b = ev.target.closest('[data-acao]');
+    if (b) avaliar(b.getAttribute('data-id'), b.getAttribute('data-acao'));
+  });
+  function segmento(sel, chave) {
+    $(sel).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b) return;
+      filtro[chave] = b.getAttribute(chave === 'perfil' ? 'data-perfil' : 'data-mx') || '';
+      Array.prototype.forEach.call($(sel).querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      render();
+    });
+  }
+  segmento('#filtroPerfil', 'perfil'); segmento('#filtroTipo', 'mx');
+  var tb; $('#busca').addEventListener('input', function (e) { clearTimeout(tb); var v = e.target.value; tb = setTimeout(function () { filtro.q = v; render(); }, 150); });
+  $('#recarregar').addEventListener('click', carregar);
+  carregar();
+})();
+</script>
+</body>
+</html>

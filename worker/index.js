@@ -519,6 +519,58 @@ async function meusAcessos(request, env) {
 const TALENTOS_RESOURCE = 'arvore_talentos';
 const TALENTOS_XP_POR_PONTO = 100;
 const TALENTOS_MAX_PAGINAS  = 5;
+
+/* MULTIESTILO — desafios de nível profissional nas 5 linguagens (espelha
+   UDX_TALENTOS.multiestilo em /js/talentTree.data.js). Ids: mx-<grupo>-<vaga>.
+   O membro declara a(s) linguagem(ns) no envio (talent_progresso.estilo_declarado);
+   a coordenação confirma ou corrige na aprovação (talent_progresso.estilo).
+   Títulos: talent_rep_titulos (titulo_id = <titulo>-<tier>, eixo 'multiestilo',
+   escopo = perfil). Tier conta linguagens distintas em desafios aprovados do
+   grupo com nota acima do limiar (mesma escala 0–100 das demais avaliações). */
+const MULTI_ESTILOS = ['hhd', 'pop', 'lock', 'break', 'house'];
+const MULTI_TIERS   = [{ n: 1, estilos: 2, notaAcima: 80 }, { n: 2, estilos: 3, notaAcima: 85 }, { n: 3, estilos: 5, notaAcima: 90 }];
+const MULTI_GRUPOS  = {
+  cad:  { perfil: 'bailarino', titulo: 'trans-cadencias', min: 1, max: 1 },
+  ling: { perfil: 'bailarino', titulo: 'trans-linguagens', min: 2, max: 3 },
+  nom:  { perfil: 'performer', titulo: 'trans-nomade', min: 1, max: 1 },
+  reg:  { perfil: 'performer', titulo: 'trans-regente', min: 2, max: 5 },
+  dia:  { perfil: 'professor', titulo: 'trans-dialetos', min: 1, max: 1 },
+  cro:  { perfil: 'professor', titulo: 'trans-cronista', min: 1, max: 1 },
+};
+
+/* Grupo multiestilo de um desafio (ou null). */
+function multiGrupo(desafioId) {
+  const m = /^mx-([a-z]+)-\d+$/.exec(String(desafioId || ''));
+  return m && MULTI_GRUPOS[m[1]] ? { id: m[1], ...MULTI_GRUPOS[m[1]] } : null;
+}
+
+/* Normaliza a lista de linguagens recebida (array ou "a,b"): só chaves válidas,
+   sem repetição, em ordem fixa. Devolve { lista, erro }. */
+function multiEstilos(bruto, g) {
+  const itens = Array.isArray(bruto) ? bruto : String(bruto || '').split(',');
+  const set = new Set(itens.map(x => String(x).trim().toLowerCase()).filter(Boolean));
+  for (const e of set) if (!MULTI_ESTILOS.includes(e)) return { erro: `Linguagem inválida: ${e}.` };
+  const lista = MULTI_ESTILOS.filter(e => set.has(e));
+  if (lista.length < g.min || lista.length > g.max) {
+    return { erro: g.min === g.max
+      ? `Escolha ${g.min} linguagem.`
+      : `Escolha de ${g.min} a ${g.max} linguagens.` };
+  }
+  return { lista };
+}
+
+/* Grupos de uma linguagem só não repetem linguagem entre as vagas
+   (envios pendentes ou aprovados; recusados liberam a linguagem). */
+async function multiConflito(env, email, g, lista, ignorarId) {
+  if (g.max !== 1) return null;
+  const rows = (await env.DB.prepare(
+    "SELECT id, COALESCE(estilo, estilo_declarado) AS est FROM talent_progresso " +
+    "WHERE email = ? AND desafio_id LIKE ? AND status IN ('pendente', 'aprovado')"
+  ).bind(email, `mx-${g.id}-%`).all()).results || [];
+  const usados = new Set(rows.filter(r => r.id !== ignorarId).map(r => r.est));
+  const repetida = lista.find(e => usados.has(e));
+  return repetida ? `A linguagem ${repetida} já foi usada em outra vaga deste desafio.` : null;
+}
  
 /* Contadores materializados — mesmo padrão de 'membros' e 'erros'.
    Mantidos por incremento aqui; ressincronizados pelo bloco 4 de
@@ -572,6 +624,15 @@ async function talentosEstado(request, env) {
       'SELECT page_id, nome, alocacao, atual FROM talent_paginas WHERE email = ? ORDER BY page_id'
     ).bind(g.email),
   ]);
+
+  /* Envios multiestilo — consulta à parte: se o SQL de 2026-10-multiestilo
+     ainda não rodou (sem as colunas estilo*), o estado segue sem eles. */
+  let envios = { results: [] };
+  try {
+    envios = await env.DB.prepare(
+      "SELECT desafio_id, status, estilo, estilo_declarado FROM talent_progresso WHERE email = ? AND desafio_id LIKE 'mx-%'"
+    ).bind(g.email).all();
+  } catch (e) { console.error('talentosEstado/envios:', (e && e.message) || e); }
  
   const xp = { bailarino: 0, professor: 0, performer: 0 };
   for (const r of (xpRows.results || [])) xp[r.perfil_id] = r.xp;
@@ -594,6 +655,11 @@ async function talentosEstado(request, env) {
     titulos:     (titulos.results  || []).map(r => r.titulo_id),
     paginaAtual: atual ? atual.page_id : listaPaginas[0].id,
     paginas:     listaPaginas,
+    /* Envios multiestilo: { 'mx-cad-1': { status, estilos: ['pop'] } } */
+    envios:      Object.fromEntries((envios.results || []).map(r => [r.desafio_id, {
+      status:  r.status,
+      estilos: String(r.estilo || r.estilo_declarado || '').split(',').filter(Boolean),
+    }])),
   });
 }
  
@@ -693,9 +759,33 @@ async function talentosEnviarDesafio(request, env) {
     return json({ ok: false, erro: 'Desafio inexistente ou desativado.' }, 404);
   }
  
+  /* MULTIESTILO: linguagem(ns) obrigatória(s) e sem repetir entre vagas. */
+  const mg = multiGrupo(desafioId);
+  let estilos = null;
+  if (mg) {
+    const r = multiEstilos(body.estilos, mg);
+    if (r.erro) return json({ ok: false, erro: r.erro }, 400);
+    const conflito = await multiConflito(env, g.email, mg, r.lista, null);
+    if (conflito) return json({ ok: false, erro: conflito }, 409);
+    estilos = r.lista.join(',');
+  }
+
   const jaTem = await env.DB.prepare(
-    'SELECT status FROM talent_progresso WHERE email = ? AND desafio_id = ?'
+    'SELECT id, status FROM talent_progresso WHERE email = ? AND desafio_id = ?'
   ).bind(g.email, desafioId).first();
+  /* Vaga multiestilo recusada pode ser reenviada (outra linguagem ou novo material). */
+  if (jaTem && mg && jaTem.status === 'recusado') {
+    const comprovacaoNova = String(body.comprovacao || '').slice(0, 500);
+    await env.DB.batch([
+      env.DB.prepare(
+        "UPDATE talent_progresso SET status = 'pendente', comprovacao = ?, estilo = NULL, estilo_declarado = ?, " +
+        "avaliador = NULL, reviewed_at = NULL, created_at = datetime('now') WHERE id = ?"
+      ).bind(comprovacaoNova, estilos, jaTem.id),
+      contador(env, CNT_PENDENTES, 1),
+    ]);
+    await logEvent(env, g.email, 'talento_desafio_pendente', `${desafioId} reenvio ${estilos}`);
+    return json({ ok: true, status: 'pendente', reenvio: true });
+  }
   if (jaTem) {
     return json({ ok: true, status: jaTem.status, duplicado: true });
   }
@@ -706,13 +796,14 @@ async function talentosEnviarDesafio(request, env) {
   // Grava o progresso e ajusta o contador no mesmo round-trip.
   await env.DB.batch([
     env.DB.prepare(
-      'INSERT INTO talent_progresso (email, desafio_id, perfil_id, xp, status, comprovacao, reviewed_at) ' +
-      "VALUES (?, ?, ?, ?, ?, ?, CASE WHEN ? = 'aprovado' THEN datetime('now') ELSE NULL END)"
-    ).bind(g.email, desafioId, d.perfil_id, d.xp, status, comprovacao, status),
+      'INSERT INTO talent_progresso (email, desafio_id, perfil_id, xp, status, comprovacao, reviewed_at' +
+      (estilos ? ', estilo_declarado' : '') + ') ' +
+      "VALUES (?, ?, ?, ?, ?, ?, CASE WHEN ? = 'aprovado' THEN datetime('now') ELSE NULL END" + (estilos ? ', ?' : '') + ')'
+    ).bind(...[g.email, desafioId, d.perfil_id, d.xp, status, comprovacao, status].concat(estilos ? [estilos] : [])),
     contador(env, status === 'aprovado' ? CNT_APROVADOS : CNT_PENDENTES, 1),
   ]);
  
-  await logEvent(env, g.email, 'talento_desafio_' + status, desafioId);
+  await logEvent(env, g.email, 'talento_desafio_' + status, desafioId + (estilos ? ` ${estilos}` : ''));
  
   if (status !== 'aprovado') {
     return json({ ok: true, status: 'pendente' });
@@ -750,13 +841,29 @@ async function talentosAvaliar(request, env, admin) {
     await logEvent(env, admin.email, 'talento_avaliar_erro', `id ${id} já avaliado`);
     return json({ ok: false, erro: 'Já avaliado.' }, 409);
   }
+
+  /* MULTIESTILO: aprovação exige nota e linguagem confirmada (a declarada,
+     ou a corrigida pela coordenação em body.estilos). */
+  const mg = multiGrupo(reg.desafio_id);
+  let estilosConfirmados = null;
+  if (mg && decisao === 'aprovado') {
+    if (body.nota == null || notaValida(body.nota) === null) {
+      return json({ ok: false, erro: `Informe a nota (${REP.notaMin}..${REP.notaMax}) para aprovar desafio multiestilo.` }, 400);
+    }
+    const atual = await env.DB.prepare('SELECT estilo_declarado FROM talent_progresso WHERE id = ?').bind(id).first();
+    const r = multiEstilos(body.estilos != null ? body.estilos : (atual && atual.estilo_declarado), mg);
+    if (r.erro) return json({ ok: false, erro: r.erro }, 400);
+    const conflito = await multiConflito(env, reg.email, mg, r.lista, id);
+    if (conflito) return json({ ok: false, erro: conflito }, 409);
+    estilosConfirmados = r.lista.join(',');
+  }
  
   // Sai da fila; entra em aprovados só se aprovado.
   const escritas = [
     env.DB.prepare(
       "UPDATE talent_progresso SET status = ?, avaliador = ?, parecer = ?, " +
-      "reviewed_at = datetime('now') WHERE id = ?"
-    ).bind(decisao, admin.email || 'admin', parecer, id),
+      "reviewed_at = datetime('now')" + (estilosConfirmados ? ', estilo = ?' : '') + ' WHERE id = ?'
+    ).bind(...[decisao, admin.email || 'admin', parecer].concat(estilosConfirmados ? [estilosConfirmados] : [], [id])),
     contador(env, CNT_PENDENTES, -1),
   ];
   if (decisao === 'aprovado') escritas.push(contador(env, CNT_APROVADOS, 1));
@@ -1835,7 +1942,38 @@ async function recalcularReputacao(env, email) {
     escopos.push({ perfil, pr, pd, n: notas.length });
   }
   await concederRepTitulos(env, email, escopos);
+  try { await concederMultiestilo(env, email); }
+  catch (e) { console.error('concederMultiestilo:', (e && e.message) || e); }   // nunca derruba a avaliação
   return escopos;
+}
+
+/* Títulos MULTIESTILO: por grupo, conta linguagens distintas em desafios
+   aprovados com nota ATUAL (última avaliação) acima do limiar de cada tier.
+   Conquistas são permanentes (INSERT OR IGNORE), como os demais títulos. */
+async function concederMultiestilo(env, email) {
+  const rows = (await env.DB.prepare(
+    "SELECT p.desafio_id, COALESCE(p.estilo, p.estilo_declarado) AS estilo, " +
+    "  (SELECT a.nota FROM talent_avaliacoes a WHERE a.progresso_id = p.id ORDER BY a.id DESC LIMIT 1) AS nota " +
+    "FROM talent_progresso p WHERE p.email = ? AND p.status = 'aprovado' AND p.desafio_id LIKE 'mx-%'"
+  ).bind(email).all()).results || [];
+  const novos = [];
+  for (const [gid, g] of Object.entries(MULTI_GRUPOS)) {
+    const doGrupo = rows.filter(r => (multiGrupo(r.desafio_id) || {}).id === gid && r.nota != null);
+    for (const t of MULTI_TIERS) {
+      const estilos = new Set();
+      doGrupo.filter(r => r.nota > t.notaAcima)
+             .forEach(r => String(r.estilo || '').split(',').filter(Boolean).forEach(e => estilos.add(e)));
+      if (estilos.size >= t.estilos) {
+        const tid = `${g.titulo}-${t.n}`;
+        const r = await env.DB.prepare(
+          'INSERT OR IGNORE INTO talent_rep_titulos (email, titulo_id, eixo, escopo) VALUES (?, ?, ?, ?)'
+        ).bind(email, tid, 'multiestilo', g.perfil).run();
+        if (r.meta && r.meta.changes) novos.push(tid);
+      }
+    }
+  }
+  if (novos.length) await logEvent(env, email, 'talento_multiestilo_titulo', novos.join(','));
+  return novos;
 }
 
 async function concederRepTitulos(env, email, escopos) {

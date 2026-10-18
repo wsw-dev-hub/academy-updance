@@ -14,6 +14,8 @@
  *     Títulos que cruzam estilos e valem para a Profissionalização
  *     (Bailarino(a), Performer, Improviso, Popping + Coreografia).
  *     Mantêm os ids trans-* já gravados no D1.
+ *     multiestilo: true → desafios mx-* da Árvore de Talentos nas 5
+ *     linguagens; gravados em talent_rep_titulos como <id>-<tier>.
  *
  *  3. REPUTAÇÃO                  (reputacao)
  *     Reconhecimento pela comunidade e constância: rodas, condução,
@@ -1349,6 +1351,180 @@
         }
       ],
       "sugestao": true
+    },
+    {
+      "id": "trans-cadencias",
+      "nome": "Mestre das Cadências",
+      "nomeF": "Mestra das Cadências",
+      "escopo": "Bailarino(a) · 5 linguagens",
+      "icone": "mdi-metronome",
+      "cor": "#F20505",
+      "multiestilo": true,
+      "perfil": "bailarino",
+      "habilidadeArvore": "bal-multi",
+      "desc": "Domínio técnico de verdade em linguagens diferentes: cada estilo com a sua cadência.",
+      "tiers": [
+        {
+          "n": 1,
+          "rotulo": "I",
+          "regra": "2 linguagens diferentes com nota acima de 80 em \"Solo técnico\"."
+        },
+        {
+          "n": 2,
+          "rotulo": "II",
+          "regra": "3 linguagens diferentes com nota acima de 85 em \"Solo técnico\"."
+        },
+        {
+          "n": 3,
+          "rotulo": "III",
+          "regra": "5 linguagens diferentes com nota acima de 90 em \"Solo técnico\"."
+        }
+      ]
+    },
+    {
+      "id": "trans-linguagens",
+      "nome": "Oráculo das Linguagens",
+      "nomeF": "Oráculo das Linguagens",
+      "escopo": "Bailarino(a) · 5 linguagens",
+      "icone": "mdi-eye-circle-outline",
+      "cor": "#F20505",
+      "multiestilo": true,
+      "perfil": "bailarino",
+      "habilidadeArvore": "bal-multi",
+      "desc": "Funde linguagens numa mesma coreografia sem apagar a assinatura de nenhuma delas.",
+      "tiers": [
+        {
+          "n": 1,
+          "rotulo": "I",
+          "regra": "2 linguagens diferentes com nota acima de 80 em \"Coreografia de fusão\"."
+        },
+        {
+          "n": 2,
+          "rotulo": "II",
+          "regra": "3 linguagens diferentes com nota acima de 85 em \"Coreografia de fusão\"."
+        },
+        {
+          "n": 3,
+          "rotulo": "III",
+          "regra": "5 linguagens diferentes com nota acima de 90 em \"Coreografia de fusão\"."
+        }
+      ]
+    },
+    {
+      "id": "trans-nomade",
+      "nome": "Nômade do Groove",
+      "nomeF": "Nômade do Groove",
+      "escopo": "Performer · 5 linguagens",
+      "icone": "mdi-compass-rose",
+      "cor": "#FA33A1",
+      "multiestilo": true,
+      "perfil": "performer",
+      "habilidadeArvore": "perf-multi",
+      "desc": "Atravessa estilos no freestyle: a música muda e o corpo responde na língua certa.",
+      "tiers": [
+        {
+          "n": 1,
+          "rotulo": "I",
+          "regra": "2 linguagens diferentes com nota acima de 80 em \"Round de freestyle\"."
+        },
+        {
+          "n": 2,
+          "rotulo": "II",
+          "regra": "3 linguagens diferentes com nota acima de 85 em \"Round de freestyle\"."
+        },
+        {
+          "n": 3,
+          "rotulo": "III",
+          "regra": "5 linguagens diferentes com nota acima de 90 em \"Round de freestyle\"."
+        }
+      ]
+    },
+    {
+      "id": "trans-regente",
+      "nome": "Regente do Movimento",
+      "nomeF": "Regente do Movimento",
+      "escopo": "Performer · 5 linguagens",
+      "icone": "mdi-movie-open-star-outline",
+      "cor": "#FA33A1",
+      "multiestilo": true,
+      "perfil": "performer",
+      "habilidadeArvore": "perf-multi",
+      "desc": "Concebe e dirige números em que cada trecho fala uma linguagem diferente.",
+      "tiers": [
+        {
+          "n": 1,
+          "rotulo": "I",
+          "regra": "2 linguagens diferentes com nota acima de 80 em \"Número multiestilo\"."
+        },
+        {
+          "n": 2,
+          "rotulo": "II",
+          "regra": "3 linguagens diferentes com nota acima de 85 em \"Número multiestilo\"."
+        },
+        {
+          "n": 3,
+          "rotulo": "III",
+          "regra": "5 linguagens diferentes com nota acima de 90 em \"Número multiestilo\"."
+        }
+      ]
+    },
+    {
+      "id": "trans-dialetos",
+      "nome": "Guardião dos Dialetos Urbanos",
+      "nomeF": "Guardiã dos Dialetos Urbanos",
+      "escopo": "Professor(a) · 5 linguagens",
+      "icone": "mdi-translate",
+      "cor": "#5708A6",
+      "multiestilo": true,
+      "perfil": "professor",
+      "habilidadeArvore": "prof-multi",
+      "desc": "Ensina cada linguagem com a mesma segurança, do vocabulário à musicalidade.",
+      "tiers": [
+        {
+          "n": 1,
+          "rotulo": "I",
+          "regra": "2 linguagens diferentes com nota acima de 80 em \"Aula\"."
+        },
+        {
+          "n": 2,
+          "rotulo": "II",
+          "regra": "3 linguagens diferentes com nota acima de 85 em \"Aula\"."
+        },
+        {
+          "n": 3,
+          "rotulo": "III",
+          "regra": "5 linguagens diferentes com nota acima de 90 em \"Aula\"."
+        }
+      ]
+    },
+    {
+      "id": "trans-cronista",
+      "nome": "Cronista das Cinco Escolas",
+      "nomeF": "Cronista das Cinco Escolas",
+      "escopo": "Professor(a) · 5 linguagens",
+      "icone": "mdi-book-open-page-variant-outline",
+      "cor": "#5708A6",
+      "multiestilo": true,
+      "perfil": "professor",
+      "habilidadeArvore": "prof-multi",
+      "desc": "Conhece e conta a origem, os pioneiros e os fundamentos das cinco escolas.",
+      "tiers": [
+        {
+          "n": 1,
+          "rotulo": "I",
+          "regra": "2 linguagens diferentes com nota acima de 80 em \"Seminário de raízes\"."
+        },
+        {
+          "n": 2,
+          "rotulo": "II",
+          "regra": "3 linguagens diferentes com nota acima de 85 em \"Seminário de raízes\"."
+        },
+        {
+          "n": 3,
+          "rotulo": "III",
+          "regra": "5 linguagens diferentes com nota acima de 90 em \"Seminário de raízes\"."
+        }
+      ]
     }
   ],
   "classificacao": [
@@ -1538,9 +1714,19 @@
     return 'hab-' + modalidade + '-' + (SIGLA[nivel] || nivel) + '-' + categoria;
   };
 
+  /* Títulos multiestilo gravados com o tier no id: 'trans-cadencias-2' → base + tier 2. */
+  T.separarTier = function (id) {
+    var m = /^(.*)-([123])$/.exec(String(id || ''));
+    if (m && indice[m[1]] && !indice[id]) return { base: m[1], tier: Number(m[2]) };
+    return { base: id, tier: 0 };
+  };
+
   /* Nome para exibir: genero 'f' usa a forma feminina; tier (1..3) acrescenta o numeral. */
   T.nomeTitulo = function (id, opc) {
     opc = opc || {};
+    var sep = T.separarTier(id);
+    if (sep.tier && !opc.tier) { opc = { genero: opc.genero, tier: sep.tier }; }
+    id = sep.base;
     var x = indice[id];
     if (!x) return id;
     var nome = opc.genero === 'f' ? (x.titulo.nomeF || x.titulo.nome) : x.titulo.nome;

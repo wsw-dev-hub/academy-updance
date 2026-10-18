@@ -835,7 +835,21 @@
       var n = idx[x.id] || {};
       cards.push(card(n.icone || 'mdi-crown-outline', n.nome || x.id, rotuloGrupo('talentos', x.grupo, d.nomes || {}), null));
     });
+    /* Multiestilo (talent_rep_titulos.eixo = 'multiestilo', id <titulo>-<tier>):
+       um card por título, com o tier mais alto conquistado. */
+    var TT = win.UDX_TITULOS, maiorTier = {};
     ((d.reputacao && d.reputacao.titulos) || []).forEach(function (x) {
+      if (x.eixo !== 'multiestilo' || !TT) return;
+      var sep = TT.separarTier(x.titulo_id);
+      if (!maiorTier[sep.base] || sep.tier > maiorTier[sep.base].tier) maiorTier[sep.base] = { tier: sep.tier, escopo: x.escopo };
+    });
+    Object.keys(maiorTier).forEach(function (base) {
+      var meta = (TT.indice[base] || {}).titulo || {};
+      cards.push(card(meta.icone || 'mdi-earth', TT.nomeTitulo(base, { tier: maiorTier[base].tier }),
+        'Multiestilo · ' + rotuloGrupo('talentos', maiorTier[base].escopo, d.nomes || {}).replace(/^Profissionalização, /, ''), meta.cor));
+    });
+    ((d.reputacao && d.reputacao.titulos) || []).forEach(function (x) {
+      if (x.eixo === 'multiestilo') return;
       var r = nomeTituloRep(x.titulo_id);
       var escopo = win.UDX_REP && win.UDX_REP.perfilLabel ? win.UDX_REP.perfilLabel(x.escopo) : x.escopo;
       cards.push(card((r && r.icone) || 'mdi-shield-star-outline', (r && r.nome) || x.titulo_id,
@@ -922,7 +936,7 @@
             s.progresso = fmt(Math.min(melhor.gastos, melhor.req)) + ' de ' + fmt(melhor.req) + ' pontos na árvore mais avançada (' + melhor.nome + ')';
           }
           s.dica = 'Com os pontos da faixa do título, falta ser aprovado(a) no desafio do título da árvore.';
-          s.link = PAGINA_TALENTOS; s.linkTxt = 'Abrir Talentos';
+          s.link = PAGINA_TALENTOS; s.linkTxt = 'Abrir a Árvore de Talentos';
         } else {
           s.dica = 'Disponível a partir de Estagiário(a), depois das trilhas de nível.';
         }

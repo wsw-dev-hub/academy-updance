@@ -44,6 +44,9 @@
   var MAX_PAGINAS   = 5;
   var XP_POR_PONTO  = DADOS.xpPorPonto || 100;
   var ARVORE        = DADOS.arvore || 'talentos';   // chave de ROTAS em desafios.js
+  var MULTI         = DADOS.multiestilo || { estilos: [], grupos: {}, tiers: [] };
+  var NOME_ESTILO   = {};
+  MULTI.estilos.forEach(function (e) { NOME_ESTILO[e.id] = e.nome; });
 
   var $  = function (sel, ctx) { return (ctx || doc).querySelector(sel); };
   var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || doc).querySelectorAll(sel)); };
@@ -90,6 +93,7 @@
         xp:          xp,
         desafios:    [],
         titulos:     [],
+        envios:      {},      // multiestilo: { 'mx-cad-1': { status, estilos: [] } }
         paginaAtual: 1,
         paginas:     [{ id: 1, nome: 'Plano 01', alocacao: {} }]
       };
@@ -106,6 +110,15 @@
 
       base.desafios = Array.isArray(bruto.desafios) ? bruto.desafios.slice() : [];
       base.titulos  = Array.isArray(bruto.titulos)  ? bruto.titulos.slice()  : [];
+      if (bruto.envios && typeof bruto.envios === 'object') {
+        Object.keys(bruto.envios).forEach(function (id) {
+          var e = bruto.envios[id] || {};
+          base.envios[id] = {
+            status:  String(e.status || ''),
+            estilos: Array.isArray(e.estilos) ? e.estilos.filter(function (x) { return NOME_ESTILO[x]; }) : []
+          };
+        });
+      }
 
       if (Array.isArray(bruto.paginas) && bruto.paginas.length) {
         base.paginas = bruto.paginas.slice(0, MAX_PAGINAS).map(function (pg, i) {
@@ -637,6 +650,7 @@
 
       html += '<ul class="tt-challenges">';
       hab.desafios.forEach(function (d) {
+        if (d.multi) { html += UI.itemMultiestilo(d); return; }
         var feito = Estado.dados.desafios.indexOf(d.id) !== -1;
         var meta  = DADOS.tiposDesafio[d.tipo] || DADOS.tiposDesafio.tarefa;
         html +=
@@ -666,6 +680,93 @@
       html += '</ul>';
 
       p.innerHTML = html;
+    },
+
+    /* ---------- desafios multiestilo ---------- */
+    escolhas: {},          // desafioId -> [estilos] escolhidos antes de enviar
+
+    /* Linguagens já usadas em outras vagas do mesmo grupo (só grupos de 1 linguagem). */
+    estilosUsados: function (d) {
+      var g = MULTI.grupos[d.multi], usados = {};
+      if (!g || g.max !== 1) { return usados; }
+      Object.keys(Estado.dados.envios).forEach(function (id) {
+        if (id === d.id || id.indexOf('mx-' + d.multi + '-') !== 0) { return; }
+        var e = Estado.dados.envios[id];
+        if (e.status === 'pendente' || e.status === 'aprovado') {
+          e.estilos.forEach(function (x) { usados[x] = true; });
+        }
+      });
+      return usados;
+    },
+
+    itemMultiestilo: function (d) {
+      var g     = MULTI.grupos[d.multi] || { min: 1, max: 1 };
+      var envio = Estado.dados.envios[d.id] || null;
+      var st    = envio ? envio.status : '';
+      var feito = st === 'aprovado' || Estado.dados.desafios.indexOf(d.id) !== -1;
+      var meta  = DADOS.tiposDesafio[d.tipo] || DADOS.tiposDesafio.tarefa;
+      var nomes = function (lista) { return lista.map(function (x) { return NOME_ESTILO[x] || x; }).join(' + '); };
+      var html =
+        '<li class="tt-challenge tt-challenge--mx' + (feito ? ' is-done' : '') + '">' +
+          '<span class="tt-challenge__mark"><span class="mdi ' + (feito ? 'mdi-check-bold' : meta.icone) + '"></span></span>' +
+          '<div class="tt-challenge__body">' +
+            '<span class="tt-challenge__name">' + escapar(d.nome) + '</span>' +
+            '<p class="tt-challenge__desc">' + escapar(d.desc) + '</p>' +
+            '<div class="tt-challenge__meta">' +
+              '<span class="tt-chip"><span class="mdi ' + meta.icone + '"></span>' + escapar(meta.label) + '</span>' +
+              (d.xp > 0 ? '<span class="tt-chip tt-chip--xp"><span class="mdi mdi-lightning-bolt"></span>+' + d.xp + ' XP</span>' : '') +
+              '<span class="tt-chip"><span class="mdi mdi-earth"></span>Multiestilo</span>' +
+            '</div>';
+      if (st === 'aprovado' || st === 'pendente') {
+        html += '<p class="tt-mx__status">' +
+          (st === 'aprovado' ? 'Aprovado em ' : 'Aguardando validação · ') +
+          '<b>' + escapar(nomes(envio.estilos)) + '</b></p>';
+      } else {
+        var escolha = UI.escolhas[d.id] || [];
+        var usados  = UI.estilosUsados(d);
+        html += '<div class="tt-mx" role="group" aria-label="' +
+          escapar(g.max === 1 ? 'Linguagem do envio' : 'Linguagens do envio (' + g.min + ' a ' + g.max + ')') + '">' +
+          '<span class="tt-mx__rot">' + (g.max === 1 ? 'Linguagem:' : 'Linguagens (' + g.min + ' a ' + g.max + '):') + '</span>' +
+          MULTI.estilos.map(function (e) {
+            var usado = !!usados[e.id];
+            var on    = escolha.indexOf(e.id) !== -1;
+            return '<button type="button" class="tt-mx__btn" data-mx-desafio="' + escapar(d.id) + '" data-mx-estilo="' + e.id + '"' +
+              ' aria-pressed="' + on + '"' + (usado ? ' disabled title="Já usada em outra vaga"' : '') + '>' +
+              escapar(e.nome) + '</button>';
+          }).join('') +
+          '</div>' +
+          (st === 'recusado' ? '<p class="tt-mx__status">Recusado pela coordenação. Você pode reenviar.</p>' : '');
+      }
+      var pronto = (UI.escolhas[d.id] || []).length >= g.min && (UI.escolhas[d.id] || []).length <= g.max;
+      var bloqueado = feito || st === 'pendente' || !pronto;
+      html += '</div>' +
+          '<button type="button" class="tt-challenge__cta" data-desafio="' + escapar(d.id) + '"' + (bloqueado ? ' disabled' : '') + '>' +
+            '<span class="mdi ' + (feito ? 'mdi-check-circle-outline' : st === 'pendente' ? 'mdi-timer-sand' : 'mdi-upload-outline') + '"></span>' +
+            (feito ? 'Concluído' : st === 'pendente' ? 'Em validação' : st === 'recusado' ? 'Reenviar' : 'Enviar comprovação') +
+          '</button>' +
+        '</li>';
+      return html;
+    },
+
+    alternarEstilo: function (desafioId, estilo) {
+      var d = null;
+      DADOS.perfis.some(function (p) {
+        return p.habilidades.some(function (h) {
+          return h.desafios.some(function (x) { if (x.id === desafioId) { d = x; return true; } return false; });
+        });
+      });
+      if (!d || !d.multi) { return; }
+      var g = MULTI.grupos[d.multi] || { max: 1 };
+      var atual = (UI.escolhas[desafioId] || []).slice();
+      var i = atual.indexOf(estilo);
+      if (i !== -1) { atual.splice(i, 1); }
+      else if (g.max === 1) { atual = [estilo]; }
+      else if (atual.length < g.max) { atual.push(estilo); }
+      else { UI.toast('Escolha no máximo ' + g.max + ' linguagens.', true); return; }
+      UI.escolhas[desafioId] = atual;
+      UI.renderPanel();
+      var b = UI.refs.panel.querySelector('[data-mx-desafio="' + desafioId + '"][data-mx-estilo="' + estilo + '"]');
+      if (b) { b.focus(); }
     },
 
     /* ---------- títulos ---------- */
@@ -943,17 +1044,43 @@
       if (!hab || !desafio) { return; }
       if (Estado.dados.desafios.indexOf(desafioId) !== -1) { return; }
 
+      var estilos = desafio.multi ? (UI.escolhas[desafioId] || []).slice() : null;
+      if (desafio.multi) {
+        var g = MULTI.grupos[desafio.multi] || { min: 1, max: 1 };
+        if (estilos.length < g.min || estilos.length > g.max) {
+          UI.toast(g.max === 1 ? 'Escolha a linguagem do envio.' : 'Escolha de ' + g.min + ' a ' + g.max + ' linguagens.', true);
+          UI.renderPanel();
+          return;
+        }
+      }
+      var corpo = { desafio: desafioId, habilidade: hab.id };
+      if (estilos) { corpo.estilos = estilos; }
+
       fetch(API.desafio, {
         method:      'POST',
         credentials: 'same-origin',
         headers:     { 'Content-Type': 'application/json' },
-        body:        JSON.stringify({ desafio: desafioId, habilidade: hab.id })
+        body:        JSON.stringify(corpo)
       })
-        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (r) {
+          /* Recusa do servidor com motivo (ex.: linguagem repetida) não cai no modo local. */
+          if (!r.ok) {
+            return r.json().catch(function () { return null; }).then(function (e) {
+              if (e && e.erro) { var x = new Error(e.erro); x.servidor = true; throw x; }
+              return null;
+            });
+          }
+          return r.json();
+        })
         .then(function (j) {
           if (!j || j.ok !== true) { throw new Error('sem worker'); }
           Estado.online = true;
           if (j.status === 'pendente') {
+            if (estilos) {
+              Estado.dados.envios[desafioId] = { status: 'pendente', estilos: estilos };
+              delete UI.escolhas[desafioId];
+              UI.renderPanel();
+            }
             UI.toast('Comprovação enviada. A coordenação valida em até 48h.');
             return;
           }
@@ -969,9 +1096,15 @@
           UI.renderTudo();
           UI.toast('Desafio validado: +' + desafio.xp + ' ' + perfilPorId(hab.perfilId).xpLabel + '.');
         })
-        .catch(function () {
+        .catch(function (err) {
+          if (err && err.servidor) {
+            UI.toast(err.message, true);
+            UI.renderPanel();
+            return;
+          }
           /* Sem Worker: modo local. Credita para permitir navegar o sistema. */
           Estado.online = false;
+          if (estilos) { Estado.dados.envios[desafioId] = { status: 'aprovado', estilos: estilos }; }
           Estado.dados.desafios.push(desafioId);
           Estado.dados.xp[hab.perfilId] =
             (Estado.dados.xp[hab.perfilId] || 0) + (desafio.xp || 0);
@@ -1057,6 +1190,11 @@
 
     /* --- desafios --- */
     UI.refs.panel.addEventListener('click', function (ev) {
+      var mx = ev.target.closest('[data-mx-estilo]');
+      if (mx) {
+        UI.alternarEstilo(mx.getAttribute('data-mx-desafio'), mx.getAttribute('data-mx-estilo'));
+        return;
+      }
       var b = ev.target.closest('[data-desafio]');
       if (!b) { return; }
       b.disabled = true;
@@ -1098,7 +1236,30 @@
     if (gate) { gate.hidden = false; }
   }
 
+  /* Estilos do seletor de linguagem — injetados aqui para não depender de
+     outra versão de talentTree.css. Usam os mesmos tokens do painel. */
+  function estilosMultiestilo() {
+    if (doc.getElementById('tt-mx-css')) { return; }
+    var st = doc.createElement('style');
+    st.id = 'tt-mx-css';
+    st.textContent =
+      '.tt-mx{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px}' +
+      '.tt-mx__rot{font-size:11px;font-weight:700;color:var(--udx-text-muted);margin-right:2px}' +
+      '.tt-mx__btn{padding:5px 11px;border-radius:50px;border:1px solid var(--udx-border);background:rgba(2,2,26,.7);' +
+        'color:var(--udx-text);font-family:var(--udx-font);font-size:11px;font-weight:700;cursor:pointer;min-height:30px;' +
+        'transition:border-color 200ms ease,background-color 200ms ease}' +
+      '.tt-mx__btn:hover{border-color:var(--panel-accent,var(--seg-accent))}' +
+      '.tt-mx__btn[aria-pressed="true"]{background:var(--panel-grad,var(--seg-grad));border-color:transparent;color:#fff}' +
+      '.tt-mx__btn:disabled{opacity:.38;cursor:not-allowed;text-decoration:line-through}' +
+      '.tt-mx__btn:focus-visible{outline:2px solid var(--panel-accent,var(--seg-accent));outline-offset:2px}' +
+      '.tt-mx__status{margin:8px 0 0;font-size:11.5px;color:var(--udx-text-muted)}' +
+      '.tt-mx__status b{color:var(--udx-text)}' +
+      '@media (prefers-reduced-motion: reduce){.tt-mx__btn{transition:none}}';
+    doc.head.appendChild(st);
+  }
+
   function boot() {
+    estilosMultiestilo();
     UI.montarEsqueleto();
     if (!UI.refs.board) { return; }
 
