@@ -513,6 +513,19 @@
 .page-perfil .pf-nivel[style*="--nv-grad"] .pf-nivel__trilho .xp{ background: var(--nv-grad); }
 .page-perfil .pf-prof .pf-nivel.is-aberto{ border-color: rgba(242, 116, 5, .40); }
 
+/* ---------------- Formação (Iniciante, Intermediário, Técnico) ---------------- */
+.page-perfil .pf-form{
+  background:
+    radial-gradient(520px 180px at 100% 0%, rgba(180, 75, 240, .12), transparent 70%),
+    var(--pf-surface);
+  border-color: rgba(180, 75, 240, .24);
+}
+.page-perfil .pf-form .pf-bloco__titulo .mdi{ color: #B44BF0; }
+.page-perfil .pf-form .pf-nivel.is-aberto{ border-color: rgba(180, 75, 240, .42); }
+
+.page-perfil .pf-rank__escopo{ margin: 0 0 12px; font-size: 12px; line-height: 1.5; color: var(--pf-muted); }
+.page-perfil .pf-rank__escopo b{ color: #fff; font-weight: 600; }
+
 /* ---------------- Insígnias (vitrine + detalhe) ---------------- */
 .page-perfil .pf-ins-bloco{
   background:

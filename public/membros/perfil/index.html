@@ -97,13 +97,22 @@
         </div>
       </section>
 
-      <!-- Seus níveis (interativo) -->
-      <section class="pf-bloco pf-niveis-bloco" id="blNiveis" aria-labelledby="tNiveis">
+      <!-- Fundamentos: trilha do Nível Free (porta de entrada) -->
+      <section class="pf-bloco pf-niveis-bloco pf-fund" id="blNiveis" aria-labelledby="tNiveis">
         <div class="pf-bloco__cab">
-          <h2 class="pf-bloco__titulo" id="tNiveis"><span class="mdi mdi-stairs-up" aria-hidden="true"></span>Seus níveis</h2>
+          <h2 class="pf-bloco__titulo" id="tNiveis"><span class="mdi mdi-sprout-outline" aria-hidden="true"></span>Fundamentos</h2>
         </div>
-        <p class="pf-sub">Trilhas de nível (Free, Iniciante, Intermediário e Técnico). Abra um nível para ver o progresso por card, a situação de cada desafio e sua posição no ranking do nível.</p>
+        <p class="pf-sub">A trilha do Nível Free, a porta de entrada da Up Dance. Abra o nível para ver o progresso por card, a situação de cada desafio e sua posição no ranking do nível.</p>
         <div id="pfNiveis"><div class="pf-esqueleto" style="height:120px"></div></div>
+      </section>
+
+      <!-- Formação: trilhas dos níveis Iniciante, Intermediário e Técnico -->
+      <section class="pf-bloco pf-niveis-bloco pf-form" id="blForm" aria-labelledby="tForm" hidden>
+        <div class="pf-bloco__cab">
+          <h2 class="pf-bloco__titulo" id="tForm"><span class="mdi mdi-school-outline" aria-hidden="true"></span>Formação<span class="pf-ins-cont" id="pfFormCont"></span></h2>
+        </div>
+        <p class="pf-sub">Sua formação técnica: as trilhas dos níveis Iniciante, Intermediário e Técnico. Cada nível tem cards, desafios, insígnia e ranking próprios.</p>
+        <div id="pfForm"></div>
       </section>
 
       <!-- Profissionalização: Árvores de Talentos do Estágio (separadas dos níveis) -->
@@ -137,8 +146,9 @@
               <input class="pf-busca" id="pfBusca" type="search" placeholder="Buscar desafio ou habilidade" autocomplete="off">
               <label class="pf-oculto" for="pfOrigem">Origem</label>
               <select class="pf-select" id="pfOrigem">
-                <option value="">Níveis e profissionalização</option>
-                <option value="trilha">Só níveis</option>
+                <option value="">Todas as origens</option>
+                <option value="fundamentos">Só Fundamentos</option>
+                <option value="formacao">Só Formação</option>
                 <option value="talentos">Só Profissionalização</option>
               </select>
             </div>
@@ -222,6 +232,7 @@
 
 <script src="/js/talentTree.data.js" defer></script>
 <script src="/js/reputacao.data.js" defer></script>
+<script src="/js/titulos.data.js" defer></script>
 <script src="/js/insignias.data.js" defer></script>
 <script src="/js/sprites.js" defer></script>
 <script src="/js/perfil.js" defer></script>

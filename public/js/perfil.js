@@ -27,6 +27,15 @@
   };
   var PAGINA_TALENTOS = '/membros/nivel-estagiario/arvore-de-talentos/';
 
+  /* Etapas da jornada: Fundamentos (Nível Free) → Formação (Iniciante,
+     Intermediário, Técnico) → Profissionalização (Árvores de Talentos).
+     A etapa sai do id da trilha; nada muda no banco. */
+  var FORMACAO = ['iniciante', 'intermediario', 'tecnico'];
+  function etapaDe(origem, grupo) {
+    if (origem === 'talentos') return 'talentos';
+    return FORMACAO.indexOf(grupo) !== -1 ? 'formacao' : 'fundamentos';
+  }
+
   /* Nomes das insígnias de trilha (dos módulos de dados; ini/int seguem o padrão). */
   var INSIGNIAS = {
     'fund-insignia': { nome: 'Fundamentos Concluídos',          icone: 'mdi-medal-outline' },
@@ -101,11 +110,13 @@
   function unidadeXp(origem) { return origem === 'talentos' ? 'XP' : 'XPE'; }
 
   /* ---------------- preferências (só neste navegador) ---------------- */
-  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '', nivel: '', prof: '', ins: '' };
+  var prefs = { aba: 'pendente', dias: 14, meta: 3, habOrdem: 'progresso', escopo: 'geral', evModo: '', nivel: '', form: '', prof: '', ins: '' };
   try { var salvo = JSON.parse(win.localStorage.getItem(CHAVE_PREFS) || 'null'); if (salvo) for (var k in salvo) prefs[k] = salvo[k]; } catch (e) {}
+  /* Antes da divisão Fundamentos/Formação, o nível aberto da Formação ficava em "nivel". */
+  if (/^trilha\|/.test(prefs.nivel || '') && etapaDe('trilha', prefs.nivel.split('|')[1]) === 'formacao') { prefs.form = prefs.form || prefs.nivel; prefs.nivel = ''; }
   function salvarPrefs() { try { win.localStorage.setItem(CHAVE_PREFS, JSON.stringify(prefs)); } catch (e) {} }
 
-  var estado = { dados: null, busca: '', origem: '', mostrar: 8, habTodas: false, evTodos: false, nv: { status: '', parte: '', mostrar: 6 }, pv: { status: '', parte: '', mostrar: 6 } };
+  var estado = { dados: null, busca: '', origem: '', mostrar: 8, habTodas: false, evTodos: false, nv: { status: '', parte: '', mostrar: 6 }, fv: { status: '', parte: '', mostrar: 6 }, pv: { status: '', parte: '', mostrar: 6 } };
 
   /* ================================================================
      DERIVAÇÕES — tudo calculado a partir da resposta da API
@@ -327,7 +338,7 @@
     var q = estado.busca.trim().toLowerCase();
     var itens = v.lista.filter(function (x) {
       if (x.status !== aba) return false;
-      if (estado.origem && x.origem !== estado.origem) return false;
+      if (estado.origem && etapaDe(x.origem, x.grupo) !== estado.origem) return false;
       if (q && (x.nome + ' ' + x.habNome + ' ' + rotuloGrupo(x.origem, x.grupo, d.nomes || {})).toLowerCase().indexOf(q) === -1) return false;
       return true;
     });
@@ -622,24 +633,31 @@
     return n;
   }
 
-  /* Duas seções usam o mesmo painel: "Seus níveis" (trilhas de nível) e
-     "Profissionalização" (Árvores de Talentos do Estágio). Cada uma lembra
-     o seu item aberto e tem filtros próprios. */
+  /* Três seções usam o mesmo painel, uma por etapa: "Fundamentos" (Nível Free),
+     "Formação" (Iniciante, Intermediário e Técnico) e "Profissionalização"
+     (Árvores de Talentos do Estágio). Cada uma lembra o seu item aberto e tem
+     filtros próprios. */
   var SECOES = {
-    pfNiveis: { origem: 'trilha',   pref: 'nivel', est: 'nv', bloco: '#blNiveis',
+    pfNiveis: { etapa: 'fundamentos', pref: 'nivel', est: 'nv', bloco: '#blNiveis',
                 vazio: 'Seus níveis aparecem aqui quando você começar uma trilha. <a href="/membros/">Escolher uma trilha</a>' },
-    pfProf:   { origem: 'talentos', pref: 'prof',  est: 'pv', bloco: '#blProf', vazio: '' }
+    pfForm:   { etapa: 'formacao',    pref: 'form',  est: 'fv', bloco: '#blForm', vazio: '' },
+    pfProf:   { etapa: 'talentos',    pref: 'prof',  est: 'pv', bloco: '#blProf', vazio: '' }
   };
   function itensDaSecao(id, d, v) {
-    return niveisDoMembro(d, v).filter(function (n) { return n.origem === SECOES[id].origem; });
+    return niveisDoMembro(d, v).filter(function (n) { return etapaDe(n.origem, n.grupo) === SECOES[id].etapa; });
   }
 
   function renderNiveis(d, v) {
-    var trilhas = itensDaSecao('pfNiveis', d, v), prof = itensDaSecao('pfProf', d, v);
-    /* Sem trilha e com árvores (estagiário que já passou pelos níveis): só a Profissionalização. */
-    $('#blNiveis').hidden = !trilhas.length && !!prof.length;
+    var fund = itensDaSecao('pfNiveis', d, v), form = itensDaSecao('pfForm', d, v), prof = itensDaSecao('pfProf', d, v);
+    /* Cada etapa aparece quando tem itens. Fundamentos guarda o aviso de "nenhuma
+       trilha" e só some quando outra etapa já tem conteúdo. */
+    $('#blNiveis').hidden = !fund.length && !!(form.length || prof.length);
+    $('#blForm').hidden = !form.length;
     $('#blProf').hidden = !prof.length;
-    renderSecao('pfNiveis', d, trilhas);
+    var concluidos = form.filter(function (n) { return n.insignia || n.pct >= 100; }).length;
+    $('#pfFormCont').textContent = form.length ? fmt(concluidos) + ' de ' + fmt(FORMACAO.length) + ' concluídos' : '';
+    renderSecao('pfNiveis', d, fund);
+    renderSecao('pfForm', d, form);
     renderSecao('pfProf', d, prof);
   }
 
@@ -670,7 +688,7 @@
       ? mini(Math.round(n.pct) + '%', 'do XPE do nível') +
         mini(fmt(n.cont.aprovado) + (n.total ? '<small> de ' + fmt(n.total) + '</small>' : ''), 'desafios aprovados') +
         mini(fmt(n.cont.pendente), 'aguardando validação') +
-        mini(rk && rk.pos ? rk.pos + 'º<small> de ' + fmt(rk.participantes) + '</small>' : '—', 'no ranking do nível')
+        mini(rk && rk.pos ? rk.pos + 'º<small> de ' + fmt(rk.participantes) + '</small>' : '—', 'no ranking do ' + n.nome)
       : mini(fmt(n.livres) + '<small> de ' + fmt(n.pontos) + '</small>', 'pontos de talento livres') +
         mini(fmt(n.dominadas) + '<small> de ' + fmt(n.totalHabs) + '</small>', 'habilidades dominadas') +
         mini(fmt(n.cont.aprovado) + (n.total ? '<small> de ' + fmt(n.total) + '</small>' : ''), 'desafios aprovados') +
@@ -769,15 +787,34 @@
   function renderRanking(d) {
     var rk = d.ranking, caixa = $('#pfRanking'), sel = $('#pfRankEscopo');
     if (!rk) { caixa.innerHTML = '<div class="pf-vazio">O ranking não pôde ser carregado agora.</div>'; sel.hidden = true; return; }
-    var ids = ['geral'].concat(Object.keys(TRILHAS).filter(function (k) { return rk[k]; }), rk.talentos ? ['talentos'] : []);
+    /* Um ranking por nível, agrupado pela etapa da jornada. */
+    var grupos = [
+      { rotulo: '',                   ids: ['geral'] },
+      { rotulo: 'Fundamentos',        ids: ['fundamentos'] },
+      { rotulo: 'Formação',           ids: FORMACAO },
+      { rotulo: 'Profissionalização', ids: ['talentos'] }
+    ].map(function (g) {
+      return { rotulo: g.rotulo, ids: g.ids.filter(function (k) { return k === 'geral' || rk[k]; }) };
+    }).filter(function (g) { return g.ids.length; });
+    var ids = [].concat.apply([], grupos.map(function (g) { return g.ids; }));
     if (ids.indexOf(prefs.escopo) === -1) prefs.escopo = 'geral';
-    sel.innerHTML = ids.map(function (id) { return '<option value="' + id + '"' + (id === prefs.escopo ? ' selected' : '') + '>' + esc(rotuloEscopo(id, d)) + '</option>'; }).join('');
+    var opcao = function (id) {
+      return '<option value="' + id + '"' + (id === prefs.escopo ? ' selected' : '') + '>' +
+        esc(id === 'talentos' ? 'Árvores de Talentos' : rotuloEscopo(id, d)) + '</option>';
+    };
+    sel.innerHTML = grupos.map(function (g) {
+      return g.rotulo ? '<optgroup label="' + esc(g.rotulo) + '">' + g.ids.map(opcao).join('') + '</optgroup>' : g.ids.map(opcao).join('');
+    }).join('');
     sel.hidden = ids.length < 2;
+    var etapaRk = prefs.escopo === 'geral' ? '' : { fundamentos: 'Fundamentos', formacao: 'Formação', talentos: 'Profissionalização' }[etapaDe(prefs.escopo === 'talentos' ? 'talentos' : 'trilha', prefs.escopo)];
 
     var r = rk[prefs.escopo] || { participantes: 0, xp: 0, pos: null, faltam: 0, top: [] };
     var un = prefs.escopo === 'talentos' ? 'XP' : prefs.escopo === 'geral' ? 'XP' : 'XPE';
     var lider = (r.top[0] && r.top[0].xp) || 1;
-    var html = '';
+    var html = '<p class="pf-rank__escopo">' + (prefs.escopo === 'geral'
+      ? 'Ranking geral: todo o XP aprovado nas trilhas de nível e nas Árvores de Talentos.'
+      : '<b>' + esc(etapaRk) + '</b> · ' + esc(prefs.escopo === 'talentos' ? 'Árvores de Talentos' : rotuloEscopo(prefs.escopo, d)) +
+        ': conta só o ' + un + ' aprovado ' + (prefs.escopo === 'talentos' ? 'nas árvores' : 'neste nível') + '.') + '</p>';
     if (r.pos) {
       html += '<div class="pf-rank__pos"><b>' + r.pos + 'º</b><span>de ' + plural(r.participantes, 'membro com pontuação', 'membros com pontuação') + '</span></div>' +
         '<p class="pf-rank__dica">' + (r.pos === 1 ? 'Você lidera este ranking.' : 'Faltam <b>' + fmt(r.faltam) + ' ' + un + '</b> para subir uma posição.') + '</p>';
