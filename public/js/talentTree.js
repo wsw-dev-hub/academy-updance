@@ -93,7 +93,8 @@
         xp:          xp,
         desafios:    [],
         titulos:     [],
-        envios:      {},      // multiestilo: { 'mx-cad-1': { status, estilos: [] } }
+        envios:      {},      // multiestilo: { 'mx-cad-1': { status, estilos: [], nota } }
+        repTitulos:  [],      // ids de talent_rep_titulos (ex.: 'trans-cadencias-2')
         paginaAtual: 1,
         paginas:     [{ id: 1, nome: 'Plano 01', alocacao: {} }]
       };
@@ -115,10 +116,12 @@
           var e = bruto.envios[id] || {};
           base.envios[id] = {
             status:  String(e.status || ''),
-            estilos: Array.isArray(e.estilos) ? e.estilos.filter(function (x) { return NOME_ESTILO[x]; }) : []
+            estilos: Array.isArray(e.estilos) ? e.estilos.filter(function (x) { return NOME_ESTILO[x]; }) : [],
+            nota:    (typeof e.nota === 'number') ? e.nota : null
           };
         });
       }
+      base.repTitulos = Array.isArray(bruto.repTitulos) ? bruto.repTitulos.map(String) : [];
 
       if (Array.isArray(bruto.paginas) && bruto.paginas.length) {
         base.paginas = bruto.paginas.slice(0, MAX_PAGINAS).map(function (pg, i) {
@@ -196,6 +199,9 @@
   /* ============================================================
      2) REGRAS — o coração do sistema
   ============================================================ */
+  /* Títulos de carreira e transversais não recebem pontos. */
+  function naoInvestivel(h) { return !!h && (h.tipo === 'titulo' || h.tipo === 'transversal'); }
+
   var Regras = {
 
     /* XP acumulado do perfil, derivado dos desafios concluídos */
@@ -213,7 +219,7 @@
       var total = 0;
       Object.keys(aloc).forEach(function (id) {
         var h = DADOS.indice[id];
-        if (h && h.perfilId === perfilId && h.tipo !== 'titulo') {
+        if (h && h.perfilId === perfilId && !naoInvestivel(h)) {
           total += aloc[id];
         }
       });
@@ -277,7 +283,7 @@
     },
 
     podeInvestir: function (hab) {
-      if (hab.tipo === 'titulo') { return false; }
+      if (naoInvestivel(hab)) { return false; }
       var aloc = Estado.alocacao();
       if ((aloc[hab.id] || 0) >= hab.ranksMax) { return false; }
       if (Regras.pontosDisponiveis(hab.perfilId, aloc) <= 0) { return false; }
@@ -299,6 +305,10 @@
 
     /* Estado visual do nó */
     estadoDoNo: function (hab) {
+      if (hab.tipo === 'transversal') {
+        var tt = UI.tierConquistado(hab.titulo);
+        return tt >= hab.ranksMax ? 'maxed' : (tt > 0 ? 'ranked' : 'locked');
+      }
       var r = Estado.rank(hab.id);
       if (hab.tipo === 'titulo') {
         return Regras.tituloDesbloqueado(hab) ? 'maxed' : 'locked';
@@ -508,7 +518,8 @@
       canvas.appendChild(svg);
 
       perfil.tiers.forEach(function (t) {
-        var habs = perfil.habilidades.filter(function (h) { return h.tier === t.n; });
+        var habs = perfil.habilidades.filter(function (h) { return h.tier === t.n; })
+          .sort(function (a, b) { return a.col - b.col; });   // ordem da grade = ordem das colunas
         if (!habs.length) { return; }
 
         var aberto = Regras.tierLiberado(perfil, t.n);
@@ -542,15 +553,21 @@
       var estado = Regras.estadoDoNo(hab);
       var rank   = Estado.rank(hab.id);
 
+      var trans = hab.tipo === 'transversal';
+      if (trans) { rank = UI.tierConquistado(hab.titulo); }
       var btn = el('button', 'tt-node is-' + estado +
-        (hab.tipo === 'titulo' ? ' tt-node--titulo' : ''));
+        (hab.tipo === 'titulo' ? ' tt-node--titulo' : '') + (trans ? ' tt-node--trans' : ''));
       btn.type = 'button';
       btn.setAttribute('data-hab', hab.id);
-      btn.setAttribute('aria-label', hab.nome + ' — nível ' + rank + ' de ' + hab.ranksMax);
-      btn.innerHTML = '<span class="mdi ' + hab.icone + '"></span>' +
+      btn.setAttribute('aria-label', trans
+        ? hab.nome + ' — título transversal, ' + (rank ? 'tier ' + ['', 'I', 'II', 'III'][rank] : 'bloqueado')
+        : hab.nome + ' — nível ' + rank + ' de ' + hab.ranksMax);
+      btn.innerHTML = '<span class="mdi ' + (trans && !rank ? 'mdi-lock-outline' : hab.icone) + '"></span>' +
         (hab.tipo === 'titulo'
           ? ''
-          : '<span class="tt-node__rank">' + rank + '/' + hab.ranksMax + '</span>');
+          : trans
+            ? '<span class="tt-node__rank">' + (rank ? ['', 'I', 'II', 'III'][rank] : '—') + '</span>'
+            : '<span class="tt-node__rank">' + rank + '/' + hab.ranksMax + '</span>');
 
       var label = el('span', 'tt-node__label', escapar(hab.nome));
 
@@ -626,6 +643,8 @@
       var perfil = perfilPorId(hab.perfilId);
       var rank   = Estado.rank(hab.id);
 
+      if (hab.tipo === 'transversal') { UI.renderPanelTransversal(p, hab, perfil); return; }
+
       p.style.setProperty('--panel-grad',   UI.gradienteDe(perfil.id));
       p.style.setProperty('--panel-accent', UI.acentoDe(perfil.id));
       p.style.setProperty('--panel-glow',   UI.glowDe(perfil.id));
@@ -679,6 +698,60 @@
       });
       html += '</ul>';
 
+      p.innerHTML = html;
+    },
+
+    /* ---------- nó transversal (tier por notas) ---------- */
+    desafiosDoGrupo: function (hab) {
+      var origem = DADOS.indice[(hab.requer || [])[0]];
+      return origem ? origem.desafios.filter(function (d) { return d.multi === hab.grupo; }) : [];
+    },
+
+    progressoTransversal: function (hab) {
+      var tier = UI.tierConquistado(hab.titulo);
+      var ling = UI.linguagensDoGrupo(hab.grupo);
+      var rom  = ['', 'I', 'II', 'III'];
+      var html = '<div class="tt-trans__ling" aria-label="Linguagens">' + MULTI.estilos.map(function (e) {
+        var l = ling[e.id];
+        var cls = !l ? '' : l.status === 'aprovado' ? ' is-ok' : ' is-pend';
+        var txt = !l ? '' : l.status === 'aprovado' ? (l.nota != null ? ' · ' + l.nota : ' · sem nota') : ' · em validação';
+        return '<span class="tt-trans__l' + cls + '">' + escapar(e.nome) + txt + '</span>';
+      }).join('') + '</div>';
+      var prox = null;
+      MULTI.tiers.forEach(function (tt) { if (!prox && tt.n > tier) { prox = tt; } });
+      if (prox) {
+        var tem = Object.keys(ling).filter(function (x) {
+          return ling[x].status === 'aprovado' && ling[x].nota != null && ling[x].nota > prox.notaAcima;
+        }).length;
+        html += '<p class="tt-trans__prox">Próximo: <b>tier ' + rom[prox.n] + '</b>, ' + prox.estilos +
+          ' linguagens com nota acima de ' + prox.notaAcima + ' (você tem ' + tem + ').</p>';
+      } else {
+        html += '<p class="tt-trans__prox"><b>Tier máximo conquistado.</b></p>';
+      }
+      return html;
+    },
+
+    renderPanelTransversal: function (p, hab, perfil) {
+      var tier = UI.tierConquistado(hab.titulo);
+      var rom  = ['', 'I', 'II', 'III'];
+      p.style.setProperty('--panel-grad',   UI.gradienteDe(perfil.id));
+      p.style.setProperty('--panel-accent', UI.acentoDe(perfil.id));
+      p.style.setProperty('--panel-glow',   UI.glowDe(perfil.id));
+      p.style.setProperty('--trans-cor',    UI.acentoDe(perfil.id));
+      var html =
+        '<div class="tt-panel__head">' +
+          '<span class="tt-panel__icon"><span class="mdi ' + hab.icone + '"></span></span>' +
+          '<div class="tt-panel__title">' +
+            '<span>' + escapar(perfil.nome) + ' &middot; Título transversal</span>' +
+            '<h3>' + escapar(hab.nome) + (hab.nomeF && hab.nomeF !== hab.nome ? ' / ' + escapar(hab.nomeF) : '') + '</h3>' +
+          '</div>' +
+          '<span class="tt-chip"><span class="mdi ' + (tier ? 'mdi-shield-star' : 'mdi-lock-outline') + '"></span>' +
+            (tier ? 'Tier ' + rom[tier] : 'Bloqueado') + '</span>' +
+        '</div>' +
+        '<p class="tt-trans__desc" style="margin:0 0 10px">' + escapar(hab.resumo) +
+          ' Sobe de tier pelas notas das vagas abaixo; não recebe pontos.</p>' +
+        '<div class="tt-trans__painel">' + UI.progressoTransversal(hab) + '</div>' +
+        '<ul class="tt-challenges">' + UI.desafiosDoGrupo(hab).map(function (d) { return UI.itemMultiestilo(d); }).join('') + '</ul>';
       p.innerHTML = html;
     },
 
@@ -796,6 +869,121 @@
       });
     },
 
+    /* ---------- títulos transversais (catálogo em /js/titulos.data.js) ---------- */
+    transCaixa: function () {
+      var c = $('#ttTransTitles');
+      if (c || !UI.refs.titles) { return c; }
+      c = el('div', 'tt-trans');
+      c.id = 'ttTransTitles';
+      c.innerHTML =
+        '<div class="tt-trans__head">' +
+          '<h3><span class="mdi mdi-shield-star-outline" aria-hidden="true"></span>Títulos transversais de desempenho</h3>' +
+          '<p>Vêm das avaliações de desempenho e cruzam perfis. Os títulos multiestilo estão nas árvores, ' +
+          'na faixa Título, ao lado do título de carreira.</p>' +
+        '</div>' +
+        '<ul class="tt-titles tt-trans__lista" id="ttTransList"></ul>';
+      UI.refs.titles.parentNode.insertBefore(c, UI.refs.titles.nextSibling);
+      return c;
+    },
+
+    /* Maior tier conquistado de um título (ids '<id>-<n>' ou o id puro = conquistado). */
+    tierConquistado: function (id) {
+      var max = 0;
+      Estado.dados.repTitulos.forEach(function (t) {
+        if (t === id) { max = Math.max(max, 3); return; }
+        var m = /^(.*)-([123])$/.exec(t);
+        if (m && m[1] === id) { max = Math.max(max, Number(m[2])); }
+      });
+      return max;
+    },
+
+    /* Linguagens de um grupo multiestilo: { pop: { nota, status } } — melhor envio por linguagem. */
+    linguagensDoGrupo: function (grupo) {
+      var out = {};
+      Object.keys(Estado.dados.envios).forEach(function (id) {
+        if (id.indexOf('mx-' + grupo + '-') !== 0) { return; }
+        var e = Estado.dados.envios[id];
+        if (e.status !== 'aprovado' && e.status !== 'pendente') { return; }
+        e.estilos.forEach(function (x) {
+          var atual = out[x];
+          var novo = { status: e.status, nota: e.status === 'aprovado' ? e.nota : null };
+          if (!atual || (novo.status === 'aprovado' && (atual.status !== 'aprovado' || (novo.nota || 0) > (atual.nota || 0)))) {
+            out[x] = novo;
+          }
+        });
+      });
+      return out;
+    },
+
+    renderTransversais: function () {
+      var T = win.UDX_TITULOS;
+      var caixa = UI.transCaixa();
+      if (!caixa) { return; }
+      var lista = $('#ttTransList', caixa);
+      if (!T || !T.transversais) {
+        lista.innerHTML = '<li class="tt-trans__vazio">' + (UI.catalogoTitulosFalhou
+          ? 'Não foi possível carregar os títulos transversais agora.'
+          : 'Carregando os títulos transversais…') + '</li>';
+        return;
+      }
+      var grupoDoTitulo = {};
+      Object.keys(MULTI.grupos).forEach(function (gid) { grupoDoTitulo[MULTI.grupos[gid].titulo] = gid; });
+      var rom = ['', 'I', 'II', 'III'];
+      /* Os multiestilo já são nós das árvores (faixa 5): aqui ficam só os demais. */
+      var naArvore = {};
+      Object.keys(DADOS.indice).forEach(function (id) {
+        var h = DADOS.indice[id];
+        if (h.tipo === 'transversal' && h.titulo) { naArvore[h.titulo] = true; }
+      });
+
+      lista.innerHTML = T.transversais.filter(function (t) { return !naArvore[t.id]; }).map(function (t) {
+        var tier = UI.tierConquistado(t.id);
+        var nomes = escapar(t.nome) + (t.nomeF && t.nomeF !== t.nome ? ' <small>/ ' + escapar(t.nomeF) + '</small>' : '');
+        var head =
+          '<div class="tt-trans__topo">' +
+            '<span class="tt-title-card__icon"><span class="mdi ' + escapar(tier ? t.icone : 'mdi-lock-outline') + '"></span></span>' +
+            '<div class="tt-title-card__body"><b>' + nomes + (tier ? ' ' + rom[tier] : '') + '</b>' +
+              '<span>' + escapar(t.escopo || '') + '</span></div>' +
+            '<span class="tt-trans__chip' + (tier ? ' is-ok' : '') + '">' + (tier ? 'Tier ' + rom[tier] : 'Bloqueado') + '</span>' +
+          '</div>' +
+          '<p class="tt-trans__desc">' + escapar(t.desc || '') + '</p>';
+
+        var corpo = '';
+        var gid = grupoDoTitulo[t.id];
+        if (t.multiestilo && gid) {
+          var ling = UI.linguagensDoGrupo(gid);
+          corpo += '<div class="tt-trans__ling" aria-label="Linguagens">' + MULTI.estilos.map(function (e) {
+            var l = ling[e.id];
+            var cls = !l ? '' : l.status === 'aprovado' ? ' is-ok' : ' is-pend';
+            var txt = !l ? '' : l.status === 'aprovado' ? (l.nota != null ? ' · ' + l.nota : ' · sem nota') : ' · em validação';
+            return '<span class="tt-trans__l' + cls + '">' + escapar(e.nome) + txt + '</span>';
+          }).join('') + '</div>';
+          var prox = null;
+          MULTI.tiers.forEach(function (tt) { if (!prox && tt.n > tier) { prox = tt; } });
+          if (prox) {
+            var tem = Object.keys(ling).filter(function (x) {
+              return ling[x].status === 'aprovado' && ling[x].nota != null && ling[x].nota > prox.notaAcima;
+            }).length;
+            corpo += '<p class="tt-trans__prox">Próximo: <b>tier ' + rom[prox.n] + '</b>, ' + prox.estilos +
+              ' linguagens com nota acima de ' + prox.notaAcima + ' (você tem ' + tem + ').</p>';
+          } else {
+            corpo += '<p class="tt-trans__prox"><b>Tier máximo conquistado.</b></p>';
+          }
+          var hab = DADOS.indice[t.habilidadeArvore];
+          if (hab) {
+            corpo += '<button type="button" class="tt-trans__ir" data-trans-hab="' + escapar(hab.id) + '">' +
+              '<span class="mdi mdi-flag-checkered" aria-hidden="true"></span>Desafios em ' + escapar(hab.nome) + '</button>';
+          }
+        } else {
+          corpo += '<ol class="tt-trans__tiers">' + (t.tiers || []).map(function (tt) {
+            return '<li' + (tier >= tt.n ? ' class="is-ok"' : '') + '><b>' + rom[tt.n] + '</b>' + escapar(tt.regra) + '</li>';
+          }).join('') + '</ol>';
+        }
+        return '<li class="tt-title-card tt-trans__card' + (tier ? '' : ' is-locked') + '" style="--trans-cor:' + escapar(t.cor || '#FA33A1') + '">' +
+          head + corpo + '</li>';
+      }).join('');
+    },
+
     /* ---------- barra de status ---------- */
     renderStatus: function () {
       var s = UI.refs.status;
@@ -816,6 +1004,7 @@
       UI.renderBoard();
       UI.renderPanel();
       UI.renderTitles();
+      UI.renderTransversais();
       UI.renderStatus();
       win.requestAnimationFrame(UI.desenharConectores);
     },
@@ -830,6 +1019,29 @@
 
       tip.style.setProperty('--tip-grad',   UI.gradienteDe(perfil.id));
       tip.style.setProperty('--tip-accent', UI.acentoDe(perfil.id));
+
+      if (hab.tipo === 'transversal') {
+        var tierT = UI.tierConquistado(hab.titulo), romT = ['', 'I', 'II', 'III'];
+        var htmlT =
+          '<div class="tt-tip__head">' +
+            '<span class="tt-tip__icon"><span class="mdi ' + hab.icone + '"></span></span>' +
+            '<div><h4 class="tt-tip__name">' + escapar(hab.nome) + '</h4>' +
+              '<span class="tt-tip__tier">' + escapar(perfil.nome) + ' &middot; Título transversal</span></div>' +
+            '<span class="tt-tip__rank">' + (tierT ? 'TIER ' + romT[tierT] : 'BLOQUEADO') + '</span>' +
+          '</div>' +
+          '<p class="tt-tip__resumo">' + escapar(hab.resumo) + '</p>';
+        hab.niveis.forEach(function (n, i) {
+          htmlT += '<p class="tt-tip__nivel' + (i + 1 > tierT ? ' tt-tip__nivel--next' : '') + '"><b>' +
+            (i + 1 <= tierT ? 'Conquistado' : 'A conquistar') + '</b>' + escapar(n) + '</p>';
+        });
+        htmlT += UI.progressoTransversal(hab) +
+          '<p class="tt-tip__hint">Sobe de tier pelas notas dos desafios; não recebe pontos. Clique no nó para abrir as vagas.</p>';
+        tip.innerHTML = htmlT;
+        tip.classList.add('is-open');
+        tip.setAttribute('aria-hidden', 'false');
+        UI.posicionarTip(alvo);
+        return;
+      }
 
       var html =
         '<div class="tt-tip__head">' +
@@ -947,6 +1159,7 @@
   var Acoes = {
 
     investir: function (hab) {
+      if (hab.tipo === 'transversal') { return; }      // sobe por notas; o clique só abre o painel
       if (hab.tipo === 'titulo') {
         UI.toast('Títulos não recebem pontos — são liberados ao completar a faixa.', true);
         return;
@@ -1201,6 +1414,20 @@
       Acoes.enviarDesafio(b.getAttribute('data-desafio'));
     });
 
+    /* --- títulos transversais: abrir os desafios da habilidade --- */
+    doc.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-trans-hab]');
+      if (!b) { return; }
+      var hab = DADOS.indice[b.getAttribute('data-trans-hab')];
+      if (!hab) { return; }
+      UI.habSelecionada = hab.id;
+      UI.perfilVisivel = hab.perfilId;
+      UI.renderTabs();
+      UI.aplicarVisibilidade();
+      UI.renderPanel();
+      UI.irParaDesafios();
+    });
+
     /* --- barra de ações --- */
     if (UI.refs.btnSave) { UI.refs.btnSave.addEventListener('click', Acoes.salvar); }
     if (UI.refs.btnUndo) { UI.refs.btnUndo.addEventListener('click', Acoes.reverter); }
@@ -1254,12 +1481,73 @@
       '.tt-mx__btn:focus-visible{outline:2px solid var(--panel-accent,var(--seg-accent));outline-offset:2px}' +
       '.tt-mx__status{margin:8px 0 0;font-size:11.5px;color:var(--udx-text-muted)}' +
       '.tt-mx__status b{color:var(--udx-text)}' +
+      '.tt-node--trans{border-radius:50%}' +
+      '.tt-node--trans.is-locked{cursor:pointer}' +
+      '.tt-node--trans.is-ranked,.tt-node--trans.is-maxed{background:var(--p-grad);color:#fff;border-color:transparent}' +
+      '.tt-node--trans .tt-node__rank{min-width:24px}' +
+      '.tt-legend__dot--trans{border-radius:50%;background:var(--seg-grad);border-color:transparent}' +
+      '.tt-trans__painel{display:grid;gap:8px;margin:0 0 14px;padding:12px;border-radius:12px;' +
+        'background:rgba(2,2,26,.55);border:1px solid var(--udx-border)}' +
+      '.tt-trans{margin-top:34px}' +
+      '.tt-trans__head h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:1.05rem;color:var(--udx-text)}' +
+      '.tt-trans__head p{margin:0 0 14px;font-size:12.5px;line-height:1.55;color:var(--udx-text-muted);max-width:720px}' +
+      '.tt-trans__card{display:grid;gap:10px;align-content:start;align-items:stretch}' +
+      '.tt-trans__card.is-locked{opacity:1}' +
+      '.tt-trans__card.is-locked .tt-trans__topo{opacity:.8}' +
+      '.tt-trans__card:not(.is-locked){border-color:var(--trans-cor)}' +
+      '.tt-trans__card:not(.is-locked) .tt-title-card__icon{background:var(--trans-cor);box-shadow:none}' +
+      '.tt-trans__topo{display:flex;align-items:center;gap:12px}' +
+      '.tt-trans__topo small{font-weight:600;color:var(--udx-text-muted)}' +
+      '.tt-trans__chip{flex-shrink:0;padding:3px 10px;border-radius:50px;font-size:10.5px;font-weight:700;' +
+        'border:1px solid var(--udx-border);color:var(--udx-text-muted)}' +
+      '.tt-trans__chip.is-ok{background:var(--trans-cor);border-color:transparent;color:#fff}' +
+      '.tt-trans__desc{margin:0;font-size:12px;line-height:1.5;color:var(--udx-text-muted)}' +
+      '.tt-trans__ling{display:flex;flex-wrap:wrap;gap:6px}' +
+      '.tt-trans__l{padding:3px 9px;border-radius:50px;font-size:10.5px;font-weight:700;border:1px dashed var(--udx-border);color:var(--udx-text-muted)}' +
+      '.tt-trans__l.is-ok{border-style:solid;border-color:var(--trans-cor);color:var(--udx-text)}' +
+      '.tt-trans__l.is-pend{border-style:solid;color:var(--udx-text)}' +
+      '.tt-trans__prox{margin:0;font-size:11.5px;color:var(--udx-text-muted)}' +
+      '.tt-trans__prox b{color:var(--udx-text)}' +
+      '.tt-trans__tiers{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:11.5px;color:var(--udx-text-muted)}' +
+      '.tt-trans__tiers b{display:inline-block;min-width:26px;color:var(--udx-text)}' +
+      '.tt-trans__tiers li.is-ok{color:var(--udx-text)}' +
+      '.tt-trans__ir{justify-self:start;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:50px;' +
+        'border:1px solid rgba(223,224,242,.28);background:rgba(255,255,255,.03);color:var(--udx-text);' +
+        'font-family:var(--udx-font);font-size:11.5px;font-weight:700;cursor:pointer;min-height:34px}' +
+      '.tt-trans__ir:hover{border-color:var(--trans-cor)}' +
+      '.tt-trans__ir:focus-visible{outline:2px solid var(--trans-cor);outline-offset:2px}' +
+      '.tt-trans__vazio{font-size:12.5px;color:var(--udx-text-muted)}' +
+      '@media (min-width:768px){.tt-trans__lista{grid-template-columns:repeat(2,minmax(0,1fr))}}' +
+      '@media (min-width:1200px){.tt-trans__lista{grid-template-columns:repeat(3,minmax(0,1fr))}}' +
       '@media (prefers-reduced-motion: reduce){.tt-mx__btn{transition:none}}';
     doc.head.appendChild(st);
   }
 
+  /* Catálogo dos títulos transversais: carregado aqui para não exigir mudança no HTML. */
+  function carregarCatalogoTitulos() {
+    if (win.UDX_TITULOS || doc.getElementById('tt-titulos-js')) { return; }
+    var s = doc.createElement('script');
+    s.id = 'tt-titulos-js';
+    s.src = '/js/titulos.data.js';
+    s.onload = function () { if (Estado.dados) { UI.renderTransversais(); } };
+    s.onerror = function () {
+      UI.catalogoTitulosFalhou = true;
+      if (Estado.dados) { UI.renderTransversais(); }
+    };
+    doc.head.appendChild(s);
+  }
+
+  function legendaTransversal() {
+    var leg = doc.querySelector('.tt-legend');
+    if (!leg || leg.querySelector('.tt-legend__dot--trans')) { return; }
+    var item = el('span', 'tt-legend__item', '<span class="tt-legend__dot tt-legend__dot--trans"></span> Transversal (tier por notas)');
+    leg.appendChild(item);
+  }
+
   function boot() {
     estilosMultiestilo();
+    legendaTransversal();
+    carregarCatalogoTitulos();
     UI.montarEsqueleto();
     if (!UI.refs.board) { return; }
 

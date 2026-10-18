@@ -584,7 +584,7 @@
       var TAL = win.UDX_TALENTOS, perfil = null;
       ((TAL && TAL.perfis) || []).forEach(function (p) { if (p.id === grupo) perfil = p; });
       var aloc = (d.plano && d.plano.alocacao) || {};
-      var habs = perfil ? perfil.habilidades.filter(function (h) { return h.tipo !== 'titulo'; }) : [];
+      var habs = perfil ? perfil.habilidades.filter(function (h) { return h.tipo !== 'titulo' && h.tipo !== 'transversal'; }) : [];
       var gastos = habs.reduce(function (s2, h) { return s2 + Math.min(Number(aloc[h.id]) || 0, h.ranksMax); }, 0);
       var dominadas = habs.filter(function (h) { return (Number(aloc[h.id]) || 0) >= h.ranksMax; }).length;
       var tiers = perfil ? perfil.tiers.slice().sort(function (a, b) { return a.n - b.n; }) : [];
@@ -923,7 +923,7 @@
         } else if (estag && perfis.length) {
           var aloc = (d.plano && d.plano.alocacao) || {}, melhor = null;
           perfis.forEach(function (p) {
-            var habs = p.habilidades.filter(function (h) { return h.tipo !== 'titulo'; });
+            var habs = p.habilidades.filter(function (h) { return h.tipo !== 'titulo' && h.tipo !== 'transversal'; });
             var titH = p.habilidades.filter(function (h) { return h.tipo === 'titulo'; })[0];
             var faixa = titH ? p.tiers.filter(function (t) { return t.n === titH.tier; })[0] : null;
             var req = (faixa && faixa.requisito) || 0;

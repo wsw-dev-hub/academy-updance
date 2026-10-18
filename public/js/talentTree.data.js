@@ -15,7 +15,9 @@
  *  habilidade.col ......... coluna 1..3 dentro da faixa (grid da árvore)
  *  habilidade.ranksMax .... quantos pontos cabem na habilidade
  *  habilidade.requer ...... ids que precisam estar no rank MÁXIMO
- *  habilidade.tipo ........ 'habilidade' (padrão) | 'titulo'
+ *  habilidade.tipo ........ 'habilidade' (padrão) | 'titulo' | 'transversal'
+ *                           transversal: título que sobe de tier pelas notas dos
+ *                           desafios multiestilo (grupo); não recebe pontos.
  *  desafio.tipo ........... 'tarefa' | 'atividade' | 'evento'
  *  desafio.xp ............. experiência ESPECÍFICA do perfil
  *  desafio.multi .......... grupo multiestilo (ver T.multiestilo)
@@ -32,7 +34,7 @@
 
   var T = {
 
-    versao:      '1.1.0',
+    versao:      '1.2.0',
     xpPorPonto:  100,
 
     /* Acesso: árvores do nível Estagiário — exclusivas do tipo 'Estagiário(a)'.
@@ -335,7 +337,6 @@
             id: 'bal-multi', tier: 4, col: 2, ranksMax: 3,
             nome: 'Repertório Multiestilo', icone: 'mdi-earth',
             resumo: 'Dançar com propriedade nas cinco linguagens da Up Dance: Hip Hop Dance, Popping, Locking, Breaking e House.',
-            requer: ['bal-cena', 'bal-solo'],
             niveis: [
               'Sustenta solo técnico em 2 linguagens com a musicalidade de cada uma.',
               'Sustenta solo técnico em 3 linguagens e funde duas delas numa coreografia.',
@@ -369,13 +370,41 @@
             ]
           },
 
+          /* ---------- FAIXA 5 · TRANSVERSAIS MULTIESTILO (sobem por notas, não recebem pontos) ---------- */
+          {
+            id: 'bal-tr-cad', tier: 5, col: 1, tipo: 'transversal', ranksMax: 3,
+            nome: 'Mestre das Cadências', nomeF: 'Mestra das Cadências', icone: 'mdi-metronome',
+            titulo: 'trans-cadencias', grupo: 'cad',
+            resumo: 'Domínio técnico de verdade em linguagens diferentes: cada estilo com a sua cadência.',
+            requer: ['bal-multi'],
+            niveis: [
+              'Tier I: 2 linguagens diferentes com nota acima de 80 em "Solo técnico".',
+              'Tier II: 3 linguagens diferentes com nota acima de 85 em "Solo técnico".',
+              'Tier III: 5 linguagens diferentes com nota acima de 90 em "Solo técnico".'
+            ],
+            desafios: []      // usa as vagas do grupo em bal-multi
+          },
+          {
+            id: 'bal-tr-ling', tier: 5, col: 3, tipo: 'transversal', ranksMax: 3,
+            nome: 'Oráculo das Linguagens', nomeF: 'Oráculo das Linguagens', icone: 'mdi-eye-circle-outline',
+            titulo: 'trans-linguagens', grupo: 'ling',
+            resumo: 'Funde linguagens numa mesma coreografia sem apagar a assinatura de nenhuma delas.',
+            requer: ['bal-multi'],
+            niveis: [
+              'Tier I: 2 linguagens diferentes com nota acima de 80 em "Coreografia de fusão".',
+              'Tier II: 3 linguagens diferentes com nota acima de 85 em "Coreografia de fusão".',
+              'Tier III: 5 linguagens diferentes com nota acima de 90 em "Coreografia de fusão".'
+            ],
+            desafios: []      // usa as vagas do grupo em bal-multi
+          },
+
           /* ---------------- TÍTULO ---------------- */
           {
             id: 'bal-titulo', tier: 5, col: 2, tipo: 'titulo', ranksMax: 1,
             nome: 'Bailarino(a) de Companhia', icone: 'mdi-trophy-variant',
             resumo: 'Título concedido a quem domina corpo, repertório, coletivo e cena. ' +
                     'Habilita audição interna para o elenco fixo da Up Dance.',
-            requer: ['bal-cena', 'bal-multi', 'bal-solo'],
+            requer: ['bal-cena', 'bal-solo'],
             niveis: ['Título conquistado — audição para elenco fixo liberada.'],
             desafios: [
               { id: 'bal-tit-d1', tipo: 'evento', xp: 0,
@@ -641,7 +670,6 @@
             id: 'prof-multi', tier: 4, col: 2, ranksMax: 3,
             nome: 'Didática Multiestilo', icone: 'mdi-translate',
             resumo: 'Ensinar e contar a história de cada linguagem com a mesma segurança.',
-            requer: ['prof-turma-propria', 'prof-workshop'],
             niveis: [
               'Conduz aula e apresenta as raízes de 2 linguagens.',
               'Conduz aula e apresenta as raízes de 3 linguagens.',
@@ -681,13 +709,41 @@
             ]
           },
 
+          /* ---------- FAIXA 5 · TRANSVERSAIS MULTIESTILO (sobem por notas, não recebem pontos) ---------- */
+          {
+            id: 'prof-tr-dia', tier: 5, col: 1, tipo: 'transversal', ranksMax: 3,
+            nome: 'Guardião dos Dialetos Urbanos', nomeF: 'Guardiã dos Dialetos Urbanos', icone: 'mdi-translate',
+            titulo: 'trans-dialetos', grupo: 'dia',
+            resumo: 'Ensina cada linguagem com a mesma segurança, do vocabulário à musicalidade.',
+            requer: ['prof-multi'],
+            niveis: [
+              'Tier I: 2 linguagens diferentes com nota acima de 80 em "Aula".',
+              'Tier II: 3 linguagens diferentes com nota acima de 85 em "Aula".',
+              'Tier III: 5 linguagens diferentes com nota acima de 90 em "Aula".'
+            ],
+            desafios: []      // usa as vagas do grupo em prof-multi
+          },
+          {
+            id: 'prof-tr-cro', tier: 5, col: 3, tipo: 'transversal', ranksMax: 3,
+            nome: 'Cronista das Cinco Escolas', nomeF: 'Cronista das Cinco Escolas', icone: 'mdi-book-open-page-variant-outline',
+            titulo: 'trans-cronista', grupo: 'cro',
+            resumo: 'Conhece e conta a origem, os pioneiros e os fundamentos das cinco escolas.',
+            requer: ['prof-multi'],
+            niveis: [
+              'Tier I: 2 linguagens diferentes com nota acima de 80 em "Seminário de raízes".',
+              'Tier II: 3 linguagens diferentes com nota acima de 85 em "Seminário de raízes".',
+              'Tier III: 5 linguagens diferentes com nota acima de 90 em "Seminário de raízes".'
+            ],
+            desafios: []      // usa as vagas do grupo em prof-multi
+          },
+
           /* ---------------- TÍTULO ---------------- */
           {
             id: 'prof-titulo', tier: 5, col: 2, tipo: 'titulo', ranksMax: 1,
             nome: 'Professor(a) Certificado(a)', icone: 'mdi-certificate-outline',
             resumo: 'Título concedido a quem planeja, conduz, adapta e avalia com autonomia. ' +
                     'Habilita a solicitação do tipo de membro Professor(a).',
-            requer: ['prof-turma-propria', 'prof-multi', 'prof-workshop'],
+            requer: ['prof-turma-propria', 'prof-workshop'],
             niveis: ['Título conquistado — solicitação de credencial liberada.'],
             desafios: [
               { id: 'prof-tit-d1', tipo: 'evento', xp: 0,
@@ -946,7 +1002,6 @@
             id: 'perf-multi', tier: 4, col: 2, ranksMax: 3,
             nome: 'Palco Multiestilo', icone: 'mdi-account-music',
             resumo: 'Responder a qualquer música no palco e dirigir números que passam por vários estilos.',
-            requer: ['perf-direcao', 'perf-headliner'],
             niveis: [
               'Improvisa em 2 linguagens em cypher ou battle.',
               'Improvisa em 3 linguagens e dirige um número com trechos de estilos diferentes.',
@@ -980,13 +1035,41 @@
             ]
           },
 
+          /* ---------- FAIXA 5 · TRANSVERSAIS MULTIESTILO (sobem por notas, não recebem pontos) ---------- */
+          {
+            id: 'perf-tr-nom', tier: 5, col: 1, tipo: 'transversal', ranksMax: 3,
+            nome: 'Nômade do Groove', nomeF: 'Nômade do Groove', icone: 'mdi-compass-rose',
+            titulo: 'trans-nomade', grupo: 'nom',
+            resumo: 'Atravessa estilos no freestyle: a música muda e o corpo responde na língua certa.',
+            requer: ['perf-multi'],
+            niveis: [
+              'Tier I: 2 linguagens diferentes com nota acima de 80 em "Round de freestyle".',
+              'Tier II: 3 linguagens diferentes com nota acima de 85 em "Round de freestyle".',
+              'Tier III: 5 linguagens diferentes com nota acima de 90 em "Round de freestyle".'
+            ],
+            desafios: []      // usa as vagas do grupo em perf-multi
+          },
+          {
+            id: 'perf-tr-reg', tier: 5, col: 3, tipo: 'transversal', ranksMax: 3,
+            nome: 'Regente do Movimento', nomeF: 'Regente do Movimento', icone: 'mdi-movie-open-star-outline',
+            titulo: 'trans-regente', grupo: 'reg',
+            resumo: 'Concebe e dirige números em que cada trecho fala uma linguagem diferente.',
+            requer: ['perf-multi'],
+            niveis: [
+              'Tier I: 2 linguagens diferentes com nota acima de 80 em "Número multiestilo".',
+              'Tier II: 3 linguagens diferentes com nota acima de 85 em "Número multiestilo".',
+              'Tier III: 5 linguagens diferentes com nota acima de 90 em "Número multiestilo".'
+            ],
+            desafios: []      // usa as vagas do grupo em perf-multi
+          },
+
           /* ---------------- TÍTULO ---------------- */
           {
             id: 'perf-titulo', tier: 5, col: 2, tipo: 'titulo', ranksMax: 1,
             nome: 'Performer Profissional', icone: 'mdi-crown-outline',
             resumo: 'Título concedido a quem domina palco, câmera, mercado e direção. ' +
                     'Habilita entrada no casting de shows e eventos da Up Dance.',
-            requer: ['perf-direcao', 'perf-multi', 'perf-headliner'],
+            requer: ['perf-direcao', 'perf-headliner'],
             niveis: ['Título conquistado — casting de shows e eventos liberado.'],
             desafios: [
               { id: 'perf-tit-d1', tipo: 'evento', xp: 0,

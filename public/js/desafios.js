@@ -138,13 +138,31 @@
     };
     var CHAVE_LOCAL = IS_TAL ? 'udx:talentos:v1' : (RT.chaveLocal || 'udx:temporada:v1');
 
-    function ehConquista(h) { return !!h && (h.tipo === 'titulo' || h.tipo === 'insignia'); }
+    function ehConquista(h) { return !!h && (h.tipo === 'titulo' || h.tipo === 'insignia' || h.tipo === 'transversal'); }
+    /* Transversal: tier conquistado (talent_rep_titulos '<titulo>-<n>'; id puro = III). */
+    function tierTrans(h) {
+      var max = 0;
+      (Estado.repTitulos || []).forEach(function (t) {
+        if (t === h.titulo) { max = 3; return; }
+        var m = /^(.*)-([123])$/.exec(t); if (m && m[1] === h.titulo) { max = Math.max(max, Number(m[2])); }
+      });
+      return max;
+    }
+    /* Vagas que alimentam um nó transversal (grupo do nó Multiestilo de origem). */
+    function desafiosDoNo(h) {
+      if (h && h.tipo === 'transversal') {
+        var o = IDX[(h.requer || [])[0]];
+        return o ? (o.desafios || []).filter(function (d) { return d.multi === h.grupo; }) : [];
+      }
+      return (h && h.desafios) || [];
+    }
+    var ROM = ['', 'I', 'II', 'III'];
     function perfilPorId(id) { var P = DADOS.perfis || []; for (var i = 0; i < P.length; i++) { if (P[i].id === id) { return P[i]; } } return null; }
     function tierDe(perfil, n) { var ts = (perfil && perfil.tiers) || []; for (var i = 0; i < ts.length; i++) { if (ts[i].n === n) { return ts[i]; } } return { n: n, requisito: 0 }; }
 
     /* ---- ESTADO ---- */
     var Estado = {
-      aprovados: [], xpe: null, xpPerfil: {}, alocacao: {}, online: false,
+      aprovados: [], xpe: null, xpPerfil: {}, alocacao: {}, online: false, repTitulos: [], envios: {},
       reputacao: { global: { pr: 0, pd: 0, n: 0 }, porPerfil: {} }, repronto: false,
       aplicarPlano: function (j) {
         Estado.xpPerfil = j.xp || {};
@@ -170,6 +188,8 @@
             Estado.aprovados = Array.isArray(j.desafios) ? j.desafios.slice() : [];
             Estado.xpe = (typeof j.xpe === 'number') ? j.xpe : null;
             if (IS_TAL) { Estado.aplicarPlano(j); }
+            Estado.repTitulos = Array.isArray(j.repTitulos) ? j.repTitulos : [];
+            Estado.envios = (j.envios && typeof j.envios === 'object') ? j.envios : {};
           })
           .catch(function () { Estado.online = false; Estado.lerLocal(); });
       },
@@ -186,6 +206,7 @@
     var Regras = {
       aprovado: function (id) { return Estado.aprovados.indexOf(id) !== -1; },
       rank: function (h) {
+        if (h && h.tipo === 'transversal') { return tierTrans(h); }
         if (ehConquista(h)) { return Regras.conquistaOk(h) ? 1 : 0; }
         if (IS_TAL) { return Estado.alocacao[h.id] || 0; }
         var n = h.desafios.reduce(function (a, d) { return a + (Regras.aprovado(d.id) ? 1 : 0); }, 0);
@@ -193,7 +214,7 @@
       },
       pontosTotais: function (pid) { return Math.floor((Estado.xpPerfil[pid] || 0) / XP_POR_PONTO); },
       pontosGastos: function (pid) {
-        var t = 0; Object.keys(Estado.alocacao).forEach(function (id) { var x = IDX[id]; if (x && x.perfilId === pid && x.tipo !== 'titulo') { t += Estado.alocacao[id]; } }); return t;
+        var t = 0; Object.keys(Estado.alocacao).forEach(function (id) { var x = IDX[id]; if (x && x.perfilId === pid && x.tipo !== 'titulo' && x.tipo !== 'transversal') { t += Estado.alocacao[id]; } }); return t;
       },
       tierLiberado: function (perfil, n) { return Regras.pontosGastos(perfil.id) >= tierDe(perfil, n).requisito; },
       prereqsOk: function (h) {
@@ -201,6 +222,7 @@
         return (h.requer || []).every(function (id) { var p = IDX[id]; return p && Regras.rank(p) >= p.ranksMax; });
       },
       conquistaOk: function (h) {
+        if (h && h.tipo === 'transversal') { return tierTrans(h) > 0; }
         if (IS_TAL) { var perfil = perfilPorId(h.perfilId); return Regras.tierLiberado(perfil, h.tier) && Regras.prereqsOk(h); }
         return (h.requer || []).length ? (h.requer).every(function (id) { var p = IDX[id]; return p && Regras.rank(p) >= p.ranksMax; }) : false;
       },
@@ -214,6 +236,10 @@
       },
       pendencias: function (h) {
         var lista = [];
+        if (h && h.tipo === 'transversal') {
+          if (!tierTrans(h)) { lista.push('Sobe de tier pelas notas das vagas abaixo; não recebe pontos.'); }
+          return lista;
+        }
         if (IS_TAL) {
           var perfil = perfilPorId(h.perfilId); var g = Regras.pontosGastos(perfil.id); var req = tierDe(perfil, h.tier).requisito;
           if (g < req) { lista.push('Invista ' + (req - g) + ' ponto(s) em ' + perfil.nome + ' para abrir esta faixa.'); }
@@ -225,7 +251,7 @@
       },
       contabilizar: function (h) {
         var t = { total: 0, feitos: 0, pendentes: 0, xpTotal: 0, xpFeito: 0, tipos: { tarefa: { t: 0, f: 0 }, atividade: { t: 0, f: 0 }, evento: { t: 0, f: 0 } } };
-        (h.desafios || []).forEach(function (d) {
+        desafiosDoNo(h).forEach(function (d) {
           var f = Regras.aprovado(d.id);
           t.total++; t.xpTotal += (d.xp || 0);
           if (f) { t.feitos++; t.xpFeito += (d.xp || 0); }
@@ -276,7 +302,7 @@
     /* ---------- 1) DESAFIOS DO NÓ (origem) ---------- */
     function renderTally(hab) {
       var c = $('#dxTally'); if (!c) { return; }
-      if (ehConquista(hab) || !hab.desafios.length) { c.innerHTML = ''; return; }
+      if ((ehConquista(hab) && hab.tipo !== 'transversal') || !desafiosDoNo(hab).length) { c.innerHTML = ''; return; }
       var t = Regras.contabilizar(hab);
       c.innerHTML =
         metric('mdi-flag-checkered', 'Desafios concluídos', t.feitos, '/ ' + t.total, t.pct, t.pendentes + ' pendente(s) · ' + t.pct + '%') +
@@ -293,6 +319,7 @@
       var perfil = perfilPorId(hab.perfilId);
       var est = Regras.estadoDoNo(hab); var conquista = ehConquista(hab);
       var rot = { available: 'Disponível', ranked: 'Em desenvolvimento', maxed: conquista ? 'Conquistado' : 'Dominado', locked: 'Bloqueado' }[est];
+      if (hab.tipo === 'transversal') { var tr = tierTrans(hab); rot = tr ? 'Tier ' + ROM[tr] : 'Bloqueado'; est = tr ? 'maxed' : 'locked'; }
       var pillMod = est === 'locked' ? ' dx-state-pill--locked' : (est === 'maxed' ? ' dx-state-pill--done' : '');
       var html = '<div class="tt-panel__head">' +
           '<span class="tt-panel__icon"><span class="mdi ' + hab.icone + '"></span></span>' +
@@ -301,19 +328,26 @@
       if (hab.resumo) { html += '<p class="tt-tip__resumo" style="margin:0 0 12px">' + escapar(hab.resumo) + '</p>'; }
       var pend = Regras.pendencias(hab);
       if (pend.length) { html += '<div class="dx-node-tally"><span class="dx-state-pill dx-state-pill--locked"><span class="mdi mdi-lock-outline"></span>' + escapar(pend[0]) + '</span></div>'; }
-      if (!hab.desafios.length) {
+      var lista = desafiosDoNo(hab);
+      if (!lista.length) {
         html += '<div class="tt-panel__empty">' + (conquista ? (Regras.conquistaOk(hab) ? 'Conquista concluída.' : 'Conclua os nós exigidos para desbloquear.') : 'Nenhum desafio cadastrado para este nó.') + '</div>';
         p.innerHTML = html; return;
       }
       html += '<ul class="tt-challenges">';
-      hab.desafios.forEach(function (d) {
+      lista.forEach(function (d) {
         var feito = Regras.aprovado(d.id); var meta = TIPOS[d.tipo] || TIPOS.tarefa || {};
         html += '<li class="tt-challenge' + (feito ? ' is-done' : '') + '">' +
             '<span class="tt-challenge__mark"><span class="mdi ' + (feito ? 'mdi-check-bold' : (meta.icone || 'mdi-circle-small')) + '"></span></span>' +
             '<div class="tt-challenge__body"><span class="tt-challenge__name">' + escapar(d.nome) + '</span>' +
               '<p class="tt-challenge__desc">' + escapar(d.desc || '') + '</p>' +
               '<div class="tt-challenge__meta"><span class="tt-chip"><span class="mdi ' + (meta.icone || 'mdi-circle-small') + '"></span>' + escapar(meta.label || d.tipo) + '</span>' +
-                (d.xp > 0 ? '<span class="tt-chip tt-chip--xp"><span class="mdi mdi-lightning-bolt"></span>+' + d.xp + ' XP</span>' : '') + '</div></div>' +
+                (d.xp > 0 ? '<span class="tt-chip tt-chip--xp"><span class="mdi mdi-lightning-bolt"></span>+' + d.xp + ' XP</span>' : '') +
+                (function () {
+                  var e = d.multi && Estado.envios[d.id];
+                  if (!e || !e.estilos || !e.estilos.length) { return ''; }
+                  return '<span class="tt-chip"><span class="mdi mdi-earth"></span>' + escapar(e.estilos.join(' + ')) +
+                    (e.nota != null ? ' · ' + e.nota : '') + (e.status === 'pendente' ? ' · em validação' : '') + '</span>';
+                }()) + '</div></div>' +
             '<span class="dx-status' + (feito ? ' dx-status--done' : '') + '"><span class="mdi ' + (feito ? 'mdi-check-circle-outline' : 'mdi-clock-outline') + '"></span>' + (feito ? 'Concluído' : 'Pendente') + '</span></li>';
       });
       html += '</ul>'; p.innerHTML = html;
@@ -391,7 +425,7 @@
       }
       var conq = [];
       (DADOS.perfis || []).forEach(function (p) { p.habilidades.forEach(function (h) { if (ehConquista(h) && Regras.conquistaOk(h)) { conq.push(h); } }); });
-      conq.forEach(function (h) { chips += '<span class="dx-ladder__step is-reached" style="background:var(--seg-accent)"><span class="mdi ' + h.icone + '"></span>' + escapar(h.nome) + '</span>'; });
+      conq.forEach(function (h) { chips += '<span class="dx-ladder__step is-reached" style="background:var(--seg-accent)"><span class="mdi ' + h.icone + '"></span>' + escapar(h.nome) + (h.tipo === 'transversal' ? ' ' + ROM[tierTrans(h)] : '') + '</span>'; });
       var body = chips ? ('<div class="dx-ladder">' + chips + '</div>') : '<p class="dx-note">Sem títulos ainda — conclua conquistas e acumule reputação.</p>';
       c.innerHTML = cabec('mdi-crown-outline', 'Títulos', 'Degraus de reputação e insígnias conquistadas') + body;
     }
