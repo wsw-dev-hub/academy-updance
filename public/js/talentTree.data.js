@@ -335,6 +335,7 @@
             id: 'bal-multi', tier: 4, col: 2, ranksMax: 3,
             nome: 'Repertório Multiestilo', icone: 'mdi-earth',
             resumo: 'Dançar com propriedade nas cinco linguagens da Up Dance: Hip Hop Dance, Popping, Locking, Breaking e House.',
+            requer: ['bal-cena', 'bal-solo'],
             niveis: [
               'Sustenta solo técnico em 2 linguagens com a musicalidade de cada uma.',
               'Sustenta solo técnico em 3 linguagens e funde duas delas numa coreografia.',
@@ -374,7 +375,7 @@
             nome: 'Bailarino(a) de Companhia', icone: 'mdi-trophy-variant',
             resumo: 'Título concedido a quem domina corpo, repertório, coletivo e cena. ' +
                     'Habilita audição interna para o elenco fixo da Up Dance.',
-            requer: ['bal-cena', 'bal-solo'],
+            
             niveis: ['Título conquistado — audição para elenco fixo liberada.'],
             desafios: [
               { id: 'bal-tit-d1', tipo: 'evento', xp: 0,
@@ -640,6 +641,7 @@
             id: 'prof-multi', tier: 4, col: 2, ranksMax: 3,
             nome: 'Didática Multiestilo', icone: 'mdi-translate',
             resumo: 'Ensinar e contar a história de cada linguagem com a mesma segurança.',
+            requer: ['prof-turma-propria', 'prof-workshop'],
             niveis: [
               'Conduz aula e apresenta as raízes de 2 linguagens.',
               'Conduz aula e apresenta as raízes de 3 linguagens.',
@@ -685,7 +687,7 @@
             nome: 'Professor(a) Certificado(a)', icone: 'mdi-certificate-outline',
             resumo: 'Título concedido a quem planeja, conduz, adapta e avalia com autonomia. ' +
                     'Habilita a solicitação do tipo de membro Professor(a).',
-            requer: ['prof-turma-propria', 'prof-workshop'],
+            
             niveis: ['Título conquistado — solicitação de credencial liberada.'],
             desafios: [
               { id: 'prof-tit-d1', tipo: 'evento', xp: 0,
@@ -944,6 +946,7 @@
             id: 'perf-multi', tier: 4, col: 2, ranksMax: 3,
             nome: 'Palco Multiestilo', icone: 'mdi-account-music',
             resumo: 'Responder a qualquer música no palco e dirigir números que passam por vários estilos.',
+            requer: ['perf-direcao', 'perf-headliner'],
             niveis: [
               'Improvisa em 2 linguagens em cypher ou battle.',
               'Improvisa em 3 linguagens e dirige um número com trechos de estilos diferentes.',
@@ -983,7 +986,7 @@
             nome: 'Performer Profissional', icone: 'mdi-crown-outline',
             resumo: 'Título concedido a quem domina palco, câmera, mercado e direção. ' +
                     'Habilita entrada no casting de shows e eventos da Up Dance.',
-            requer: ['perf-direcao', 'perf-headliner'],
+            
             niveis: ['Título conquistado — casting de shows e eventos liberado.'],
             desafios: [
               { id: 'perf-tit-d1', tipo: 'evento', xp: 0,
