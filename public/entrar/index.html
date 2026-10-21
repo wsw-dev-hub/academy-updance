@@ -1185,6 +1185,54 @@ function setEstado(campo, estado){
 }
 function emailValido(e){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e); }
 
+/* ---------- destino pós-login (rodada 22) ----------
+   Quem chega de outro ambiente traz ?next=<url daquele ambiente>. Depois do
+   login (ou se a sessão já existir), o destino é resolvido pela bridge do
+   servidor, fonte única do registro de ambientes (UDX_ENVS em index.js):
+   inicio=1 leva à ÁREA DE MEMBROS do ambiente de origem, entregando a sessão
+   àquele host. `next` ausente → /membros/; `next` fora do registro → a
+   bridge também devolve /membros/ (sem open-redirect). */
+function udxDestinoPosLogin(){
+  var n = null;
+  try { n = new URLSearchParams(location.search).get('next'); } catch (e) { n = null; }
+  return n ? '/api/session/bridge?inicio=1&next=' + encodeURIComponent(n) : '/membros/';
+}
+
+/* ---------- saída vinda de qualquer ambiente (rodadas 21/22) ----------
+   "Sair" em qualquer ambiente encerra a sessão dele e abre esta página com
+   ?sair=1. Aqui o cookie do hub também é removido (só esta página pode
+   removê-lo); a sessão compartilhada msess:<sid> já foi apagada lá, e o
+   POST abaixo cobre eventual atraso de propagação do KV. O login fica
+   travado até a resposta chegar, para a limpeza não alcançar uma sessão nova. */
+var udxSaindo = false;
+(function(){
+  var qs;
+  try { qs = new URLSearchParams(location.search); } catch (e) { return; }
+  if (qs.get('sair') !== '1') return;
+  udxSaindo = true;
+  qs.delete('sair');
+  try { history.replaceState(null, '', location.pathname + (qs.toString() ? '?' + qs.toString() : '') + location.hash); } catch (e) {}
+  fetch('/api/member/logout', { method: 'POST', credentials: 'same-origin' })
+    .catch(function(){})
+    .finally(function(){
+      udxSaindo = false;
+      var lm = document.getElementById('lmsg');
+      if (lm && !lm.textContent) { lm.className = 'msg ok'; lm.textContent = 'Você saiu da sua conta.'; }
+      if (typeof verificarLogin === 'function') verificarLogin();
+    });
+}());
+
+/* ---------- sessão já ativa (rodada 22) ----------
+   Com sessão válida no hub, o formulário não é necessário: segue direto para
+   o destino (login automático). Não roda durante a saída (?sair=1). */
+(function(){
+  if (udxSaindo) return;
+  fetch('/api/me', { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(u){ if (u && u.email) location.replace(udxDestinoPosLogin()); })
+    .catch(function(){});
+}());
+
 /* ---------- tabs ---------- */
 function tab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.t===name));
@@ -1220,7 +1268,7 @@ function verificarLogin(){
   var s = lpass.value;
   setEstado(lcEmail, !e ? '' : (emailValido(e) ? 'ok' : 'err'));
   setEstado(lcPass,  !s ? '' : (s.length >= 8 ? 'ok' : 'err'));
-  lbtn.disabled = !(emailValido(e) && s.length >= 8);
+  lbtn.disabled = udxSaindo || !(emailValido(e) && s.length >= 8);   // rodada 21: travado até a saída concluir
 }
 lemail.addEventListener('input', verificarLogin);
 lpass .addEventListener('input', verificarLogin);
@@ -1231,7 +1279,7 @@ lbtn.addEventListener('click', function(){
   lbtn.disabled = true;
   post('/api/member/login', { email: lemail.value.trim(), password: lpass.value })
     .then(d => {
-      if (d.ok) { location.href = '/membros/'; }
+      if (d.ok) { location.href = udxDestinoPosLogin(); }   // rodada 20: vitrine de apps quando veio dos apps
       else      { setMsg(lmsg,'err', d.erro || 'Falha no login.'); verificarLogin(); }
     })
     .catch(() => { setMsg(lmsg,'err','Falha de conexão.'); verificarLogin(); });
