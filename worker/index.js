@@ -22,6 +22,11 @@
  * Páginas protegidas: /membros/* (sessão de membro), /admin/* (sessão de admin).
  * Sessões e cookies SEPARADOS: m_session (membro) e a_session (admin).
  *
+ * SSO DO ECOSSISTEMA (rodada 22) — este worker é o HUB (academy-updance):
+ *   GET /api/session/bridge?next=<url>[&inicio=1] → entrega a sessão a outro
+ *       ambiente (handoff → <ambiente>/api/session/adopt) ou abre /entrar/.
+ *   Registro dos ambientes: bloco ECOSSISTEMA UDX (idêntico no worker app).
+ *
  * Bindings: KV, DB (D1), ASSETS. Vars: GMAIL_USER. Secrets: GMAIL_APP_PASSWORD, ADMIN_SETUP_KEY.
  * ESTE ARQUIVO RODA NO SERVIDOR — não use document/window.
  */
@@ -37,15 +42,46 @@ const SESSION_TTL  = 60 * 60 * 24 * 7;
 const MAGIC_TTL    = 60 * 15;
 const COOLDOWN_TTL = 60;
 const RESET_TTL    = 60 * 30;   // 30 minutos para o link de redefinição
-/* ─────────────────────────────────────────────────────────────
-   Handoff cross-subdomain (blog ↔ apps sob *.workers.dev)
-   TTL curto + uso único: o token vale apenas para um adopt.
-   APPS_ORIGIN: destino canônico das redireções pós-handoff e
-   whitelist de `next` (defesa contra open-redirect).
-───────────────────────────────────────────────────────────── */
-const HANDOFF_TTL = 60; // segundos — janela para o adopt do outro subdomínio
-const APPS_ORIGIN = 'https://app.updance.workers.dev';
-const BLOG_ORIGIN = 'https://blog.updance.workers.dev';
+/* ═════════════════════════════════════════════════════════════
+   ECOSSISTEMA UDX — registro único dos ambientes (rodada 22)
+   Bloco IDÊNTICO nos workers academy-updance e app-updance
+   (o harness da rodada confere os dois byte a byte).
+   • Base comum: os workers usam os MESMOS bindings DB (D1) e KV,
+     então a sessão msess:<sid> é uma só e vale em qualquer ambiente.
+   • Cookies continuam host-only (m_session em cada host). O 1º acesso
+     a um ambiente sem cookie passa pela bridge do hub, que copia o
+     MESMO sid para o host pedido (handoff de uso único, 60 s).
+   • Logout em qualquer ambiente apaga msess:<sid> → saída global.
+   • Hub = único ambiente com formulário de login e bridge.
+   • sso:false → ambiente ainda sem /api/session/adopt: a bridge não
+     entrega sessão para ele (club e blog, nesta rodada).
+   • home/login null → ainda não definidos (ambiente futuro).
+═════════════════════════════════════════════════════════════ */
+const UDX_ENVS = {
+  academy: { origin: 'https://academy.updance.workers.dev', home: '/membros/', login: '/entrar/', sso: true  },
+  app:     { origin: 'https://app.updance.workers.dev',     home: '/',         login: '/entrar/', sso: true  },
+  club:    { origin: 'https://club.updance.workers.dev',    home: null,        login: null,       sso: false },
+  blog:    { origin: 'https://blog.updance.workers.dev',    home: null,        login: null,       sso: false },
+};
+const UDX_HUB     = 'academy';
+const HANDOFF_TTL = 60;   // segundos — janela do adopt (uso único)
+
+/* Ambiente (sso:true) dono da URL absoluta recebida, ou null.
+   Compara a ORIGEM exata (protocolo + host + porta), não um prefixo de
+   texto: "https://app.updance.workers.dev.evil.com/" não passa. */
+function udxAmbienteDe(raw) {
+  let u;
+  try { u = new URL(String(raw || '')); } catch (_) { return null; }
+  for (const chave of Object.keys(UDX_ENVS)) {
+    const amb = UDX_ENVS[chave];
+    if (amb.sso && u.origin === amb.origin) return { chave, amb, url: u };
+  }
+  return null;
+}
+/* ═════════════════ fim do bloco ECOSSISTEMA UDX ═════════════════ */
+/* Blog (4º ambiente) continua recebendo `/` e os prefixos públicos;
+   a origem vem do registro acima (fonte única). */
+const BLOG_ORIGIN = UDX_ENVS.blog.origin;
 const BLOG_PREFIXES = ['/contato/', '/planos/', '/trilhas/', '/apps/', '/aluno/', '/premium/', '/estagio/', '/intermediario/', '/iniciante/', '/free/'];
 //const MEMBER_TYPES = ['Premium','Professor(a)','Monitor(a)','Assistente','Estagiário(a)','Intermediário','Iniciante','Aluno','Free'];
 //const MEMBER_TYPES = ['Premium','Professor(a)','Assistente','Monitor(a)','Estagiário(a)','Intermediário','Básico','Iniciante','Free'];
@@ -158,6 +194,15 @@ export default {
       }
       
 	    if (pathname === '/api/session/bridge')                                return sessionBridge(request, url, env);
+
+      // ---- rodada 23: "Meus Apps" — atalho da área de membros para o app-updance ----
+      // Reaproveita a bridge (mesmas regras de sessão e de destino): com sessão,
+      // handoff direto para a vitrine do app; sem sessão, /entrar/ com retorno
+      // ao app. A origem e a home vêm de UDX_ENVS (fonte única, rodada 22).
+      if (pathname === '/meus-apps' || pathname === '/meus-apps/') {
+        const destino = UDX_ENVS.app.origin + UDX_ENVS.app.home;
+        return sessionBridge(request, new URL('/api/session/bridge?next=' + encodeURIComponent(destino), url), env);
+      }
 
       // ---- ÁRVORE DE TALENTOS (membro) ----
       if (pathname === '/api/talentos/estado')                                return talentosEstado(request, env);
@@ -413,53 +458,47 @@ async function quemSouEu(request, env) {
   return m ? json(m) : json(null, 401);
 }
 /* ─────────────────────────────────────────────────────────────
-   sessionBridge — GET /api/session/bridge?next=<url>
-   Chamado por app.updance.workers.dev quando o gate detecta
-   ausência de sessão no host de apps. Objetivos:
-     1) Se há m_session válida em blog.*, emite handoff token
-        (uso único, TTL 60 s) e 302 → apps/adopt.
-     2) Caso contrário, 302 → /entrar/ (atende ao P.S. de
-        redirecionar para "a página de acesso, em membros").
-   Segurança:
-     • `next` só é aceito se começar com APPS_ORIGIN + '/'
-       (whitelist estrita contra open-redirect); em qualquer
-       outra forma, cai no default APPS_ORIGIN + '/apps/'.
-     • `next` é gravado NO KV junto do sid, não trafega pela
-       URL do adopt — cliente só vê `t=<tok>` opaco.
-     • Token de 32 bytes randômicos, delete-on-read no adopt.
+   sessionBridge — GET /api/session/bridge?next=<url>[&inicio=1]
+   Rodada 22: genérica para todos os ambientes de UDX_ENVS.
+   Chamada por qualquer ambiente sso:true que não achou sessão no
+   próprio host, e pelo /entrar/ deste hub depois do login.
+     • next = URL absoluta pedida no ambiente de origem. Só vale se a
+       origem for de um ambiente sso:true (udxAmbienteDe); fora disso
+       o destino é a área de membros do hub.
+     • inicio=1 (pós-login) → o destino passa a ser a ÁREA DE MEMBROS
+       do ambiente de origem (home), e não o link profundo.
+   Sem sessão no hub → /entrar/?next=<destino>.
+   Com sessão:
+     • destino no próprio hub → 302 direto;
+     • destino em outro ambiente → handoff de uso único (TTL 60 s)
+       { sid, next } no KV → 302 <ambiente>/api/session/adopt?t=<tok>.
+   `next` viaja dentro do KV (o adopt revalida a origem); o cliente
+   só vê o token opaco de 32 bytes, apagado na leitura.
 ───────────────────────────────────────────────────────────── */
 async function sessionBridge(request, url, env) {
-  const rawNext = url.searchParams.get('next') || '';
-  const next = (typeof rawNext === 'string'
-                && rawNext.startsWith(APPS_ORIGIN + '/'))
-    ? rawNext
-    : (APPS_ORIGIN + '/apps/');
+  const hub    = UDX_ENVS[UDX_HUB];
+  const alvo   = udxAmbienteDe(url.searchParams.get('next'));
+  const inicio = url.searchParams.get('inicio') === '1';
+
+  let destino;
+  if (!alvo)       destino = url.origin + hub.home;
+  else if (inicio) destino = alvo.amb.origin + alvo.amb.home;
+  else             destino = alvo.url.href;
 
   const sid = readCookie(request, 'm_session');
   const m   = sid ? await lerSessao(env, 'msess', sid) : null;
 
   if (!m) {
-    // Sem sessão válida em blog.* → manda para /entrar/.
-    // (Encaminha `next` para uso futuro por /entrar/, caso venha
-    // a suportar retorno pós-login. Ignorar não quebra nada.)
-    return Response.redirect(
-      url.origin + '/entrar/?next=' + encodeURIComponent(next),
-      302
-    );
+    return Response.redirect(url.origin + hub.login + '?next=' + encodeURIComponent(destino), 302);
   }
 
-  // Sessão válida → mint handoff (uso único, TTL curto).
-  const tok = randomToken(32);
-  await env.KV.put(
-    'handoff:' + tok,
-    JSON.stringify({ sid: sid, next: next }),
-    { expirationTtl: HANDOFF_TTL }
-  );
+  if (!alvo || alvo.chave === UDX_HUB) {
+    return Response.redirect(destino, 302);
+  }
 
-  return Response.redirect(
-    APPS_ORIGIN + '/api/session/adopt?t=' + encodeURIComponent(tok),
-    302
-  );
+  const tok = randomToken(32);
+  await env.KV.put('handoff:' + tok, JSON.stringify({ sid: sid, next: destino }), { expirationTtl: HANDOFF_TTL });
+  return Response.redirect(alvo.amb.origin + '/api/session/adopt?t=' + encodeURIComponent(tok), 302);
 }
 async function meusAcessos(request, env) {
   const m = await getMember(request, env);

@@ -350,6 +350,29 @@
   }
   .trail-x.is-locked .trail-x__cta--info .mdi{ font-size: 15px; }
 
+  /* -------------------------------------------------------------
+     Meus Apps (rodada 23) — destaque de acesso ao app-updance.
+     Usa só o contrato --seg-* e os tokens --udx-* da página.
+  ------------------------------------------------------------- */
+  .meus-apps{ padding-bottom: 0; }
+  .meus-apps__box{
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    padding: 28px; border-radius: var(--udx-radius-lg, 16px);
+    background: var(--seg-grad-soft);
+    border: 1px solid var(--udx-border);
+    box-shadow: 0 10px 30px var(--seg-glow);
+  }
+  .meus-apps__icon{
+    flex-shrink: 0; width: 72px; height: 72px; border-radius: 18px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--seg-grad); color: #fff; font-size: 38px;
+    box-shadow: 0 6px 18px var(--seg-glow);
+  }
+  .meus-apps__txt{ flex: 1; min-width: 240px; }
+  .meus-apps__txt h2{ margin: 6px 0 8px; }
+  .meus-apps__txt .lead{ margin: 0 0 16px; }
+  .meus-apps__cta{ display: inline-flex; align-items: center; gap: 8px; }
+
   @media (prefers-reduced-motion: reduce){
     .trail-x, .ebooks-list a, .products-list a, .members-topbar .btn-sair{ transition: none; }
   }
@@ -366,6 +389,10 @@
       <span id="typeBadgeLabel">—</span>
     </span>
     <span class="spacer"></span>
+    <a class="btn-sair btn-perfil" href="/meus-apps/">
+      <span class="mdi mdi-apps" aria-hidden="true"></span>
+      Meus Apps
+    </a>
     <a class="btn-sair btn-perfil" href="/membros/perfil/">
       <span class="mdi mdi-account-star-outline" aria-hidden="true"></span>
       Meu perfil
@@ -408,6 +435,34 @@
             <a class="home-cta home-cta--solid" href="/membros/reputacao/">
               <span class="mdi mdi-medal-outline" aria-hidden="true"></span>
               Minha reputação
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO EM DESTAQUE — MEUS APPS (rodada 23)
+         Leva ao app-updance já conectado: /meus-apps/ passa pela bridge do
+         academy (handoff da sessão). O catálogo de apps fica só na vitrine do
+         app (fonte única); aqui não há lista duplicada. -->
+    <section class="trails-section meus-apps" id="meusApps" aria-labelledby="meusAppsTitulo">
+      <div class="auto-container">
+        <div class="meus-apps__box">
+          <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-apps"></span></span>
+          <div class="meus-apps__txt">
+            <div class="eyebrow">
+              <span class="mdi mdi-star-four-points-outline" aria-hidden="true"></span>
+              <span>Meus Apps</span>
+            </div>
+            <h2 id="meusAppsTitulo">Suas <em>ferramentas de análise</em> em um clique</h2>
+            <p class="lead">
+              Os apps da Up Dance analisam, avaliam e refinam a sua dança.
+              Você entra já conectado, sem fazer login de novo; o que estiver
+              fora do seu plano continua bloqueado lá dentro.
+            </p>
+            <a class="home-cta home-cta--solid meus-apps__cta" href="/meus-apps/">
+              <span class="mdi mdi-open-in-app" aria-hidden="true"></span>
+              Abrir Meus Apps
             </a>
           </div>
         </div>
@@ -729,10 +784,14 @@
         emptyState.hidden = false;
       });
 
+    /* Rodada 22 — "Sair": encerra a sessão (apagando msess:<sid>, que é a mesma
+       em todos os ambientes) e abre o login do academy. ?sair=1 mostra o aviso
+       de saída; location.replace: o "Voltar" não reabre a área de membros. */
     document.getElementById('sair').addEventListener('click', function(){
+      this.disabled = true;
       fetch('/api/member/logout', { method:'POST', credentials:'same-origin' })
         .catch(function(){})
-        .finally(function(){ location.href = '/'; });
+        .finally(function(){ location.replace('/entrar/?sair=1'); });
     });
   })();
 </script>
