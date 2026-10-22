@@ -861,11 +861,12 @@
       var em = data(i.em);
       cards.push(card(meta.icone, arte ? arte.titulo : meta.nome, ((TRILHAS[i.grupo] && TRILHAS[i.grupo].rotulo) || i.grupo) + (em ? ', ' + diaCurto(em) + ' de ' + em.getFullYear() : ''), null, arte && arte.img));
     });
-    /* Insígnias que não vêm de trilha (Profissional, Participação). */
+    /* Insígnias que não vêm de trilha (Estagiário(a), Profissional, Participação). */
     insEstados.forEach(function (s) {
       if (!s.ok || s.b.regra.tipo === 'trilha') return;
       cards.push(card('mdi-shield-crown-outline', s.b.titulo,
-        s.b.regra.tipo === 'evento' ? 'Eventos' + (s.em ? ', ' + diaCurto(s.em) + ' de ' + s.em.getFullYear() : '') : 'Profissionalização', null, s.b.img));
+        s.b.regra.tipo === 'evento' ? 'Eventos' + (s.em ? ', ' + diaCurto(s.em) + ' de ' + s.em.getFullYear() : '')
+          : s.b.regra.tipo === 'membro' ? 'Estágio' : 'Profissionalização', null, s.b.img));
     });
     var T = win.UDX_TALENTOS, idx = (T && T.indice) || {};
     (t.talentos || []).forEach(function (x) {
@@ -976,6 +977,23 @@
           s.link = PAGINA_TALENTOS; s.linkTxt = 'Abrir a Árvore de Talentos';
         } else {
           s.dica = 'Disponível a partir de Estagiário(a), depois das trilhas de nível.';
+        }
+
+      } else if (r.tipo === 'membro') {
+        /* Estagiário(a): vem do tipo de membro. O progresso mostrado é o do Nível Técnico, a última trilha antes da promoção. */
+        s.ok = tipos.some(function (t) { return (r.tipos || []).indexOf(t) !== -1; });
+        if (s.ok) {
+          s.pct = 100;
+          s.link = '/membros/nivel-estagiario/'; s.linkTxt = 'Abrir a Área do Estágio';
+        } else {
+          var limT = (cfg.tecnico && cfg.tecnico.limiar) || 0;
+          var xpT = (v && v.xpTrilha.tecnico) || 0;
+          s.pct = limT ? Math.min(100, (xpT / limT) * 100) : 0;
+          s.progresso = limT ? fmt(Math.min(xpT, limT)) + ' de ' + fmt(limT) + ' XPE no Nível Técnico' : '';
+          s.dica = limT && xpT >= limT
+            ? 'Nível Técnico concluído. A promoção a Estagiário(a) é feita pela coordenação e a insígnia aparece aqui assim que ela for registrada.'
+            : 'Conclua o Nível Técnico. Depois dele, a coordenação faz a promoção a Estagiário(a).';
+          s.link = TRILHAS.tecnico.pagina; s.linkTxt = 'Abrir a trilha do Nível Técnico';
         }
 
       } else if (r.tipo === 'evento') {

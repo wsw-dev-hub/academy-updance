@@ -56,6 +56,20 @@
     "insigniaTrilha": "tec-insignia"
   },
   {
+    "id": "udx-insignia-estagiario",
+    "nome": "Insígnia de Estagiário(a)",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-estagiario-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-estagiario-768.webp",
+    "quadro": {
+      "largura": 256,
+      "altura": 256
+    },
+    "quadros": 1,
+    "origem": "membro",
+    "tipoMembro": "Estagiário(a)"
+  },
+  {
     "id": "udx-insignia-profissional",
     "nome": "Insígnia Profissional",
     "categoria": "insignia",

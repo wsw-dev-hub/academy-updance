@@ -8,6 +8,8 @@
                   (o worker grava ao atingir o limiar de XPE do nível)
      'talentos' → conquistada com o primeiro título de uma Árvore de
                   Talentos da Profissionalização (talent_titulos)
+     'membro'   → conquistada quando o membro tem um dos regra.tipos
+                  (Estagiário(a) ou um tipo acima dele na carreira; vem de /api/perfil/resumo)
      'evento'   → conquistada com a primeira presença confirmada em
                   evento da plataforma (evento_participacoes.situacao = 'presente')
 ================================================================ */
@@ -28,6 +30,9 @@
     { id: 'tecnico',       nome: 'Técnico',       titulo: 'Insígnia do Nível Técnico',
       cor: '#F29A1A', regra: { tipo: 'trilha', trilha: 'tecnico',       insignia: 'tec-insignia' },
       como: 'Conclua a trilha do Nível Técnico somando os XPE de desafios aprovados até o limiar do nível.' },
+    { id: 'estagiario',    nome: 'Estagiário(a)', titulo: 'Insígnia de Estagiário(a)',
+      cor: '#7C8CF8', regra: { tipo: 'membro', tipos: ['Estagiário(a)', 'Monitor(a)', 'Assistente', 'Professor(a)'] },
+      como: 'Seja promovido(a) a Estagiário(a) pela coordenação, depois de concluir as trilhas de nível. É a porta de entrada da Profissionalização.' },
     { id: 'profissional',  nome: 'Profissional',  titulo: 'Insígnia Profissional',
       cor: '#E6B84A', regra: { tipo: 'talentos' },
       como: 'Conquiste o título de uma das Árvores de Talentos da Profissionalização (Bailarino(a), Professor(a) ou Performer). Área exclusiva de Estagiário(a).' },

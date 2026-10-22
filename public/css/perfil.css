@@ -625,7 +625,11 @@
   .page-perfil .pf-ins-dlg__corpo{ grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; padding: 26px; align-items: center; }
 }
 @media (min-width: 1024px){
-  .page-perfil .pf-ins-grade{ grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  /* 7 insígnias numa linha só (Free → Participação) */
+  .page-perfil .pf-ins-grade{ --ins-tam: 100px; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
+@media (min-width: 1200px){
+  .page-perfil .pf-ins-grade{ --ins-tam: 118px; }
 }
 @media (prefers-reduced-motion: reduce){
   .page-perfil .pf-ins, .page-perfil .pf-ins:hover{ transition: none; transform: none; }
