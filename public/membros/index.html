@@ -351,30 +351,90 @@
   .trail-x.is-locked .trail-x__cta--info .mdi{ font-size: 15px; }
 
   /* -------------------------------------------------------------
-     Meus Apps (rodada 23) — destaque de acesso ao app-updance.
-     Usa só o contrato --seg-* e os tokens --udx-* da página.
+     Meus Apps (rodadas 23/24) — tema institucional Up Dance Xperience.
+     Tons e gradientes reproduzem os tokens --udx-* da página /entrar/
+     (painel institucional .auth-left): fundo navy → índigo com brilhos
+     rosa (#FA33A1) e roxo (#430ABF), selo vinho → roxo (#BF0449 →
+     #5708A6), destaque Playfair rosa → laranja e CTA vinho com hover
+     rosa → laranja. Valores literais (com fallback --udx-* onde a página
+     já usa a variável): esta página não define os gradientes --udx-grad-*.
+     Não usa --seg-*: o destaque não herda a paleta rosa/laranja do hub.
   ------------------------------------------------------------- */
   .meus-apps{ padding-bottom: 0; }
   .meus-apps__box{
-    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
-    padding: 28px; border-radius: var(--udx-radius-lg, 16px);
-    background: var(--seg-grad-soft);
-    border: 1px solid var(--udx-border);
-    box-shadow: 0 10px 30px var(--seg-glow);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+    padding: 32px;
+    border-radius: var(--udx-radius-lg, 16px);
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgba(250, 51, 161, 0.20), transparent 55%),
+      radial-gradient(110% 100% at 85% 90%, rgba(67, 10, 191, 0.35), transparent 60%),
+      linear-gradient(160deg, #1a0033 0%, #02021a 50%, #0a0140 100%);
+    border: 1px solid var(--udx-border, rgba(223, 224, 242, 0.12));
+    box-shadow: 0 4px 28px rgba(0, 0, 0, 0.42);
   }
+  /* marca-d'água "UPDANCE" — mesma assinatura do painel de /entrar/ */
+  .meus-apps__box::after{
+    content: 'UPDANCE';
+    position: absolute; right: -10px; bottom: -38px;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 120px; letter-spacing: 6px; line-height: 1;
+    color: rgba(250, 51, 161, 0.05);
+    pointer-events: none; white-space: nowrap;
+  }
+  .meus-apps__icon, .meus-apps__txt{ position: relative; z-index: 1; }
   .meus-apps__icon{
     flex-shrink: 0; width: 72px; height: 72px; border-radius: 18px;
     display: inline-flex; align-items: center; justify-content: center;
-    background: var(--seg-grad); color: #fff; font-size: 38px;
-    box-shadow: 0 6px 18px var(--seg-glow);
+    background: linear-gradient(135deg, #BF0449 0%, #5708A6 100%);
+    color: #fff; font-size: 38px;
+    box-shadow: 0 4px 16px rgba(191, 4, 73, 0.38);
   }
   .meus-apps__txt{ flex: 1; min-width: 240px; }
-  .meus-apps__txt h2{ margin: 6px 0 8px; }
-  .meus-apps__txt .lead{ margin: 0 0 16px; }
-  .meus-apps__cta{ display: inline-flex; align-items: center; gap: 8px; }
+  .meus-apps__tag{
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--udx-primary-hot, #FA33A1);
+  }
+  .meus-apps__tag::before{
+    content: ''; width: 28px; height: 2px;
+    background: linear-gradient(to right, #BF0449, #FA33A1);
+  }
+  .meus-apps__txt h2{ margin: 10px 0 8px; color: var(--udx-text, #DFE0F2); }
+  .meus-apps__txt h2 em{
+    font-family: 'Playfair Display', serif; font-style: italic;
+    background: linear-gradient(to top, #fb8460, #f13aa1);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .meus-apps__txt p{
+    margin: 0 0 18px; max-width: 560px;
+    color: var(--udx-text-muted, #b0b3cc); line-height: 1.7;
+  }
+  .meus-apps__cta{
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 9px;
+    background-color: #BF0449; color: #fff;
+    font-family: var(--udx-font, 'Poppins', sans-serif);
+    font-weight: 600; text-decoration: none;
+    box-shadow: 0 4px 16px rgba(191, 4, 73, 0.38);
+    transition: background-color .25s, box-shadow .25s, transform .15s;
+  }
+  .meus-apps__cta:hover,
+  .meus-apps__cta:focus-visible{
+    background-image: linear-gradient(to right, #F434A1, #ff8442);
+    box-shadow: 0 6px 20px rgba(250, 51, 161, 0.42);
+    transform: translateY(-1px);
+    color: #fff;
+  }
+  @media (max-width: 480px){
+    .meus-apps__box{ padding: 24px 20px; gap: 18px; }
+    .meus-apps__box::after{ font-size: 80px; bottom: -26px; }
+  }
 
   @media (prefers-reduced-motion: reduce){
-    .trail-x, .ebooks-list a, .products-list a, .members-topbar .btn-sair{ transition: none; }
+    .trail-x, .ebooks-list a, .products-list a, .members-topbar .btn-sair, .meus-apps__cta{ transition: none; }
+    .meus-apps__cta:hover, .meus-apps__cta:focus-visible{ transform: none; }
   }
 </style>
 </head>
@@ -389,7 +449,7 @@
       <span id="typeBadgeLabel">—</span>
     </span>
     <span class="spacer"></span>
-    <a class="btn-sair btn-perfil" href="https://app.updance.workers.dev/">
+    <a class="btn-sair btn-perfil" href="/meus-apps/">
       <span class="mdi mdi-apps" aria-hidden="true"></span>
       Meus Apps
     </a>
@@ -450,17 +510,14 @@
         <div class="meus-apps__box">
           <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-apps"></span></span>
           <div class="meus-apps__txt">
-            <div class="eyebrow">
-              <span class="mdi mdi-star-four-points-outline" aria-hidden="true"></span>
-              <span>Meus Apps</span>
-            </div>
+            <span class="meus-apps__tag">Meus Apps</span>
             <h2 id="meusAppsTitulo">Suas <em>ferramentas de análise</em> em um clique</h2>
-            <p class="lead">
+            <p>
               Os apps da Up Dance analisam, avaliam e refinam a sua dança.
               Você entra já conectado, sem fazer login de novo; o que estiver
               fora do seu plano continua bloqueado lá dentro.
             </p>
-            <a class="home-cta home-cta--solid meus-apps__cta" href="https://app.updance.workers.dev/">
+            <a class="meus-apps__cta" href="/meus-apps/">
               <span class="mdi mdi-open-in-app" aria-hidden="true"></span>
               Abrir Meus Apps
             </a>
