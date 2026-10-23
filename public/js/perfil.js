@@ -861,12 +861,12 @@
       var em = data(i.em);
       cards.push(card(meta.icone, arte ? arte.titulo : meta.nome, ((TRILHAS[i.grupo] && TRILHAS[i.grupo].rotulo) || i.grupo) + (em ? ', ' + diaCurto(em) + ' de ' + em.getFullYear() : ''), null, arte && arte.img));
     });
-    /* Insígnias que não vêm de trilha (Estagiário(a), Profissional, Participação). */
+    /* Insígnias que não vêm de trilha (carreira, Profissional, Participação). */
     insEstados.forEach(function (s) {
       if (!s.ok || s.b.regra.tipo === 'trilha') return;
       cards.push(card('mdi-shield-crown-outline', s.b.titulo,
         s.b.regra.tipo === 'evento' ? 'Eventos' + (s.em ? ', ' + diaCurto(s.em) + ' de ' + s.em.getFullYear() : '')
-          : s.b.regra.tipo === 'membro' ? 'Estágio' : 'Profissionalização', null, s.b.img));
+          : s.b.regra.tipo === 'membro' ? (s.b.id === 'estagiario' ? 'Estágio' : 'Carreira') : 'Profissionalização', null, s.b.img));
     });
     var T = win.UDX_TALENTOS, idx = (T && T.indice) || {};
     (t.talentos || []).forEach(function (x) {
@@ -980,11 +980,19 @@
         }
 
       } else if (r.tipo === 'membro') {
-        /* Estagiário(a): vem do tipo de membro. O progresso mostrado é o do Nível Técnico, a última trilha antes da promoção. */
-        s.ok = tipos.some(function (t) { return (r.tipos || []).indexOf(t) !== -1; });
+        /* Carreira (Estagiário(a) → Monitor(a) → Assistente): vem do tipo de membro.
+           Estagiário(a) mostra o progresso do Nível Técnico, a última trilha antes da promoção;
+           os degraus seguintes mostram em que ponto da carreira o membro está. */
+        var temTipo = function (rg) { return tipos.some(function (t) { return ((rg && rg.tipos) || []).indexOf(t) !== -1; }); };
+        s.ok = temTipo(r);
+        var ant = r.anterior ? INS.indice[r.anterior] : null;
         if (s.ok) {
           s.pct = 100;
-          s.link = '/membros/nivel-estagiario/'; s.linkTxt = 'Abrir a Área do Estágio';
+          if (b.id === 'estagiario') { s.link = '/membros/nivel-estagiario/'; s.linkTxt = 'Abrir a Área do Estágio'; }
+        } else if (ant) {
+          s.dica = temTipo(ant.regra)
+            ? 'Você já é ' + ant.nome + '. A promoção a ' + b.nome + ' é feita pela coordenação e a insígnia aparece aqui assim que ela for registrada.'
+            : 'Antes, é preciso conquistar a ' + ant.titulo + '.';
         } else {
           var limT = (cfg.tecnico && cfg.tecnico.limiar) || 0;
           var xpT = (v && v.xpTrilha.tecnico) || 0;

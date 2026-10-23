@@ -83,6 +83,34 @@
     "origem": "talentos"
   },
   {
+    "id": "udx-insignia-monitor",
+    "nome": "Insígnia de Monitor(a)",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-monitor-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-monitor-768.webp",
+    "quadro": {
+      "largura": 256,
+      "altura": 256
+    },
+    "quadros": 1,
+    "origem": "membro",
+    "tipoMembro": "Monitor(a)"
+  },
+  {
+    "id": "udx-insignia-assistente",
+    "nome": "Insígnia de Assistente",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-assistente-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-assistente-768.webp",
+    "quadro": {
+      "largura": 256,
+      "altura": 256
+    },
+    "quadros": 1,
+    "origem": "membro",
+    "tipoMembro": "Assistente"
+  },
+  {
     "id": "udx-insignia-participacao",
     "nome": "Insígnia de Participação",
     "categoria": "insignia",
