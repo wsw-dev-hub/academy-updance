@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Área de Membros — Up Dance</title>
-<!-- Favicon -->
-<link rel="icon" type="image/png" href="/public/images/icons/udx-icon.ico">
-<link rel="shortcut icon" type="image/png" href="/public/images/icons/udx-icon.ico">
+<link rel="icon" type="image/x-icon" href="/images/icons/udx-icon.ico">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital@1&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.9.96/css/materialdesignicons.min.css">
@@ -362,7 +360,7 @@
      já usa a variável): esta página não define os gradientes --udx-grad-*.
      Não usa --seg-*: o destaque não herda a paleta rosa/laranja do hub.
   ------------------------------------------------------------- */
-  .meus-apps{ padding-bottom: 5%; }
+  .meus-apps{ padding-bottom: 0; }
   .meus-apps__box{
     position: relative; overflow: hidden;
     display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
@@ -502,6 +500,52 @@
     .destaques__grid .meus-apps__box::after{ font-size: 96px; bottom: -30px; }
   }
 
+  /* -------------------------------------------------------------
+     Footer do blog (rodada 27) — grade do Bootstrap 5.1.3 reproduzida
+     SÓ dentro de .blog-footer (F5=a): esta página não carrega o
+     Bootstrap, e o footer usa .row / .col-*. Valores idênticos aos do
+     Bootstrap (gutter 1.5rem; md >= 768px; lg >= 992px), mais os itens do
+     Reboot que afetam o footer (box-sizing, margens de ul/h3/p, img).
+     Nada fora do footer é afetado.
+  ------------------------------------------------------------- */
+  .blog-footer, .blog-footer *, .blog-footer *::before, .blog-footer *::after{ box-sizing: border-box; }
+  /* As margens negativas de .row (-0.75rem) dependem do padding de
+     .auto-container; se ele faltar, nunca gera rolagem horizontal na
+     página. clip não cria área de rolagem (hidden = fallback antigo). */
+  .blog-footer{ overflow-x: hidden; overflow-x: clip; }
+  .blog-footer ul{ margin-top: 0; margin-bottom: 1rem; }
+  .blog-footer h3, .blog-footer p{ margin-top: 0; }
+  .blog-footer h3{ margin-bottom: .5rem; line-height: 1.2; }
+  .blog-footer p{ margin-bottom: 1rem; }
+  .blog-footer img{ vertical-align: middle; }
+  .blog-footer .row{
+    --bs-gutter-x: 1.5rem; --bs-gutter-y: 0;
+    display: flex; flex-wrap: wrap;
+    margin-top: calc(-1 * var(--bs-gutter-y));
+    margin-right: calc(-.5 * var(--bs-gutter-x));
+    margin-left: calc(-.5 * var(--bs-gutter-x));
+  }
+  .blog-footer .row > *{
+    flex-shrink: 0; width: 100%; max-width: 100%;
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    padding-left: calc(var(--bs-gutter-x) * .5);
+    margin-top: var(--bs-gutter-y);
+  }
+  .blog-footer .col-4 { flex: 0 0 auto; width: 33.33333333%; }
+  .blog-footer .col-5 { flex: 0 0 auto; width: 41.66666667%; }
+  .blog-footer .col-12{ flex: 0 0 auto; width: 100%; }
+  @media (min-width: 768px){
+    .blog-footer .col-md-3{ flex: 0 0 auto; width: 25%; }
+    .blog-footer .col-md-6{ flex: 0 0 auto; width: 50%; }
+  }
+  @media (min-width: 992px){
+    .blog-footer .col-lg-2{ flex: 0 0 auto; width: 16.66666667%; }
+    .blog-footer .col-lg-3{ flex: 0 0 auto; width: 25%; }
+    .blog-footer .col-lg-4{ flex: 0 0 auto; width: 33.33333333%; }
+  }
+  /* F3=b — frase do antigo rodapé de membros, abaixo do copyright */
+  .blog-footer__restrito{ display: block; margin-top: 6px; opacity: .85; }
+
   @media (prefers-reduced-motion: reduce){
     .trail-x, .ebooks-list a, .products-list a, .members-topbar .btn-sair, .meus-apps__cta, .minhas-trilhas__item{ transition: none; }
     a.minhas-trilhas__item:hover, a.minhas-trilhas__item:focus-visible{ transform: none; }
@@ -511,6 +555,7 @@
 </head>
 
 <body class="page-membros">
+  <a id="topo"></a>
 
   <header class="members-topbar">
     <img src="/images/icons/udx-icon.png" alt="">
@@ -584,43 +629,43 @@
       <div class="auto-container">
         <div class="destaques__grid">
 
-			<div class="meus-apps minhas-trilhas" id="minhasTrilhas" role="region" aria-labelledby="minhasTrilhasTitulo" >
-				<div class="meus-apps__box">
-				  <span class="meus-apps__icon" aria-hidden="false"><span class="mdi mdi-compass-outline"></span></span>
-				  <div class="meus-apps__txt">
-					<span class="meus-apps__tag">Minhas Trilhas</span>
-					<h2 id="minhasTrilhasTitulo">Sua <em>jornada na dança</em>, nível a nível</h2>
-					<p>
-					  Desafios, XPE e insígnias organizados por nível. Continue de onde
-					  parou; as trilhas acima do seu plano aparecem bloqueadas.
-					</p>
-					<ul class="minhas-trilhas__lista" id="minhasTrilhasLista" aria-label="Trilhas da Up Dance"></ul>
-					<a class="meus-apps__cta" id="minhasTrilhasCta" href="#" >
-					  <span class="mdi mdi-play-circle-outline" aria-hidden="false"></span>
-					  <span id="minhasTrilhasCtaTxt">Continuar minha trilha</span>
-					</a>
-				  </div>
-				</div>
-			  </div>
-		
-			  <div class="meus-apps" id="meusApps" role="region" aria-labelledby="meusAppsTitulo">
-				<div class="meus-apps__box">
-				  <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-apps"></span></span>
-				  <div class="meus-apps__txt">
-					<span class="meus-apps__tag">Meus Apps</span>
-					<h2 id="meusAppsTitulo">Suas <em>ferramentas de análise</em> em um clique</h2>
-					<p>
-					  Os apps da Up Dance analisam, avaliam e refinam a sua dança.
-					  Você entra já conectado, sem fazer login de novo; o que estiver
-					  fora do seu plano continua bloqueado lá dentro.
-					</p>
-					<a class="meus-apps__cta" href="https://app.updance.workers.dev/">
-					  <span class="mdi mdi-open-in-app" aria-hidden="true"></span>
-					  Abrir Meus Apps
-					</a>
-				  </div>
-				</div>
-			  </div>
+          <div class="meus-apps" id="meusApps" role="region" aria-labelledby="meusAppsTitulo">
+            <div class="meus-apps__box">
+              <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-apps"></span></span>
+              <div class="meus-apps__txt">
+                <span class="meus-apps__tag">Meus Apps</span>
+                <h2 id="meusAppsTitulo">Suas <em>ferramentas de análise</em> em um clique</h2>
+                <p>
+                  Os apps da Up Dance analisam, avaliam e refinam a sua dança.
+                  Você entra já conectado, sem fazer login de novo; o que estiver
+                  fora do seu plano continua bloqueado lá dentro.
+                </p>
+                <a class="meus-apps__cta" href="/meus-apps/">
+                  <span class="mdi mdi-open-in-app" aria-hidden="true"></span>
+                  Abrir Meus Apps
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="meus-apps minhas-trilhas" id="minhasTrilhas" role="region" aria-labelledby="minhasTrilhasTitulo" hidden>
+            <div class="meus-apps__box">
+              <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-compass-outline"></span></span>
+              <div class="meus-apps__txt">
+                <span class="meus-apps__tag">Minhas Trilhas</span>
+                <h2 id="minhasTrilhasTitulo">Sua <em>jornada na dança</em>, nível a nível</h2>
+                <p>
+                  Desafios, XPE e insígnias organizados por nível. Continue de onde
+                  parou; as trilhas acima do seu plano aparecem bloqueadas.
+                </p>
+                <ul class="minhas-trilhas__lista" id="minhasTrilhasLista" aria-label="Trilhas da Up Dance"></ul>
+                <a class="meus-apps__cta" id="minhasTrilhasCta" href="#" hidden>
+                  <span class="mdi mdi-play-circle-outline" aria-hidden="true"></span>
+                  <span id="minhasTrilhasCtaTxt">Continuar minha trilha</span>
+                </a>
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -651,7 +696,7 @@
     </section>-->
 
     <!-- SEÇÃO DINÂMICA 1 — NOVIDADES (recém-adicionados; exibida por JS só se houver) -->
-    <section class="trails-section" id="novidadesSection" >
+    <section class="trails-section" id="novidadesSection" hidden>
       <div class="auto-container">
         <div class="trails-section__head ts__h">
           <div class="eyebrow">
@@ -750,9 +795,136 @@
 
   </main>
 
-  <footer class="members-footer">
-    © Up Dance — acesso restrito. Este conteúdo é pessoal e intransferível.
-  </footer>
+<!-- ======================================================
+     RODAPE  (usa as classes .blog-footer* ja estilizadas)
+====================================================== -->
+<footer class="blog-footer" aria-label="Rodape">
+    <div class="auto-container">
+        <div class="row blog-footer__cols">
+
+            <div class="col-12 col-md-6 col-lg-4 blog-footer__col">
+                <!--<a href="#topo" class="blog-logo-link" aria-label="Up Dance Xperience">
+                    <svg class="blog-logo-img" viewBox="0 0 188 46" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="udxgf" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#FA33A1"/>
+                                <stop offset="0.55" stop-color="#8C0783"/>
+                                <stop offset="1" stop-color="#430ABF"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="3" width="40" height="40" rx="11" fill="url(#udxgf)"/>
+                        <path d="M11 14 v11 a9 9 0 0 0 18 0 v-11" fill="none" stroke="#fff" stroke-width="4.4" stroke-linecap="round"/>
+                        <text x="50" y="21" font-family="Poppins, sans-serif" font-size="15" font-weight="700" letter-spacing="0.5" fill="#DFE0F2">UP DANCE</text>
+                        <text x="50" y="37" font-family="Poppins, sans-serif" font-size="10.5" font-weight="600" letter-spacing="4.2" fill="#FA33A1">XPERIENCE</text>
+                    </svg>
+                </a>-->
+                <div class="col-4 col-md-3 col-lg-2">
+                    <a href="/index.html" class="blog-logo-link">
+                        <img src="/images/icons/udx-icon.png"
+                            alt="Up Dance — voltar para Destaques"
+                            class="blog-logo-img">
+                    </a>
+                </div>
+                <p style="color: var(--udx-text-muted); font-size: 13px; line-height: 1.7; margin: 14px 0 18px; max-width: 280px;">
+                    Conteudo e formacao para dancarinos, professores e criadores.
+                    A danca levada a serio &mdash; do aquecimento ao palco.
+                </p>
+                <h3 class="blog-footer__title">Siga a UDX</h3>
+                <!--<ul class="blog-footer__list">
+                    <li><span class="mdi mdi-instagram" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">@updancexperience</a></li>
+                    <li><span class="mdi mdi-youtube" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">Up Dance no YouTube</a></li>
+                    <li><span class="mdi mdi-spotify" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">Playlists oficiais</a></li>
+                    <li><span class="mdi mdi-tiktok" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">@updancexperience</a></li>
+                </ul>-->
+            </div>
+
+            <div class="col-5 col-md-6 col-lg-2 blog-footer__col">
+                <h3 class="blog-footer__title">Explorar</h3>
+                <ul class="blog-footer__list">
+                    <li><a href="#topo">Destaques</a></li>
+                    <li><a href="/src/articles/artigos.html">Artigos</a></li>
+                    <li><a href="#clube">Clube do Groove</a></li>
+                    <li><a href="#trilhas">Trilhas</a></li>
+                    <li><a href="#newsletter">Newsletter</a></li>
+                </ul>
+            </div>
+
+            <div class="col-5 col-md-6 col-lg-3 blog-footer__col">
+                <h3 class="blog-footer__title">Contato</h3>
+                <ul class="blog-footer__list">
+                    <li><span class="mdi mdi-email-outline" aria-hidden="true"></span>
+                        <a href="mailto:updancexperience@gmail.com">updancexperience@gmail.com</a></li>
+                    <!--<li><span class="mdi mdi-whatsapp" aria-hidden="true"></span>
+                        <a href="#" target="_blank" rel="noopener">WhatsApp da equipe</a></li>
+                    <li><span class="mdi mdi-map-marker-outline" aria-hidden="true"></span> Rio de Janeiro, RJ</li>
+                    <li><span class="mdi mdi-clock-outline" aria-hidden="true"></span> Seg a Sex, 9h&ndash;18h</li>-->
+                </ul>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3 blog-footer__col">
+                <h3 class="blog-footer__title">Da Galeria</h3>
+                <ul class="blog-footer__gallery" aria-hidden="true">
+                    <li><span></span></li><li><span></span></li><li><span></span></li>
+                    <li><span></span></li><li><span></span></li><li><span></span></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+    <div class="blog-footer__bar">
+        <small>
+            &copy; <span id="udx-year">2026</span> <b>Up Dance Xperience</b> &middot;
+            Todos os direitos reservados &middot;
+            Feito com <i>groove</i> no Rio de Janeiro.
+        </small>
+        <small class="blog-footer__restrito">Acesso restrito. Este conteúdo é pessoal e intransferível.</small>
+    </div>
+</footer>
+
+<!-- ======================================================
+     MENU FLUTUANTE RADIAL (mobile/tablet)
+     Aparece após o usuário rolar e o header sair da viewport
+====================================================== -->
+<div class="udx-fab" id="udxFab" data-pane="trilhas" aria-hidden="true">
+
+    <!-- Sugestão contextual (equivalente ao "Depositar via PIX") -->
+    <!--<div class="udx-fab__hint" id="udxFabHint" role="status">
+        <span class="mdi mdi-email-fast-outline" aria-hidden="true"></span>
+        <span class="udx-fab__hint-text">Receba a Newsletter semanal</span>
+        <a href="#newsletter" class="udx-fab__hint-go" aria-label="Ir para newsletter">
+            <span class="mdi mdi-chevron-right" aria-hidden="true"></span>
+        </a>
+        <button class="udx-fab__hint-close" id="udxFabHintClose" aria-label="Fechar sugestão">
+            <span class="mdi mdi-close" aria-hidden="true"></span>
+        </button>
+    </div>-->
+
+    
+
+    <nav class="udx-fab__radial" id="udxFabRadial" aria-label="Atalhos do blog">
+        <!-- Itens injetados via JS conforme a pílula ativa -->
+        <button class="udx-fab__core" id="udxFabCore"
+                aria-label="Abrir menu de atalhos" aria-expanded="false" aria-controls="udxFabRadial">
+            <span class="mdi mdi-menu udx-fab__core-icon" aria-hidden="true"></span>
+        </button>
+    </nav>
+
+    <!-- Pílula de abas (equivalente ao Principal/Trading/IA) -->
+    <div class="udx-fab__tabs" role="tablist" aria-label="Sessões do blog">
+        <span class="udx-fab__tabs-thumb" aria-hidden="true"></span>
+        <button class="udx-fab__tab is-active" data-pane="trilhas"   role="tab" aria-selected="true">Trilhas</button>
+        <button class="udx-fab__tab"           data-pane="destaques" role="tab" aria-selected="false">Apps</button>
+        <button class="udx-fab__tab"           data-pane="clube"     role="tab" aria-selected="false">Clube</button>
+    </div>
+
+</div>
+
+<!-- Voltar ao topo -->
+<button class="to-top" id="toTop" aria-label="Voltar ao topo"><span class="mdi mdi-arrow-up" aria-hidden="true"></span></button>
 
 <script>
   (function(){
@@ -999,6 +1171,215 @@
         .finally(function(){ location.replace('/entrar/?sair=1'); });
     });
   })();
+</script>
+
+<script>
+/* ===========================================================
+   Rodada 27 — scripts copiados da home do blog, sem alteração:
+   ano do copyright, botão "voltar ao topo" e menu flutuante (FAB).
+   Os destinos dos itens do FAB são os mesmos do blog (F1/F2).
+=========================================================== */
+/* Ano automatico */
+(function () {
+    var y = document.getElementById("udx-year");
+    if (y) y.textContent = new Date().getFullYear();
+}());
+
+/* Voltar ao topo */
+(function () {
+    "use strict";
+    var btn = document.getElementById("toTop");
+    if (!btn) return;
+    window.addEventListener("scroll", function () {
+        btn.classList.toggle("show", window.pageYOffset > 600);
+    }, { passive: true });
+    btn.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+}());
+
+/* ===========================================================
+   Menu flutuante radial (FAB) — pílulas trocam camadas
+   1. Trilhas / Destaques / Clube → 5 itens cada
+   2. Polegar deslizante atrás da pílula ativa
+   3. Substituição com implosão + pulso + ejeção
+=========================================================== */
+(function () {
+    "use strict";
+
+    var fab    = document.getElementById("udxFab");
+    var radial = document.getElementById("udxFabRadial");
+    var core   = document.getElementById("udxFabCore");
+    if (!fab || !radial || !core) return;
+
+    var tabsContainer = fab.querySelector(".udx-fab__tabs");
+    var thumb         = fab.querySelector(".udx-fab__tabs-thumb");
+    var tabs          = fab.querySelectorAll(".udx-fab__tab");
+
+    /* href de "Acessar" copiado do header (mesmo comportamento do original) */
+    var headerAcessar = document.getElementById("btnAcessar");
+    var acessarHref = (headerAcessar && headerAcessar.getAttribute("href")) || "/entrar/";
+
+    var PANES = {
+        trilhas: [
+            { pos:"tl",  icon:"mdi-compass-outline",                    label:"Trilhas",  href:"#trilhas"  },
+            { pos:"top", icon:"mdi-newspaper-variant-multiple-outline", label:"Recentes", href:"#recentes" },
+            { pos:"tr",  icon:"mdi-message-video",                      label:"Clube",    href:"/src/clube/clube.html"    },
+            { pos:"bl",  icon:"mdi-account-outline",                    label:"Acessar",  href:"#acessarHref" },
+            { pos:"br",  icon:"mdi-arrow-up",                           label:"Topo",     href:"#topo"     }
+        ],
+        destaques: [
+            /*{ pos:"tl",  icon:"mdi-human-greeting",        label:"Performance",    href:"https://app.updance.workers.dev" },*/
+            { pos:"tl",  icon:"mdi-human-greeting",        label:"Performance",    href:"#Performance" },
+            { pos:"top", icon:"mdi-metronome-tick",        label:"Ritmo",          href:"#ritmo"       },
+            { pos:"tr",  icon:"mdi-head-snowflake",        label:"Percepção",      href:"#percepcao"   },
+            /*{ pos:"bl",  icon:"mdi-cog-sync",              label:"Composição",     href:"#composicao"  },*/
+            { pos:"bl",  icon:"mdi-apps",                  label:"Apps",           href:"/src/apps/apps.html"  },
+            { pos:"br",  icon:"mdi-consolidate",           label:"Movimento",      href:"#movimento"   }
+        ],
+        clube: [
+            { pos:"tl",  icon:"mdi-map-marker-path",       label:"Guias",     href:"#guias"     },
+            { pos:"top", icon:"mdi-school-outline",        label:"Tutoriais", href:"#tutoriais" },
+            { pos:"tr",  icon:"mdi-book-open-variant",     label:"Ebooks",    href:"#ebooks"    },
+            /*{ pos:"bl",  icon:"mdi-lightbulb-on-outline",  label:"Dicas",     href:"#dicas"     },*/
+            { pos:"bl",  icon:"mdi-card-account-details-star-outline",  label:"Clube",     href:"/src/clube/clube.html"     },
+            { pos:"br",  icon:"mdi-lan-connect",      label:"Cursos",    href:"#cursos"    }
+        ]
+    };
+
+    var swapLock = false;
+    function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+    function renderPane(name){
+        var items = radial.querySelectorAll(".udx-fab__item");
+        for (var i = 0; i < items.length; i++) items[i].remove();
+
+        PANES[name].forEach(function(it){
+            var a = document.createElement("a");
+            a.className = "udx-fab__item udx-fab__item--" + it.pos;
+			//a.target = "_blank";
+            a.href = it.href;
+            a.setAttribute("aria-label", it.label);
+            a.innerHTML = '<span class="mdi ' + it.icon + '" aria-hidden="true"></span><em>' + it.label + '</em>';
+            a.addEventListener("click", closeRadial);
+            radial.insertBefore(a, core);
+        });
+
+        fab.setAttribute("data-pane", name);
+    }
+
+    function moveThumbTo(tab){
+        var tabsRect = tabsContainer.getBoundingClientRect();
+        var tabRect  = tab.getBoundingClientRect();
+        var offsetX  = tabRect.left - tabsRect.left;
+        thumb.style.width = tabRect.width + "px";
+        thumb.style.transform = "translateX(" + offsetX + "px)";
+    }
+
+    /* Visibilidade controlada por scroll (mesma lógica do original) */
+    function updateVisibility(){
+        var threshold = Math.max(window.innerHeight * 0.6, 380);
+        var show = window.pageYOffset > threshold;
+        fab.classList.toggle("is-visible", show);
+        fab.setAttribute("aria-hidden", show ? "false" : "true");
+        if (!show) closeRadial();
+    }
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    window.addEventListener("resize", updateVisibility);
+    updateVisibility();
+
+    function openRadial(){
+        radial.classList.add("is-open");
+        fab.classList.add("is-open");
+        core.setAttribute("aria-expanded", "true");
+        core.querySelector(".udx-fab__core-icon").classList.replace("mdi-menu", "mdi-close");
+        requestAnimationFrame(function(){
+            var active = fab.querySelector(".udx-fab__tab.is-active");
+            if (active) moveThumbTo(active);
+        });
+    }
+    function closeRadial(){
+        radial.classList.remove("is-open", "is-collapsing");
+        fab.classList.remove("is-open");
+        core.setAttribute("aria-expanded", "false");
+        var ic = core.querySelector(".udx-fab__core-icon");
+        if (ic.classList.contains("mdi-close")) ic.classList.replace("mdi-close", "mdi-menu");
+    }
+
+    /* Coreografia da substituição: implosão → pulso → ejeção */
+    async function substitutePane(paneName){
+        if (swapLock) return;
+        swapLock = true;
+
+        radial.classList.add("is-collapsing");
+        fab.setAttribute("data-pane", paneName);
+
+        await wait(420);
+
+        renderPane(paneName);
+
+        core.classList.remove("is-pulsing");
+        void core.offsetWidth;
+        core.classList.add("is-pulsing");
+
+        void radial.offsetWidth;
+
+        await wait(80);
+        radial.classList.remove("is-collapsing");
+
+        await wait(640);
+        swapLock = false;
+    }
+
+    /* Handlers */
+    core.addEventListener("click", function(e){
+        e.stopPropagation();
+        if (radial.classList.contains("is-open")) closeRadial();
+        else openRadial();
+    });
+
+    tabs.forEach(function(tab){
+        tab.addEventListener("click", function(e){
+            e.stopPropagation();
+            if (tab.classList.contains("is-active") && radial.classList.contains("is-open")) return;
+
+            tabs.forEach(function(t){
+                t.classList.remove("is-active");
+                t.setAttribute("aria-selected", "false");
+            });
+            tab.classList.add("is-active");
+            tab.setAttribute("aria-selected", "true");
+
+            moveThumbTo(tab);
+
+            if (radial.classList.contains("is-open")) {
+                substitutePane(tab.dataset.pane);
+            } else {
+                renderPane(tab.dataset.pane);
+                openRadial();
+            }
+        });
+    });
+
+    document.addEventListener("click", function(e){
+        if (!fab.contains(e.target)) closeRadial();
+    });
+
+    window.addEventListener("resize", function(){
+        var active = fab.querySelector(".udx-fab__tab.is-active");
+        if (active) moveThumbTo(active);
+    });
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function(){
+            var active = fab.querySelector(".udx-fab__tab.is-active");
+            if (active) moveThumbTo(active);
+        });
+    }
+
+    /* Render inicial */
+    renderPane("trilhas");
+}());
 </script>
 
 </body>
