@@ -531,6 +531,62 @@
 
   <main class="members-main">
 
+
+	<!-- DESTAQUES (rodadas 23/25/26) — "Meus Apps" e "Minhas Trilhas"
+         lado a lado no tablet/desktop (>= 768px) e um abaixo do outro no
+         mobile. Um único container: os dois cartões dividem a mesma linha.
+         • Meus Apps: /meus-apps/ passa pela bridge do academy (handoff da
+           sessão); o catálogo de apps fica só na vitrine do app (fonte única).
+         • Minhas Trilhas: conteúdo de /api/me/access (recursos com r.trilha,
+           na ordem r.trilha_ordem); oculta até haver ao menos uma trilha —
+           nesse caso Meus Apps ocupa a largura toda. -->
+    <section class="trails-section destaques" aria-label="Destaques da área de membros">
+      <div class="auto-container">
+        <div class="destaques__grid">
+
+          <div class="meus-apps" id="meusApps" role="region" aria-labelledby="meusAppsTitulo">
+            <div class="meus-apps__box">
+              <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-apps"></span></span>
+              <div class="meus-apps__txt">
+                <span class="meus-apps__tag">Meus Apps</span>
+                <h2 id="meusAppsTitulo">Suas <em>ferramentas de análise</em> em um clique</h2>
+                <p>
+                  Os apps da Up Dance analisam, avaliam e refinam a sua dança.
+                  Você entra já conectado, sem fazer login de novo; o que estiver
+                  fora do seu plano continua bloqueado lá dentro.
+                </p>
+                <a class="meus-apps__cta" href="/meus-apps/">
+                  <span class="mdi mdi-open-in-app" aria-hidden="true"></span>
+                  Abrir Meus Apps
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="meus-apps minhas-trilhas" id="minhasTrilhas" role="region" aria-labelledby="minhasTrilhasTitulo" >
+            <div class="meus-apps__box">
+              <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-compass-outline"></span></span>
+              <div class="meus-apps__txt">
+                <span class="meus-apps__tag">Minhas Trilhas</span>
+                <h2 id="minhasTrilhasTitulo">Sua <em>jornada na dança</em>, nível a nível</h2>
+                <p>
+                  Desafios, XPE e insígnias organizados por nível. Continue de onde
+                  parou; as trilhas acima do seu plano aparecem bloqueadas.
+                </p>
+                <ul class="minhas-trilhas__lista" id="minhasTrilhasLista" aria-label="Trilhas da Up Dance"></ul>
+                <a class="meus-apps__cta" id="minhasTrilhasCta" href="#" hidden>
+                  <span class="mdi mdi-play-circle-outline" aria-hidden="true"></span>
+                  <span id="minhasTrilhasCtaTxt">Continuar minha trilha</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+	
+	
     <section class="trails-hero">
       <div class="auto-container">
         <div class="trails-hero__inner members-hero">
@@ -570,59 +626,7 @@
       </div>
     </section>
 
-    <!-- DESTAQUES (rodadas 23/25/26) — "Meus Apps" e "Minhas Trilhas"
-         lado a lado no tablet/desktop (>= 768px) e um abaixo do outro no
-         mobile. Um único container: os dois cartões dividem a mesma linha.
-         • Meus Apps: /meus-apps/ passa pela bridge do academy (handoff da
-           sessão); o catálogo de apps fica só na vitrine do app (fonte única).
-         • Minhas Trilhas: conteúdo de /api/me/access (recursos com r.trilha,
-           na ordem r.trilha_ordem); oculta até haver ao menos uma trilha —
-           nesse caso Meus Apps ocupa a largura toda. -->
-    <section class="trails-section destaques" aria-label="Destaques da área de membros">
-      <div class="auto-container">
-        <div class="destaques__grid">
-
-          <div class="meus-apps" id="meusApps" role="region" aria-labelledby="meusAppsTitulo">
-            <div class="meus-apps__box">
-              <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-apps"></span></span>
-              <div class="meus-apps__txt">
-                <span class="meus-apps__tag">Meus Apps</span>
-                <h2 id="meusAppsTitulo">Suas <em>ferramentas de análise</em> em um clique</h2>
-                <p>
-                  Os apps da Up Dance analisam, avaliam e refinam a sua dança.
-                  Você entra já conectado, sem fazer login de novo; o que estiver
-                  fora do seu plano continua bloqueado lá dentro.
-                </p>
-                <a class="meus-apps__cta" href="/meus-apps/">
-                  <span class="mdi mdi-open-in-app" aria-hidden="true"></span>
-                  Abrir Meus Apps
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="meus-apps minhas-trilhas" id="minhasTrilhas" role="region" aria-labelledby="minhasTrilhasTitulo" hidden>
-            <div class="meus-apps__box">
-              <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-compass-outline"></span></span>
-              <div class="meus-apps__txt">
-                <span class="meus-apps__tag">Minhas Trilhas</span>
-                <h2 id="minhasTrilhasTitulo">Sua <em>jornada na dança</em>, nível a nível</h2>
-                <p>
-                  Desafios, XPE e insígnias organizados por nível. Continue de onde
-                  parou; as trilhas acima do seu plano aparecem bloqueadas.
-                </p>
-                <ul class="minhas-trilhas__lista" id="minhasTrilhasLista" aria-label="Trilhas da Up Dance"></ul>
-                <a class="meus-apps__cta" id="minhasTrilhasCta" href="#" hidden>
-                  <span class="mdi mdi-play-circle-outline" aria-hidden="true"></span>
-                  <span id="minhasTrilhasCtaTxt">Continuar minha trilha</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
+    
 
     <!-- SEÇÃO DINÂMICA — populada por JS a partir de /api/me/access -->
     <!--<section class="trails-section">
