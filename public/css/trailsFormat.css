@@ -1496,3 +1496,608 @@
     margin: 14px 0 18px;
     max-width: 280px;
 }
+
+
+/* ================================================================
+   10) ÁREAS DE MEMBROS
+   Estilos que ficavam em <style> dentro das páginas. Cada bloco vale
+   só para a página cujo <body> tem a classe-gancho:
+     10a  body.membros-hub   → /membros/ do academy
+     10b  body.apps-vitrine  → vitrine do app (/)
+   :where(.gancho) não soma peso: cada seletor pesa o mesmo que pesava
+   dentro da página. Em qualquer outra página que carregue este arquivo
+   nenhuma regra desta seção se aplica.
+================================================================ */
+
+/* ---------------- 10a) /membros/ do academy ---------------- */
+.page-membros:where(.membros-hub){
+  --m-grad:        linear-gradient(135deg, #F434A1 0%, #ff8442 100%);
+  --m-grad-soft:   linear-gradient(135deg, rgba(244,52,161,.18) 0%, rgba(255,132,66,.22) 100%);
+  --m-grad-text:   linear-gradient(135deg, #ff8442 0%, #F434A1 100%);
+  --m-pink:        #F434A1;
+  --m-orange:      #ff8442;
+  --m-glow:        rgba(244, 52, 161, 0.32);
+
+  --seg-grad:      var(--m-grad);
+  --seg-grad-soft: var(--m-grad-soft);
+  --seg-grad-text: var(--m-grad-text);
+  --seg-accent:    var(--m-pink);
+  --seg-accent-2:  var(--m-orange);
+  --seg-glow:      var(--m-glow);
+
+  --seg-hero-rgba-a: rgba(244, 52, 161, 0.22);
+  --seg-hero-rgba-b: rgba(255, 132, 66, 0.28);
+  --seg-cta-rgba-a:  rgba(244, 52, 161, 0.18);
+  --seg-cta-rgba-b:  rgba(255, 132, 66, 0.22);
+  --seg-how-rgba-a:  rgba(244, 52, 161, 0.06);
+  --seg-how-rgba-b:  rgba(255, 132, 66, 0.08);
+  --seg-step-bg:     rgba(17, 2, 115, 0.18);
+}
+
+:where(.membros-hub) .members-topbar{
+  position: sticky; top: 0; z-index: 300;
+  display: flex; align-items: center; gap: .8rem;
+  padding: 12px 22px;
+  background: rgba(2, 2, 26, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--udx-border);
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.50);
+  flex-wrap: wrap;
+}
+:where(.membros-hub) .members-topbar img{ width: 34px; height: 34px; }
+:where(.membros-hub) .members-topbar .marca{
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 1.25rem;
+  background: linear-gradient(to top, #fb8460, #f13aa1);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+:where(.membros-hub) .members-topbar .type-badge{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 50px;
+  font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--seg-grad); color: #fff;
+  box-shadow: 0 6px 18px var(--seg-glow);
+  max-width: 60vw;
+  white-space: normal;
+  line-height: 1.15;
+  font-size: 10.5px;
+}
+:where(.membros-hub) .members-topbar .type-badge .mdi{ font-size: 14px; }
+:where(.membros-hub) .members-topbar .spacer{ flex: 1; }
+:where(.membros-hub) .members-topbar .btn-sair{
+  background: transparent;
+  color: var(--udx-text);
+  border: 1.5px solid rgba(223, 224, 242, 0.40);
+  padding: 8px 16px; border-radius: var(--udx-radius-sm);
+  font-family: var(--udx-font); font-size: .88rem; font-weight: 500;
+  cursor: pointer;
+  transition: background-color 280ms ease, border-color 280ms ease, color 280ms ease;
+}
+:where(.membros-hub) .members-topbar .btn-perfil{
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+  margin-bottom: 12px;
+}
+:where(.membros-hub) .members-topbar .btn-sair:hover{
+  background-color: rgba(223, 224, 242, 0.08);
+  border-color: var(--udx-primary-hot);
+  color: #fff;
+}
+
+:where(.membros-hub) .members-main{ padding-bottom: 40px; }
+
+:where(.membros-hub) .members-hero .type-chip{
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 10px; padding: 6px 14px; border-radius: 50px;
+  background: rgba(2, 2, 26, 0.55);
+  border: 1px solid var(--udx-border);
+  color: var(--udx-text);
+  font-size: 12px; font-weight: 600;
+}
+:where(.membros-hub) .members-hero .type-chip .mdi{ font-size: 15px; color: var(--seg-accent); }
+:where(.membros-hub) .members-hero .type-chip b{ font-weight: 700; }
+
+:where(.membros-hub) .members-list{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+@media (min-width: 780px){
+  :where(.membros-hub) .members-list{ grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Card bloqueado */
+:where(.membros-hub) .trail-x.is-locked{
+  opacity: .55;
+  filter: grayscale(.25);
+}
+:where(.membros-hub) .trail-x.is-locked .trail-x__cta{
+  background: rgba(2, 2, 26, 0.65);
+  color: var(--udx-text-muted);
+  box-shadow: none;
+  border: 1px solid var(--udx-border);
+}
+:where(.membros-hub) .trail-x .lock-note{
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 600;
+  color: var(--udx-text-muted);
+  margin-top: 4px;
+}
+:where(.membros-hub) .trail-x .lock-note .mdi{ font-size: 14px; }
+
+/* Paleta por nível (Opção 2) — sobrescreve o contrato --seg-* no card.
+   Só tokens oficiais. Card sem data-lvl (ou nível sem paleta) mantém a
+   paleta padrão de .page-membros. */
+:where(.membros-hub) .trail-x[data-lvl="free"]{
+  --seg-grad:      linear-gradient(135deg, #030BA6 0%, #BF0449 100%);
+  --seg-grad-soft: linear-gradient(135deg, rgba(3,11,166,.18) 0%, rgba(191,4,73,.22) 100%);
+  --seg-grad-text: linear-gradient(135deg, #BF0449 0%, #030BA6 100%);
+  --seg-accent:    #030BA6; --seg-accent-2: #BF0449;
+  --seg-glow:      rgba(3, 11, 166, 0.32);
+}
+:where(.membros-hub) .trail-x[data-lvl="iniciante"]{
+  --seg-grad:      linear-gradient(135deg, #110273 0%, #030BA6 100%);
+  --seg-grad-soft: linear-gradient(135deg, rgba(17,2,115,.18) 0%, rgba(3,11,166,.22) 100%);
+  --seg-grad-text: linear-gradient(135deg, #030BA6 0%, #110273 100%);
+  --seg-accent:    #030BA6; --seg-accent-2: #110273;
+  --seg-glow:      rgba(3, 11, 166, 0.32);
+}
+:where(.membros-hub) .trail-x[data-lvl="intermediario"]{
+  --seg-grad:      linear-gradient(135deg, #8C0783 0%, #FA33A1 100%);
+  --seg-grad-soft: linear-gradient(135deg, rgba(140,7,131,.18) 0%, rgba(250,51,161,.22) 100%);
+  --seg-grad-text: linear-gradient(135deg, #FA33A1 0%, #8C0783 100%);
+  --seg-accent:    #8C0783; --seg-accent-2: #FA33A1;
+  --seg-glow:      rgba(140, 7, 131, 0.32);
+}
+/* professor — TENTATIVO (herdado de talentTree.css data-perfil="professor"); CONFIRMAR */
+:where(.membros-hub) .trail-x[data-lvl="professor"]{
+  --seg-grad:      linear-gradient(135deg, #5708A6 0%, #430ABF 100%);
+  --seg-grad-soft: linear-gradient(135deg, rgba(87,8,166,.18) 0%, rgba(67,10,191,.22) 100%);
+  --seg-grad-text: linear-gradient(135deg, #430ABF 0%, #5708A6 100%);
+  --seg-accent:    #430ABF; --seg-accent-2: #5708A6;
+  --seg-glow:      rgba(67, 10, 191, 0.32);
+}
+/* AGUARDANDO HEX OFICIAL — enquanto não vierem, estes níveis caem no fallback:
+.trail-x[data-lvl="basico"]{ }
+.trail-x[data-lvl="estagiario"]{ }
+.trail-x[data-lvl="monitor"]{ }
+.trail-x[data-lvl="assistente"]{ }
+.trail-x[data-lvl="premium"]{ }
+*/
+
+/* Lista de produtos dentro do card (turno 13) */
+:where(.membros-hub) .products-list{
+  margin: 12px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px dashed var(--udx-border);
+  list-style: none;
+  display: grid; gap: 8px;
+}
+:where(.membros-hub) .products-list li{ margin: 0; padding: 0; }
+:where(.membros-hub) .products-list a{
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--udx-radius-sm);
+  color: var(--udx-text); text-decoration: none;
+  font-size: 13px; line-height: 1.4;
+  background: rgba(2, 2, 26, 0.35);
+  border: 1px solid var(--udx-border);
+  transition: border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
+}
+:where(.membros-hub) .products-list a:hover{
+  border-color: var(--seg-accent);
+  background: rgba(244, 52, 161, 0.06);
+  transform: translateX(3px);
+}
+:where(.membros-hub) .products-list a > .mdi:first-child{
+  font-size: 18px; color: var(--seg-accent); flex-shrink: 0;
+}
+:where(.membros-hub) .products-list__label{
+  display: flex; flex-direction: column;
+  flex: 1; min-width: 0;
+}
+:where(.membros-hub) .products-list__desc{
+  font-size: 11.5px; color: var(--udx-text-muted); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+:where(.membros-hub) .products-list__ext{
+  font-size: 14px; color: var(--udx-text-muted); flex-shrink: 0;
+}
+
+/* Ebooks fixos (bloco "Sempre disponível") */
+:where(.membros-hub) .ebooks-list{
+  margin: 6px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px dashed var(--udx-border);
+  list-style: none;
+  display: grid; gap: 8px;
+}
+:where(.membros-hub) .ebooks-list li{ margin: 0; padding: 0; }
+:where(.membros-hub) .ebooks-list a{
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--udx-radius-sm);
+  color: var(--udx-text); text-decoration: none;
+  font-size: 13px; line-height: 1.4;
+  background: rgba(2, 2, 26, 0.35);
+  border: 1px solid var(--udx-border);
+  transition: border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
+}
+:where(.membros-hub) .ebooks-list a:hover{
+  border-color: var(--seg-accent);
+  background: rgba(244, 52, 161, 0.06);
+  transform: translateX(3px);
+}
+:where(.membros-hub) .ebooks-list a .mdi{
+  font-size: 16px; color: var(--seg-accent); flex-shrink: 0;
+}
+
+:where(.membros-hub) .members-state{
+  text-align: center; /*padding: 40px 20px;*/
+  color: var(--udx-text-muted); font-size: .95rem;
+}
+:where(.membros-hub) .members-footer{
+  padding: 20px 22px; text-align: center;
+  color: var(--udx-text-muted); font-size: .8rem;
+  border-top: 1px solid var(--udx-border);
+}
+
+/* -------------------------------------------------------------
+   Vitrine — itens vinculados apresentados sem navegação.
+   Só se aplica às listas geradas no hub /membros/ com o
+   modificador .products-list--display; a página de estágio
+   usa .products-list padrão (com links reais) e não é afetada.
+------------------------------------------------------------- */
+:where(.membros-hub) .products-list--display .products-list__row{
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--udx-radius-sm);
+  color: var(--udx-text);
+  font-size: 13px; line-height: 1.4;
+  background: rgba(2, 2, 26, 0.35);
+  border: 1px solid var(--udx-border);
+  cursor: default;
+  user-select: none;
+}
+:where(.membros-hub) .products-list--display .products-list__row:hover{
+  background: rgba(2, 2, 26, 0.35);
+  border-color: var(--udx-border);
+  transform: none;
+}
+:where(.membros-hub) .products-list--display .products-list__row > .mdi:first-child{
+  font-size: 18px; color: var(--udx-primary-hot); flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------
+   Seção de itens dentro de cada card (SEMPRE presente).
+   Três estados possíveis para o conteúdo interno:
+     - <ul class="products-list--display">  → vitrine dos itens
+     - <div class="products-list__empty">   → pacote sem itens vinculados
+     - <div class="products-list__empty products-list__empty--locked">
+                                            → pacote bloqueado no plano
+------------------------------------------------------------- */
+:where(.membros-hub) .products-list__wrap{
+  display: block;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--udx-border);
+}
+:where(.membros-hub) .products-list__title{
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 8px;
+  font-size: 11.5px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--udx-text-muted);
+}
+:where(.membros-hub) .products-list__title .mdi{
+  font-size: 14px; color: var(--udx-primary-hot);
+}
+
+:where(.membros-hub) .products-list__empty{
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--udx-radius-sm);
+  color: var(--udx-text-muted);
+  font-size: 12.5px; line-height: 1.4;
+  background: rgba(2, 2, 26, 0.30);
+  border: 1px dashed var(--udx-border);
+}
+:where(.membros-hub) .products-list__empty .mdi{
+  font-size: 16px; flex-shrink: 0;
+  color: var(--udx-primary-hot);
+}
+:where(.membros-hub) .products-list__empty--locked{
+  /* No card bloqueado o estado ficam coerente com .is-locked: a mesma
+     borda tracejada, com o ícone de cadeado em tom neutro. */
+  background: rgba(2, 2, 26, 0.20);
+  color: var(--udx-text-muted);
+}
+:where(.membros-hub) .products-list__empty--locked .mdi{
+  color: var(--udx-text-muted);
+}
+
+/* Dentro da seção wrap, remove a borda superior duplicada da própria
+   .products-list padrão (a wrap já traz o divisor). */
+:where(.membros-hub) .products-list__wrap .products-list{
+  margin: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* -------------------------------------------------------------
+   Variantes de CTA no card do hub:
+   .trail-x__cta--go   → acesso à área real do recurso (liberado)
+   .trail-x__cta--info → landing descritiva do plano (bloqueado)
+   Ambas herdam o layout de .trail-x__cta; só o tratamento
+   cromático é modulado para leitura imediata do estado.
+------------------------------------------------------------- */
+:where(.membros-hub) .trail-x.is-locked .trail-x__cta--info{
+  background: rgba(2, 2, 26, 0.55);
+  color: var(--udx-text);
+  border: 1px solid var(--udx-border);
+  box-shadow: none;
+}
+:where(.membros-hub) .trail-x.is-locked .trail-x__cta--info:hover,
+:where(.membros-hub) .trail-x.is-locked .trail-x__cta--info:focus-visible{
+  background: rgba(223, 224, 242, 0.06);
+  border-color: var(--udx-primary-hot);
+  color: #fff;
+}
+:where(.membros-hub) .trail-x.is-locked .trail-x__cta--info .mdi{ font-size: 15px; }
+
+/* -------------------------------------------------------------
+   Meus Apps (rodadas 23/24) — tema institucional Up Dance Xperience.
+   Tons e gradientes reproduzem os tokens --udx-* da página /entrar/
+   (painel institucional .auth-left): fundo navy → índigo com brilhos
+   rosa (#FA33A1) e roxo (#430ABF), selo vinho → roxo (#BF0449 →
+   #5708A6), destaque Playfair rosa → laranja e CTA vinho com hover
+   rosa → laranja. Valores literais (com fallback --udx-* onde a página
+   já usa a variável): esta página não define os gradientes --udx-grad-*.
+   Não usa --seg-*: o destaque não herda a paleta rosa/laranja do hub.
+------------------------------------------------------------- */
+:where(.membros-hub) .meus-apps{ padding-bottom: 0; }
+:where(.membros-hub) .meus-apps__box{
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+  padding: 32px;
+  border-radius: var(--udx-radius-lg, 16px);
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(250, 51, 161, 0.20), transparent 55%),
+    radial-gradient(110% 100% at 85% 90%, rgba(67, 10, 191, 0.35), transparent 60%),
+    linear-gradient(160deg, #1a0033 0%, #02021a 50%, #0a0140 100%);
+  border: 1px solid var(--udx-border, rgba(223, 224, 242, 0.12));
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.42);
+}
+/* marca-d'água "UPDANCE" — mesma assinatura do painel de /entrar/ */
+:where(.membros-hub) .meus-apps__box::after{
+  content: 'UPDANCE';
+  position: absolute; right: -10px; bottom: -38px;
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 120px; letter-spacing: 6px; line-height: 1;
+  color: rgba(250, 51, 161, 0.05);
+  pointer-events: none; white-space: nowrap;
+}
+:where(.membros-hub) .meus-apps__icon, :where(.membros-hub) .meus-apps__txt{ position: relative; z-index: 1; }
+:where(.membros-hub) .meus-apps__icon{
+  flex-shrink: 0; width: 72px; height: 72px; border-radius: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #BF0449 0%, #5708A6 100%);
+  color: #fff; font-size: 38px;
+  box-shadow: 0 4px 16px rgba(191, 4, 73, 0.38);
+}
+:where(.membros-hub) .meus-apps__txt{ flex: 1; min-width: 240px; }
+:where(.membros-hub) .meus-apps__tag{
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--udx-primary-hot, #FA33A1);
+}
+:where(.membros-hub) .meus-apps__tag::before{
+  content: ''; width: 28px; height: 2px;
+  background: linear-gradient(to right, #BF0449, #FA33A1);
+}
+:where(.membros-hub) .meus-apps__txt h2{ margin: 10px 0 8px; color: var(--udx-text, #DFE0F2); }
+:where(.membros-hub) .meus-apps__txt h2 em{
+  font-family: 'Playfair Display', serif; font-style: italic;
+  background: linear-gradient(to top, #fb8460, #f13aa1);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+:where(.membros-hub) .meus-apps__txt p{
+  margin: 0 0 18px; max-width: 560px;
+  color: var(--udx-text-muted, #b0b3cc); line-height: 1.7;
+}
+:where(.membros-hub) .meus-apps__cta{
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px; border-radius: 9px;
+  background-color: #BF0449; color: #fff;
+  font-family: var(--udx-font, 'Poppins', sans-serif);
+  font-weight: 600; text-decoration: none;
+  box-shadow: 0 4px 16px rgba(191, 4, 73, 0.38);
+  transition: background-color .25s, box-shadow .25s, transform .15s;
+}
+:where(.membros-hub) .meus-apps__cta:hover,
+:where(.membros-hub) .meus-apps__cta:focus-visible{
+  background-image: linear-gradient(to right, #F434A1, #ff8442);
+  box-shadow: 0 6px 20px rgba(250, 51, 161, 0.42);
+  transform: translateY(-1px);
+  color: #fff;
+}
+@media (max-width: 480px){
+  :where(.membros-hub) .meus-apps__box{ padding: 24px 20px; gap: 18px; }
+  :where(.membros-hub) .meus-apps__box::after{ font-size: 80px; bottom: -26px; }
+}
+
+/* -------------------------------------------------------------
+   Minhas Trilhas (rodada 25) — reaproveita o componente de destaque
+   .meus-apps__* (mesmo tema UDX) e acrescenta só a lista de trilhas.
+   Tons: os mesmos rgba(250,51,161,…) dos itens do painel de /entrar/.
+------------------------------------------------------------- */
+:where(.membros-hub) .minhas-trilhas[hidden], :where(.membros-hub) .meus-apps__cta[hidden]{ display: none; }
+/* display:inline-flex do selo anulava o atributo hidden (mostrava "—" antes da sessão) */
+:where(.membros-hub) .members-topbar .type-badge[hidden]{ display: none; }
+:where(.membros-hub) .minhas-trilhas__lista{
+  list-style: none; margin: 0 0 18px; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+:where(.membros-hub) .minhas-trilhas__lista li{ margin: 0; padding: 0; }
+:where(.membros-hub) .minhas-trilhas__item{
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 50px;
+  font-size: 12.5px; font-weight: 600; line-height: 1.3; text-decoration: none;
+  color: var(--udx-text, #DFE0F2);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(223, 224, 242, 0.18);
+  transition: border-color .2s, background-color .2s, transform .15s;
+}
+:where(.membros-hub) .minhas-trilhas__item .mdi{ font-size: 16px; color: var(--udx-primary-hot, #FA33A1); }
+:where(.membros-hub) .minhas-trilhas__item small{ font-size: 11.5px; font-weight: 500; color: var(--udx-text-muted, #b0b3cc); }
+:where(.membros-hub) a.minhas-trilhas__item:hover,
+:where(.membros-hub) a.minhas-trilhas__item:focus-visible{
+  border-color: rgba(250, 51, 161, 0.45);
+  background: rgba(250, 51, 161, 0.08);
+  color: #fff; transform: translateY(-1px);
+}
+:where(.membros-hub) .minhas-trilhas__item.is-atual{
+  border-color: rgba(250, 51, 161, 0.55);
+  background: rgba(250, 51, 161, 0.12);
+}
+:where(.membros-hub) .minhas-trilhas__item.is-locked{ opacity: .6; }
+:where(.membros-hub) .minhas-trilhas__item.is-locked .mdi{ color: var(--udx-text-muted, #b0b3cc); }
+
+/* -------------------------------------------------------------
+   Destaques lado a lado (rodada 26)
+   • mobile (< 768px): um abaixo do outro, largura total; dentro do
+     cartão vale o layout de .meus-apps__box (ícone ao lado do texto
+     quando cabe, acima dele quando não cabe);
+   • tablet e desktop (>= 768px): lado a lado, mesma altura, ícone acima
+     do texto e botão alinhado na base dos dois cartões.
+   Flex (e não grid de 2 colunas): o cartão oculto não reserva espaço,
+   então Meus Apps sozinho ocupa a largura toda.
+------------------------------------------------------------- */
+:where(.membros-hub) .destaques{ padding-bottom: 0; }
+:where(.membros-hub) .destaques__grid{ display: flex; flex-direction: column; gap: 18px; }
+:where(.membros-hub) .destaques__grid > .meus-apps{ display: flex; min-width: 0; }
+:where(.membros-hub) .destaques__grid > .meus-apps > .meus-apps__box{ flex: 1 1 auto; min-width: 0; }
+/* display:flex acima anularia o atributo hidden — reafirma-o depois */
+:where(.membros-hub) .destaques__grid > [hidden]{ display: none; }
+@media (min-width: 768px){
+  :where(.membros-hub) .destaques__grid{ flex-direction: row; align-items: stretch; gap: 20px; }
+  :where(.membros-hub) .destaques__grid > .meus-apps{ flex: 1 1 0; }
+  :where(.membros-hub) .destaques__grid .meus-apps__box{
+    flex-direction: column; align-items: flex-start; flex-wrap: nowrap;
+    gap: 20px; padding: 28px;
+  }
+  :where(.membros-hub) .destaques__grid .meus-apps__txt{
+    display: flex; flex-direction: column; align-items: flex-start;
+    flex: 1 1 auto; width: 100%; min-width: 0;
+  }
+  :where(.membros-hub) .destaques__grid .meus-apps__cta{ margin-top: auto; }
+  :where(.membros-hub) .destaques__grid .meus-apps__box::after{ font-size: 96px; bottom: -30px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  :where(.membros-hub) .trail-x, :where(.membros-hub) .ebooks-list a, :where(.membros-hub) .products-list a, :where(.membros-hub) .members-topbar .btn-sair, :where(.membros-hub) .meus-apps__cta, :where(.membros-hub) .minhas-trilhas__item{ transition: none; }
+  :where(.membros-hub) a.minhas-trilhas__item:hover, :where(.membros-hub) a.minhas-trilhas__item:focus-visible{ transform: none; }
+  :where(.membros-hub) .meus-apps__cta:hover, :where(.membros-hub) .meus-apps__cta:focus-visible{ transform: none; }
+}
+
+/* -------------------------------------------------------------
+   Rodada 33 — antes eram atributos style="" no HTML
+------------------------------------------------------------- */
+:where(.membros-hub) .members-hero__stats{ margin-top: 26px; }
+:where(.membros-hub) .members-hero__actions{ margin-top: 22px; }
+:where(.membros-hub) .trails-section.trails-section--sem-topo{ padding-top: 0; }
+:where(.membros-hub) .lock-note.lock-note--espaco{ margin-top: 10px; }
+
+
+/* ---------------- 10b) vitrine do app ---------------- */
+/* ----------------------------------------------------------
+     Identificação de membro na vitrine /apps/
+     Espelha o padrão visual de /membros/index.html:
+       .members-topbar → barra sticky com marca + badge + Sair
+       .type-badge     → badge multi-tipo (types.join(' · '))
+       .type-chip      → chip "Conectado como email" no hero
+     Elementos internos usam o atributo HTML nativo `hidden`,
+     revelados por JS quando o guard confirma sessão.
+---------------------------------------------------------- */
+/*.page-apps{
+    --m-grad:      linear-gradient(135deg, #F434A1 0%, #ff8442 100%);
+    --m-grad-soft: linear-gradient(135deg, rgba(244,52,161,.18) 0%, rgba(255,132,66,.22) 100%);
+    --m-glow:      rgba(244, 52, 161, 0.32);
+    --seg-grad:    var(--m-grad);
+    --seg-glow:    var(--m-glow);
+}*/
+
+:where(.apps-vitrine) .members-topbar{
+    position: sticky; top: 0; z-index: 300;
+    display: flex; align-items: center; gap: .8rem;
+    padding: 12px 22px;
+    background: rgba(2, 2, 26, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--udx-border, rgba(255,255,255,.10));
+    box-shadow: 0 2px 24px rgba(0, 0, 0, 0.50);
+    flex-wrap: wrap;
+}
+:where(.apps-vitrine) .members-topbar img{ width: 34px; height: 34px; }
+:where(.apps-vitrine) .members-topbar .marca{
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1.25rem;
+    background: linear-gradient(to top, #fb8460, #f13aa1);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+:where(.apps-vitrine) .members-topbar .type-badge{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 50px;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--seg-grad); color: #fff;
+    box-shadow: 0 6px 18px var(--seg-glow);
+    max-width: 60vw; white-space: normal; line-height: 1.15;
+    font-size: 10.5px;
+}
+:where(.apps-vitrine) .members-topbar .type-badge .mdi{ font-size: 14px; }
+:where(.apps-vitrine) .members-topbar .spacer{ flex: 1; }
+:where(.apps-vitrine) .members-topbar .btn-sair{
+    background: transparent;
+    color: var(--udx-text, #DFE0F2);
+    border: 1.5px solid rgba(223, 224, 242, 0.40);
+    padding: 8px 16px; border-radius: var(--udx-radius-sm, 8px);
+    font-family: var(--udx-font, 'Poppins', sans-serif);
+    font-size: .88rem; font-weight: 500; cursor: pointer;
+    transition: background-color 280ms ease, border-color 280ms ease, color 280ms ease;
+}
+:where(.apps-vitrine) .members-topbar .btn-sair:hover{
+    background-color: rgba(223, 224, 242, 0.08);
+    border-color: var(--udx-primary-hot, #F434A1);
+    color: #fff;
+}
+
+/* Chip "Conectado como email" no hero da vitrine */
+:where(.apps-vitrine) .apps-hero .type-chip{
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 10px; margin-bottom:29px; padding: 6px 14px; border-radius: 50px;
+    background: rgba(2, 2, 26, 0.55);
+    border: 1px solid var(--udx-border, rgba(255,255,255,.10));
+    color: var(--udx-text, #DFE0F2);
+    font-size: 12px; font-weight: 600;
+}
+:where(.apps-vitrine) .apps-hero .type-chip .mdi{ font-size: 15px; color: #F434A1; }
+:where(.apps-vitrine) .apps-hero .type-chip b{ font-weight: 700; }
+:where(.apps-vitrine) .apps-hero .type-chip--warn{
+    border-color: rgba(255, 132, 66, .55);
+    background: rgba(255, 132, 66, .12);
+}
+:where(.apps-vitrine) .apps-hero .type-chip--warn .mdi{ color: #ff8442; }
+:where(.apps-vitrine) .apps-hero .type-chip--warn a{
+    color: #fff; text-decoration: underline; font-weight: 700; margin-left: 4px;
+}
+
+/* O atributo HTML nativo `hidden` já rege a visibilidade dos internos
+   (#typeBadge, #userChip). O browser aplica display:none automaticamente
+   enquanto o atributo estiver presente — padrão idêntico ao /membros/. */
+
+:where(.apps-vitrine) .members-topbar .btn-voltar,
+:where(.apps-vitrine) .members-topbar .btn-sair{ transition: none; margin-bottom:12px; }
+
+/*@media (prefers-reduced-motion: reduce){
+    .members-topbar .btn-sair{ transition: none; }
+}*/
