@@ -70,19 +70,6 @@
     "tipoMembro": "Estagiário(a)"
   },
   {
-    "id": "udx-insignia-profissional",
-    "nome": "Insígnia Profissional",
-    "categoria": "insignia",
-    "arquivo": "insignias/udx-insignia-profissional-256.webp",
-    "arquivoGrande": "insignias/udx-insignia-profissional-768.webp",
-    "quadro": {
-      "largura": 256,
-      "altura": 256
-    },
-    "quadros": 1,
-    "origem": "talentos"
-  },
-  {
     "id": "udx-insignia-monitor",
     "nome": "Insígnia de Monitor(a)",
     "categoria": "insignia",
@@ -109,6 +96,19 @@
     "quadros": 1,
     "origem": "membro",
     "tipoMembro": "Assistente"
+  },
+  {
+    "id": "udx-insignia-profissional",
+    "nome": "Insígnia Profissional",
+    "categoria": "insignia",
+    "arquivo": "insignias/udx-insignia-profissional-256.webp",
+    "arquivoGrande": "insignias/udx-insignia-profissional-768.webp",
+    "quadro": {
+      "largura": 256,
+      "altura": 256
+    },
+    "quadros": 1,
+    "origem": "talentos"
   },
   {
     "id": "udx-insignia-participacao",
