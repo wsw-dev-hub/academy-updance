@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Área de Membros — Up Dance</title>
-<!-- Favicon -->
-<link rel="icon" type="image/png" href="/public/images/icons/udx-icon.ico">
-<link rel="shortcut icon" type="image/png" href="/public/images/icons/udx-icon.ico">
+<link rel="icon" type="image/x-icon" href="/images/icons/udx-icon.ico">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital@1&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.9.96/css/materialdesignicons.min.css">
@@ -362,7 +360,7 @@
      já usa a variável): esta página não define os gradientes --udx-grad-*.
      Não usa --seg-*: o destaque não herda a paleta rosa/laranja do hub.
   ------------------------------------------------------------- */
-  .meus-apps{ padding-bottom: 5%; }
+  .meus-apps{ padding-bottom: 0; }
   .meus-apps__box{
     position: relative; overflow: hidden;
     display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
@@ -434,8 +432,77 @@
     .meus-apps__box::after{ font-size: 80px; bottom: -26px; }
   }
 
+  /* -------------------------------------------------------------
+     Minhas Trilhas (rodada 25) — reaproveita o componente de destaque
+     .meus-apps__* (mesmo tema UDX) e acrescenta só a lista de trilhas.
+     Tons: os mesmos rgba(250,51,161,…) dos itens do painel de /entrar/.
+  ------------------------------------------------------------- */
+  .minhas-trilhas[hidden], .meus-apps__cta[hidden]{ display: none; }
+  /* display:inline-flex do selo anulava o atributo hidden (mostrava "—" antes da sessão) */
+  .members-topbar .type-badge[hidden]{ display: none; }
+  .minhas-trilhas__lista{
+    list-style: none; margin: 0 0 18px; padding: 0;
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .minhas-trilhas__lista li{ margin: 0; padding: 0; }
+  .minhas-trilhas__item{
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 50px;
+    font-size: 12.5px; font-weight: 600; line-height: 1.3; text-decoration: none;
+    color: var(--udx-text, #DFE0F2);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(223, 224, 242, 0.18);
+    transition: border-color .2s, background-color .2s, transform .15s;
+  }
+  .minhas-trilhas__item .mdi{ font-size: 16px; color: var(--udx-primary-hot, #FA33A1); }
+  .minhas-trilhas__item small{ font-size: 11.5px; font-weight: 500; color: var(--udx-text-muted, #b0b3cc); }
+  a.minhas-trilhas__item:hover,
+  a.minhas-trilhas__item:focus-visible{
+    border-color: rgba(250, 51, 161, 0.45);
+    background: rgba(250, 51, 161, 0.08);
+    color: #fff; transform: translateY(-1px);
+  }
+  .minhas-trilhas__item.is-atual{
+    border-color: rgba(250, 51, 161, 0.55);
+    background: rgba(250, 51, 161, 0.12);
+  }
+  .minhas-trilhas__item.is-locked{ opacity: .6; }
+  .minhas-trilhas__item.is-locked .mdi{ color: var(--udx-text-muted, #b0b3cc); }
+
+  /* -------------------------------------------------------------
+     Destaques lado a lado (rodada 26)
+     • mobile (< 768px): um abaixo do outro, largura total; dentro do
+       cartão vale o layout de .meus-apps__box (ícone ao lado do texto
+       quando cabe, acima dele quando não cabe);
+     • tablet e desktop (>= 768px): lado a lado, mesma altura, ícone acima
+       do texto e botão alinhado na base dos dois cartões.
+     Flex (e não grid de 2 colunas): o cartão oculto não reserva espaço,
+     então Meus Apps sozinho ocupa a largura toda.
+  ------------------------------------------------------------- */
+  .destaques{ padding-bottom: 0; }
+  .destaques__grid{ display: flex; flex-direction: column; gap: 18px; }
+  .destaques__grid > .meus-apps{ display: flex; min-width: 0; }
+  .destaques__grid > .meus-apps > .meus-apps__box{ flex: 1 1 auto; min-width: 0; }
+  /* display:flex acima anularia o atributo hidden — reafirma-o depois */
+  .destaques__grid > [hidden]{ display: none; }
+  @media (min-width: 768px){
+    .destaques__grid{ flex-direction: row; align-items: stretch; gap: 20px; }
+    .destaques__grid > .meus-apps{ flex: 1 1 0; }
+    .destaques__grid .meus-apps__box{
+      flex-direction: column; align-items: flex-start; flex-wrap: nowrap;
+      gap: 20px; padding: 28px;
+    }
+    .destaques__grid .meus-apps__txt{
+      display: flex; flex-direction: column; align-items: flex-start;
+      flex: 1 1 auto; width: 100%; min-width: 0;
+    }
+    .destaques__grid .meus-apps__cta{ margin-top: auto; }
+    .destaques__grid .meus-apps__box::after{ font-size: 96px; bottom: -30px; }
+  }
+
   @media (prefers-reduced-motion: reduce){
-    .trail-x, .ebooks-list a, .products-list a, .members-topbar .btn-sair, .meus-apps__cta{ transition: none; }
+    .trail-x, .ebooks-list a, .products-list a, .members-topbar .btn-sair, .meus-apps__cta, .minhas-trilhas__item{ transition: none; }
+    a.minhas-trilhas__item:hover, a.minhas-trilhas__item:focus-visible{ transform: none; }
     .meus-apps__cta:hover, .meus-apps__cta:focus-visible{ transform: none; }
   }
 </style>
@@ -451,7 +518,7 @@
       <span id="typeBadgeLabel">—</span>
     </span>
     <span class="spacer"></span>
-    <a class="btn-sair btn-perfil" href="https://app.updance.workers.dev">
+    <a class="btn-sair btn-perfil" href="/meus-apps/">
       <span class="mdi mdi-apps" aria-hidden="true"></span>
       Meus Apps
     </a>
@@ -503,27 +570,56 @@
       </div>
     </section>
 
-    <!-- SEÇÃO EM DESTAQUE — MEUS APPS (rodada 23)
-         Leva ao app-updance já conectado: /meus-apps/ passa pela bridge do
-         academy (handoff da sessão). O catálogo de apps fica só na vitrine do
-         app (fonte única); aqui não há lista duplicada. -->
-    <section class="trails-section meus-apps" id="meusApps" aria-labelledby="meusAppsTitulo">
+    <!-- DESTAQUES (rodadas 23/25/26) — "Meus Apps" e "Minhas Trilhas"
+         lado a lado no tablet/desktop (>= 768px) e um abaixo do outro no
+         mobile. Um único container: os dois cartões dividem a mesma linha.
+         • Meus Apps: /meus-apps/ passa pela bridge do academy (handoff da
+           sessão); o catálogo de apps fica só na vitrine do app (fonte única).
+         • Minhas Trilhas: conteúdo de /api/me/access (recursos com r.trilha,
+           na ordem r.trilha_ordem); oculta até haver ao menos uma trilha —
+           nesse caso Meus Apps ocupa a largura toda. -->
+    <section class="trails-section destaques" aria-label="Destaques da área de membros">
       <div class="auto-container">
-        <div class="meus-apps__box">
-          <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-apps"></span></span>
-          <div class="meus-apps__txt">
-            <span class="meus-apps__tag">Meus Apps</span>
-            <h2 id="meusAppsTitulo">Suas <em>ferramentas de análise</em> em um clique</h2>
-            <p>
-              Os apps da Up Dance analisam, avaliam e refinam a sua dança.
-              Você entra já conectado, sem fazer login de novo; o que estiver
-              fora do seu plano continua bloqueado lá dentro.
-            </p>
-            <a class="meus-apps__cta" href="https://app.updance.workers.dev">
-              <span class="mdi mdi-open-in-app" aria-hidden="true"></span>
-              Abrir Meus Apps
-            </a>
+        <div class="destaques__grid">
+
+          <div class="meus-apps" id="meusApps" role="region" aria-labelledby="meusAppsTitulo">
+            <div class="meus-apps__box">
+              <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-apps"></span></span>
+              <div class="meus-apps__txt">
+                <span class="meus-apps__tag">Meus Apps</span>
+                <h2 id="meusAppsTitulo">Suas <em>ferramentas de análise</em> em um clique</h2>
+                <p>
+                  Os apps da Up Dance analisam, avaliam e refinam a sua dança.
+                  Você entra já conectado, sem fazer login de novo; o que estiver
+                  fora do seu plano continua bloqueado lá dentro.
+                </p>
+                <a class="meus-apps__cta" href="/meus-apps/">
+                  <span class="mdi mdi-open-in-app" aria-hidden="true"></span>
+                  Abrir Meus Apps
+                </a>
+              </div>
+            </div>
           </div>
+
+          <div class="meus-apps minhas-trilhas" id="minhasTrilhas" role="region" aria-labelledby="minhasTrilhasTitulo" hidden>
+            <div class="meus-apps__box">
+              <span class="meus-apps__icon" aria-hidden="true"><span class="mdi mdi-compass-outline"></span></span>
+              <div class="meus-apps__txt">
+                <span class="meus-apps__tag">Minhas Trilhas</span>
+                <h2 id="minhasTrilhasTitulo">Sua <em>jornada na dança</em>, nível a nível</h2>
+                <p>
+                  Desafios, XPE e insígnias organizados por nível. Continue de onde
+                  parou; as trilhas acima do seu plano aparecem bloqueadas.
+                </p>
+                <ul class="minhas-trilhas__lista" id="minhasTrilhasLista" aria-label="Trilhas da Up Dance"></ul>
+                <a class="meus-apps__cta" id="minhasTrilhasCta" href="#" hidden>
+                  <span class="mdi mdi-play-circle-outline" aria-hidden="true"></span>
+                  <span id="minhasTrilhasCtaTxt">Continuar minha trilha</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -684,6 +780,53 @@
     var novidadesSection = document.getElementById('novidadesSection');
     var novidadesList    = document.getElementById('novidadesList');
     var recursosSection  = document.getElementById('recursosSection');
+    var trilhasSection   = document.getElementById('minhasTrilhas');
+    var trilhasLista     = document.getElementById('minhasTrilhasLista');
+    var trilhasCta       = document.getElementById('minhasTrilhasCta');
+    var trilhasCtaTxt    = document.getElementById('minhasTrilhasCtaTxt');
+
+    // Rodada 25 — só aceita caminho relativo ao site ou https (nunca javascript:, //host).
+    function hrefSeguro(h){
+      return (typeof h === 'string' && /^(\/(?!\/)|https:\/\/)/.test(h)) ? h : '';
+    }
+
+    /* Rodada 25 — "Minhas Trilhas". Recursos com r.trilha, em ordem de progressão.
+       Trilha atual = a de maior ordem liberada e com destino (path_prefix).
+       Liberada → link para a trilha; bloqueada → landing do plano (mesma regra
+       dos cards); sem destino → "Em breve". Sem trilhas na resposta (ex.: worker
+       anterior à rodada 25), a seção continua oculta. */
+    function renderTrilhas(recursos){
+      if (!trilhasSection || !trilhasLista) return;
+      var trilhas = recursos
+        .filter(function(r){ return r && r.trilha; })
+        .sort(function(a, b){ return (a.trilha_ordem || 0) - (b.trilha_ordem || 0); });
+      if (!trilhas.length) return;
+
+      var atual = null;
+      trilhas.forEach(function(r){ if (r.allowed && hrefSeguro(r.path_prefix)) atual = r; });
+
+      trilhasLista.innerHTML = trilhas.map(function(r){
+        var href = r.allowed
+          ? hrefSeguro(r.path_prefix)
+          : (r.level ? '/planos/' + encodeURIComponent(r.level) + '/' : '');
+        var estado = !r.allowed ? 'Bloqueada'
+                   : (!href ? 'Em breve' : (r === atual ? 'Atual' : 'Liberada'));
+        var cls = 'minhas-trilhas__item' + (r === atual ? ' is-atual' : '') + (r.allowed ? '' : ' is-locked');
+        var inner =
+          '<span class="mdi mdi-' + esc(r.allowed ? safeIcon(r.icon) : 'lock-outline') + '" aria-hidden="true"></span>' +
+          esc(r.label || r.key) + ' <small>· ' + estado + '</small>';
+        return '<li>' + (href
+          ? '<a class="' + cls + '" href="' + esc(href) + '"' + (r === atual ? ' aria-current="true"' : '') + '>' + inner + '</a>'
+          : '<span class="' + cls + '">' + inner + '</span>') + '</li>';
+      }).join('');
+
+      if (atual && trilhasCta) {
+        trilhasCta.href = hrefSeguro(atual.path_prefix);
+        trilhasCtaTxt.textContent = 'Continuar: ' + (atual.label || atual.key);
+        trilhasCta.hidden = false;
+      }
+      trilhasSection.hidden = false;
+    }
 
     fetch('/api/me', { credentials: 'same-origin' })
       .then(function(r){ return r.ok ? r.json() : null; })
@@ -711,6 +854,7 @@
         var liberados = 0;
         recursos.forEach(function(r){ if(r.allowed) liberados++; });
         statResources.textContent = liberados;
+        renderTrilhas(recursos);   // rodada 25
 
         // Novidade = recurso criado nos últimos NOVIDADE_DIAS dias (created_at vem do backend)
         var NOVIDADE_DIAS = 14;
