@@ -2727,6 +2727,53 @@ textarea { overflow: hidden; }
    margin-top negativos das classes .floor/.footer/.on-footer
    definidas em mediaQuery.css para as outras páginas do projeto.
 ================================================================ */
+/* Dependências do Bootstrap 5.1.3 usadas pelo footer (grade .row/.col-* e
+   Reboot), para páginas que NÃO carregam o Bootstrap (ex.: /membros/ do
+   academy). :where(.blog-footer) limita ao footer sem somar peso: cada seletor
+   pesa o mesmo que no Bootstrap (".row" = classe, "ul" = elemento), então as
+   regras .blog-footer__* abaixo e mediaQuery.css continuam vencendo. Onde o
+   Bootstrap está presente, os valores são os mesmos dele.
+   a{text-decoration:none}: resultado final do blog (style.css anula o
+   sublinhado do Reboot). */
+:where(.blog-footer), :where(.blog-footer) *, :where(.blog-footer) *::before, :where(.blog-footer) *::after { box-sizing: border-box; }
+:where(.blog-footer) ul    { padding-left: 2rem; margin-top: 0; margin-bottom: 1rem; }
+:where(.blog-footer) ul ul { margin-bottom: 0; }
+:where(.blog-footer) h3    { margin-top: 0; margin-bottom: .5rem; font-weight: 500; line-height: 1.2; font-size: calc(1.3rem + .6vw); }
+:where(.blog-footer) p     { margin-top: 0; margin-bottom: 1rem; }
+:where(.blog-footer) a       { color: #0d6efd; text-decoration: none; }
+:where(.blog-footer) a:hover { color: #0a58ca; }
+:where(.blog-footer) b     { font-weight: bolder; }
+:where(.blog-footer) small { font-size: .875em; }
+:where(.blog-footer) img   { vertical-align: middle; }
+:where(.blog-footer) .row {
+    --bs-gutter-x: 1.5rem; --bs-gutter-y: 0;
+    display: flex; flex-wrap: wrap;
+    margin-top: calc(-1 * var(--bs-gutter-y));
+    margin-right: calc(-.5 * var(--bs-gutter-x));
+    margin-left: calc(-.5 * var(--bs-gutter-x));
+}
+:where(.blog-footer) .row > * {
+    flex-shrink: 0; width: 100%; max-width: 100%;
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    padding-left: calc(var(--bs-gutter-x) * .5);
+    margin-top: var(--bs-gutter-y);
+}
+:where(.blog-footer) .col-4  { flex: 0 0 auto; width: 33.33333333%; }
+:where(.blog-footer) .col-5  { flex: 0 0 auto; width: 41.66666667%; }
+:where(.blog-footer) .col-12 { flex: 0 0 auto; width: 100%; }
+@media (min-width: 768px) {
+    :where(.blog-footer) .col-md-3 { flex: 0 0 auto; width: 25%; }
+    :where(.blog-footer) .col-md-6 { flex: 0 0 auto; width: 50%; }
+}
+@media (min-width: 992px) {
+    :where(.blog-footer) .col-lg-2 { flex: 0 0 auto; width: 16.66666667%; }
+    :where(.blog-footer) .col-lg-3 { flex: 0 0 auto; width: 25%; }
+    :where(.blog-footer) .col-lg-4 { flex: 0 0 auto; width: 33.33333333%; }
+}
+@media (min-width: 1200px) {
+    :where(.blog-footer) h3 { font-size: 1.75rem; }
+}
+
 .blog-footer {
     position: relative;          /* cria contexto de empilhamento próprio */
     z-index: 10;                 /* acima do #hero-blog::before (z-index: 9) */
@@ -2735,6 +2782,7 @@ textarea { overflow: hidden; }
     padding: 52px 0 0;
     margin-top: 64px;
     width: 100%;
+    line-height: 1.5;            /* = <body> do Bootstrap; páginas sem Bootstrap herdariam "normal" */
 }
 
 /* Grade das colunas */
@@ -2833,6 +2881,51 @@ textarea { overflow: hidden; }
 .blog-footer__bar b,
 .blog-footer__bar i {
     color: rgba(223, 224, 242, 0.65);
+}
+
+/* Frase de acesso restrito abaixo do copyright (áreas de membros) */
+.blog-footer__restrito {
+    display: block;
+    margin-top: 6px;
+    opacity: .85;
+}
+
+/* Ajustes por largura espelhados de mediaQuery.css, para páginas que NÃO
+   carregam mediaQuery.css (ex.: /membros/ do academy). Mesmos valores e
+   breakpoints; :where(.blog-footer) mantém o peso do seletor original.
+   Nas páginas que carregam mediaQuery.css (depois deste arquivo) estas
+   regras não têm efeito: ao alterar um valor lá, replique aqui. */
+@media screen and (max-width: 480px) {
+    :where(.blog-footer) .blog-logo-img     { height: 36px; }
+    .blog-footer                            { padding: 36px 0 0; margin-top: 40px; }
+    :where(.blog-footer) .blog-footer__col  { padding-left: 12px; padding-right: 12px; }
+    :where(.blog-footer) .blog-footer__cols { row-gap: 28px; padding-bottom: 32px; }
+}
+@media (min-width: 481px) and (max-width: 575px) {
+    :where(.blog-footer) .blog-logo-img     { height: 38px; }
+    .blog-footer                            { padding: 36px 0 0; margin-top: 40px; }
+    :where(.blog-footer) .blog-footer__col  { padding-left: 12px; padding-right: 12px; }
+    :where(.blog-footer) .blog-footer__cols { row-gap: 28px; padding-bottom: 32px; }
+}
+@media screen and (min-width: 576px)  { :where(.blog-footer) .blog-logo-img { height: 40px; } }
+@media screen and (min-width: 768px)  { :where(.blog-footer) .blog-logo-img { height: 42px; } }
+@media screen and (min-width: 842px)  { :where(.blog-footer) .blog-logo-img { height: 44px; } }
+@media screen and (min-width: 992px) {
+    :where(.blog-footer) .col-4         { flex: 0 0 auto !important; width: 33.3333% !important; }
+    :where(.blog-footer) .blog-logo-img { height: 44px; }
+}
+@media screen and (min-width: 1024px) {
+    :where(.blog-footer) .col-4         { flex: 0 0 auto !important; width: 33.3333% !important; }
+    :where(.blog-footer) .blog-logo-img { height: 46px; }
+}
+@media screen and (min-width: 1200px) {
+    :where(.blog-footer) .col-4          { flex: 0 0 auto !important; width: 33.3333% !important; display: contents; }
+    :where(.blog-footer) .auto-container { max-width: 1200px; }
+    :where(.blog-footer) .blog-logo-img  { height: 48px; }
+}
+@media screen and (min-width: 1440px) {
+    :where(.blog-footer) .auto-container { max-width: 1360px; }
+    :where(.blog-footer) .blog-logo-img  { height: 52px; }
 }
 
 
