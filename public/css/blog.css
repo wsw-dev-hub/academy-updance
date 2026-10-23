@@ -2838,6 +2838,8 @@ textarea { overflow: hidden; }
     color: var(--udx-text-muted);
     text-decoration: none;
     transition: color 250ms ease;
+    min-width: 0;                /* item flex: pode encolher abaixo da largura do texto */
+    overflow-wrap: anywhere;     /* texto longo (e-mail) quebra dentro da coluna em vez de invadir a vizinha ou vazar da tela */
 }
 .blog-footer__list li a:hover {
     color: var(--udx-primary-hot);
