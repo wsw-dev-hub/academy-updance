@@ -785,7 +785,7 @@ div {
 .to-top .mdi { font-size: 24px; }
 
 /* ====================================================================
-   MENU FLUTUANTE — ajustes por largura (< 768px) espelhados de mediaQuery.css
+   MENU FLUTUANTE — ajustes por largura (até 992px) espelhados de mediaQuery.css
    Para páginas que NÃO carregam mediaQuery.css (ex.: /membros/ do academy).
    Mesmos valores, seletores e ordem de mediaQuery.css. Ficam ANTES do bloco
    base abaixo, então o bloco base vence onde também define a propriedade —
@@ -827,6 +827,14 @@ div {
     .udx-fab__radial.is-open .udx-fab__item--tr  { transform: translate( 110px, -64px) scale(1); }
     .udx-fab__radial.is-open .udx-fab__item--bl  { transform: translate(-128px, 0)     scale(1); }
     .udx-fab__radial.is-open .udx-fab__item--br  { transform: translate( 128px, 0)     scale(1); }
+}
+@media screen and (min-width: 768px) {
+    .udx-fab                    { bottom: 24px; }
+    .udx-fab__radial            { width: 68px; height: 68px; }
+    .udx-fab__core              { width: 68px; height: 68px; }
+    .udx-fab__core-icon         { font-size: 30px; }
+    .udx-fab__item              { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
+    .udx-fab__item .mdi         { font-size: 24px; }
 }
 
 /* ====================================================================
@@ -1170,10 +1178,10 @@ div {
     --fab-glow:        rgba(111, 66, 193, .45);
 }
 
-/* Modificador opcional: menu só no mobile (< 768px). A partir de 768px some
-   por completo (tela, foco por teclado e leitores de tela). Usado nas áreas
-   de membros (academy /membros/ e vitrine do app); sem a classe, nada muda.
-   "Voltar ao topo" (.to-top) não é afetado. */
-@media (min-width: 768px) {
-    .udx-fab.udx-fab--mobile { display: none; }
+/* Modificador opcional: menu disponível até 992px (inclusive). A partir de
+   993px some por completo (tela, foco por teclado e leitores de tela).
+   Usado nas áreas de membros (academy /membros/ e vitrine do app); sem a
+   classe, nada muda. "Voltar ao topo" (.to-top) não é afetado. */
+@media (min-width: 993px) {
+    .udx-fab.udx-fab--ate-992 { display: none; }
 }

@@ -556,12 +556,19 @@
 
 
 /* ================================================================
+   MENU FLUTUANTE (FAB) — disponível até 992px (inclusive)
+   Oculto a partir de 993px. Em 992px ele convive com o menu do
+   cabeçalho, que passa a aparecer nessa largura (bloco abaixo).
+================================================================ */
+@media screen and (min-width: 993px) {
+    .udx-fab { display: none !important; }
+}
+
+
+/* ================================================================
    DESKTOP PEQUENO — 992px a 1023px
 ================================================================ */
 @media screen and (min-width: 992px) {
-    /* ── MENU FLUTUANTE (FAB) — oculto a partir do breakpoint do menu desktop ── */
-    .udx-fab { display: none !important; }
-
     .cleanner { margin-top: 0; }
 
     /* HEADER */
