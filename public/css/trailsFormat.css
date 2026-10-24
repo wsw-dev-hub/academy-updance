@@ -1853,7 +1853,7 @@
    já usa a variável): esta página não define os gradientes --udx-grad-*.
    Não usa --seg-*: o destaque não herda a paleta rosa/laranja do hub.
 ------------------------------------------------------------- */
-:where(.membros-hub) .meus-apps{ padding-bottom: 0; }
+:where(.membros-hub) .meus-apps{ padding-bottom: 5%; }
 :where(.membros-hub) .meus-apps__box{
   position: relative; overflow: hidden;
   display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
