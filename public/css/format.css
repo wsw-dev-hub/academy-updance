@@ -1185,3 +1185,45 @@ div {
 @media (min-width: 993px) {
     .udx-fab.udx-fab--ate-992 { display: none; }
 }
+
+/* ====================================================================
+   CABEÇALHO × MENU FLUTUANTE (até 992px)
+   Onde o menu flutuante existe, os dois se alternam:
+   • menu visível (.udx-fab.is-visible — o script da página liga essa classe
+     conforme a rolagem): o cabeçalho sai suavemente pelo topo;
+   • menu oculto (início da página, ou ao voltar ao topo): o cabeçalho
+     volta, suavemente, para top: 0.
+   Vale para o cabeçalho das áreas de membros (.members-topbar) e o do blog
+   (header.blog-header). Acima de 992px o cabeçalho fica sempre visível.
+   transform/opacity não mexem no layout: a página não "pula".
+   Navegador sem suporte a :has() mantém o cabeçalho sempre visível.
+==================================================================== */
+@media (max-width: 992px) {
+    /* No blog o header fica dentro de <div class="container-fluid p-0">, da
+       mesma altura dele: o position: sticky do header não tinha espaço para
+       agir e ele rolava junto com a página. Até 992px quem gruda em top: 0 é
+       esse invólucro; layout e altura não mudam. */
+    :where(.container-fluid):has(> header.blog-header) {
+        position: sticky;
+        top: 0;
+        z-index: 300;
+    }
+    .members-topbar,
+    header.blog-header {
+        transition: transform 320ms ease, opacity 320ms ease, visibility 0s linear 0s;
+    }
+    :root:has(.udx-fab.is-visible) .members-topbar,
+    :root:has(.udx-fab.is-visible) header.blog-header {
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden !important;   /* blog.css fixa visibility: visible !important no header do blog */
+        pointer-events: none;
+        transition: transform 320ms ease, opacity 320ms ease, visibility 0s linear 320ms;
+    }
+}
+@media (max-width: 992px) and (prefers-reduced-motion: reduce) {
+    .members-topbar,
+    header.blog-header,
+    :root:has(.udx-fab.is-visible) .members-topbar,
+    :root:has(.udx-fab.is-visible) header.blog-header { transition: none; }
+}
